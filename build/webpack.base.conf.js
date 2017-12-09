@@ -30,16 +30,18 @@ let webpackConfig = {
   },
   module: {
     rules: [
-      ...(config.dev.useEslint? [{
-        test: /\.(js|vue)$/,
-        loader: 'eslint-loader',
-        enforce: 'pre',
-        include: [resolve('src'), resolve('test')],
-        options: {
-          formatter: require('eslint-friendly-formatter'),
-          emitWarning: !config.dev.showEslintErrorsInOverlay
-        }
-      }] : []),
+      ...(config.dev.useEslint? [
+      //   {
+      //   test: /\.(js|vue)$/,
+      //   loader: 'eslint-loader',
+      //   enforce: 'pre',
+      //   include: [resolve('src'), resolve('test')],
+      //   options: {
+      //     formatter: require('eslint-friendly-formatter'),
+      //     emitWarning: !config.dev.showEslintErrorsInOverlay
+      //   }
+      // }
+    ] : []),
       {
         test: /\.vue$/,
         loader: 'vue-loader',
@@ -80,5 +82,20 @@ let webpackConfig = {
 
 
 module.exports = vuxLoader.merge(webpackConfig, {
-  plugins: ['vux-ui', 'progress-bar', 'duplicate-style']
+  plugins: [
+    {
+      name: 'vux-ui'
+    },
+    {
+      name: 'progress-bar'
+    },
+    {
+      name: 'duplicate-style'
+    },
+    {
+      name: 'less-theme',
+      path: 'src/style/theme.less'
+    }
+  ]
+  // plugins: ['vux-ui', 'progress-bar', 'duplicate-style']
 })

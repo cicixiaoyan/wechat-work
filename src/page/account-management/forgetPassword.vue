@@ -1,9 +1,5 @@
 <template>
   <div>
-    <group title="cell demo">
-      <x-input title="手机号" v-model="username"></x-input>
-      <x-input title="密码" v-model="password"></x-input>
-    </group>
   </div>
 </template>
 
@@ -11,7 +7,6 @@
 import { Group, Cell } from 'vux';
 
 export default {
-  name: 'forgetPassword',
   components: {
     Group,
     Cell

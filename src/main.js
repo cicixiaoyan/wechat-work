@@ -4,20 +4,26 @@ import Vue from 'vue';
 import FastClick from 'fastclick';
 import VueRouter from 'vue-router';
 import App from './App';
-// import Home from './components/HelloFromVux';
-import router from './router/router';
+// import Home from './components/HelloFromVux'
+import routers from './router/routers';
+
 Vue.use(VueRouter);
 
-const routers = new VueRouter({
-  router,
-  strict: process.env.NODE_ENV !== 'production'
+// const routes = [{
+//   path: '/',
+//   component: Home
+// }]
+
+const router = new VueRouter({
+  routes: routers
 });
 
 FastClick.attach(document.body);
+
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({
-  routers,
+  router,
   render: h => h(App)
 }).$mount('#app-box');

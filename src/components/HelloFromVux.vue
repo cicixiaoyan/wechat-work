@@ -1,38 +1,28 @@
 <template>
   <div>
-    <group>
-      <cell is-link title="Simple" link="/component/tabbar-simple"></cell>
-      <cell is-link title="Switch icons" link="/component/tabbar-icon"></cell>
-    </group>
     <tabbar>
-      <tabbar-item>
-        <!-- <img slot="icon" src="../assets/logo.png"> -->
-        <span slot="label">首页</span>
+      <tabbar-item  link="../page/account-management/register" :selected="$route.path === '/app/register'">
+        <img slot="icon" class="iconfont icon-tasklist">
+        <span slot="label">体检</span>
       </tabbar-item>
       <tabbar-item show-dot>
-        <!-- <img slot="icon" src="../assets/logo.png"> -->
-        <span slot="label">预约</span>
+        <img slot="icon" class="iconfont icon-tasklist">
+        <span slot="label" link="../page/appointment/add">审核</span>
       </tabbar-item>
-      <tabbar-item selected link="/login">
-        <!-- <img slot="icon" src="../logo.png"> -->
-        <span slot="label">人员</span>
-      </tabbar-item>
-      <tabbar-item badge="2">
-        <!-- <img slot="icon" src="../logo.png"> -->
-        <span slot="label">设置</span>
+      <tabbar-item link="../page/account-management/login">
+        <img slot="icon" class="iconfont icon-tasklist">
+        <span slot="label" >个人中心</span>
       </tabbar-item>
     </tabbar>
   </div>
 </template>
 
 <script>
-import { Group, Cell, Tabbar, TabbarItem } from 'vux';
+import { Tabbar, TabbarItem } from 'vux';
 export default {
   components: {
     Tabbar,
-    TabbarItem,
-    Group,
-    Cell
+    TabbarItem
   },
   data () {
     return {
