@@ -1,5 +1,5 @@
 import { AjaxPlugin } from 'vux'
-
+import { store } form '../store'
 // function htttpRequest(url, params, cb) {
 //     let dataStr = ''
 //     for (let key in params) {
@@ -14,7 +14,8 @@ import { AjaxPlugin } from 'vux'
 // }
 function json2url (json, isQueryToken) {
   if (!isQueryToken) {
-    const accessToken = window.localStorage.getItem('accessToken');
+    const accessToken = store.state.userInfo.accessToken;
+    // const accessToken = window.localStorage.getItem('accessToken');
     json.accessToken = accessToken; // 每次请求都带上accessToken
     console.log(accessToken);
   }
@@ -27,7 +28,7 @@ function json2url (json, isQueryToken) {
   return arr.join('&');
 }
 
-var getInfo = (url = '', data = {}, isQueryToken = false, type = 'post') => {
+var getInfo = (url = '', data = {}, isQueryToken = true, type = 'post') => {
   var params = json2url(data, isQueryToken);
   if (type === 'get') {
     AjaxPlugin.$http.post(url, params);

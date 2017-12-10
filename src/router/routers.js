@@ -4,17 +4,18 @@ import App from '../App';
 
 export default [
   {
-    path: '/app',
+    path: '/',
     // name: 'app',
     component: App,
+    redirect: '/app/login',
     children: [
       {
-        path: '',
+        path: '/app/tab',
+        name: 'tab',
         component: function (resolve) {
-          require(['../components/HelloFromVux'], resolve);
+          require(['../components/tab'], resolve);
         }
-      },
-      {
+      },      {
         path: '/app/upload-img',
         name: 'uploadImg',
         component: function (resolve) {
@@ -57,7 +58,7 @@ export default [
         }
       },
       {
-        path: '/app/appointment/view',
+        path: '/app/appointment/view/:id',
         name: 'appointment-view',
         component: function (resolve) {
           require(['../page/appointment/view'], resolve);

@@ -57,6 +57,9 @@ export default {
 
 <style lang="less">
   @import '../../style/common.less';
+  body{
+    background: #fff;
+  }
   .logo{
     .px2rem(width, 200);
     .px2rem(height, 200);

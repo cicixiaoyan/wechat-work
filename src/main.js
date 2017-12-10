@@ -5,10 +5,13 @@ import FastClick from 'fastclick';
 import VueRouter from 'vue-router';
 import App from './App';
 // import Home from './components/HelloFromVux'
+import store from './store';
 import routers from './router/routers';
+import { ToastPlugin, ConfirmPlugin } from 'vux';
 
 Vue.use(VueRouter);
-
+Vue.use(ToastPlugin);
+Vue.use(ConfirmPlugin);
 // const routes = [{
 //   path: '/',
 //   component: Home
@@ -25,5 +28,6 @@ Vue.config.productionTip = false;
 /* eslint-disable no-new */
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app-box');

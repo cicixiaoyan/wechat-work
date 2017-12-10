@@ -1,6 +1,6 @@
 <template>
   <div>
-    <x-header>用户登陆</x-header>
+    <x-header>用户注册</x-header>
     <div class="text-center">
       <img src="../../assets/logo.png" class="logo" title="logo"/>
       <div class="title">从业人员健康体检信息大数据平台</div>
@@ -60,6 +60,9 @@ export default {
 
 <style lang="less">
   @import '../../style/common.less';
+  body{
+    background: #fff;
+  }
   .logo{
     .px2rem(width, 200);
     .px2rem(height, 200);
@@ -163,4 +166,3 @@ export default {
 
 
 </style>
-

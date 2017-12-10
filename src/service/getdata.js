@@ -1,6 +1,6 @@
 import {getInfo} from '../config/axois';
 
-const url = process.env.NODE_ENV === 'development' ? '' : '';
+const url = process.env.NODE_ENV === 'development' ? 'http://192.168.0.49:789' : '';
 /*****************************************************/
 /**************** acconunt-management ****************/
 /*****************************************************/

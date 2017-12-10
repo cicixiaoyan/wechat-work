@@ -1,13 +1,55 @@
 <template>
   <div id="app" class="app">
     <router-view></router-view>
+    <!-- <tabbar  v-show="!showTabbar" slot="bottom">
+      <tabbar-item  :link="{name: 'register' }">
+        <img slot="icon" class="iconfont icon-task_fill">
+        <span slot="label">体检</span>
+      </tabbar-item>
+      <tabbar-item show-dot :link="{path: '/app/register' }">
+        <img slot="icon" class="iconfont icon-task_fill">
+        <span slot="label" link="../page/appointment/add">审核</span>
+      </tabbar-item>
+      <tabbar-item :link="{path: '/app/register' }">
+        <img slot="icon" class="iconfont icon-task_fill">
+        <span slot="label" >个人中心</span>
+      </tabbar-item>
+    </tabbar> -->
   </div>
 </template>
 
 <script>
 import './utils/device';
 export default {
-  name: 'app'
+  name: 'app',
+  data() {
+    return {
+    }
+  },
+  computed: {
+    // showTabbar () {
+    //   return /tabbar/.test(this.$route.path);
+    // },
+  },
+  watch: {
+    // path (path) {
+    //   if (path === '/component/demo') {
+    //     this.$router.replace('/demo')
+    //     return
+    //   }
+    //   if (path === '/demo') {
+    //     setTimeout(() => {
+    //       this.box = document.querySelector('#demo_list_box')
+    //       if (this.box) {
+    //         this.box.removeEventListener('scroll', this.handler, false)
+    //         this.box.addEventListener('scroll', this.handler, false)
+    //       }
+    //     }, 1000)
+    //   } else {
+    //     this.box && this.box.removeEventListener('scroll', this.handler, false)
+    //   }
+    // }
+  }
 };
 </script>
 
@@ -15,13 +57,13 @@ export default {
 <style lang="less">
 @import '/style/common.less';
 @import '~vux/src/styles/reset.less';
-@import '//at.alicdn.com/t/font_502622_dzphuykghuygmn29.css';
+@import '//at.alicdn.com/t/font_502622_e609vzsilv0r7ldi.css';
 
 html{
   font-size: 20px;
 }
 body {
-  background-color: #fff;
+  background-color: #f2f5f7;
   color: #333;
 }
 .round-big-btn{
@@ -43,9 +85,17 @@ body {
   }
 }
 
-
+.success{
+  color: #3c9;
+}
+.warning{
+  color: #ebc650;
+}
+.danger{
+  color: #f96868;
+}
 .weui-icon.weui_icon_clear{
-    .px2px(font-size, 24); 
+    .px2px(font-size, 24);
 }
 
 .app{
@@ -63,6 +113,7 @@ body {
       align-items: center;
       padding: 15px;
       position: relative;
+      background-color: #fff;
 
       &::before{
         content: " ";
@@ -78,7 +129,7 @@ body {
         -webkit-transform: scaleY(0.5);
         transform: scaleY(0.5);
         left: 15px;
-        
+
       }
 
       &:last-child{
@@ -87,18 +138,21 @@ body {
       }
 
 
-
+      h3{
+        .px2px(font-size, 36);
+        color: #333;
+      }
       h4{
-        .px2px(font-size, 32); 
+        .px2px(font-size, 32);
         color: #333;
       }
       p{
-        .px2px(font-size, 28); 
+        .px2px(font-size, 28);
         color: #919191;
       }
     }
 
-    &::before, 
+    &::before,
     &::after{
       content: " ";
       position: absolute;

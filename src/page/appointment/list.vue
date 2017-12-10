@@ -3,8 +3,8 @@
     <x-header>申请记录</x-header>
     <!-- <panel :footer="footer" :list="list" :type="type" @on-img-error="onImgError"></panel> -->
     <div class="list">
-      <div class="item" v-for="item in list">
-        <div class="left-ctx" 
+      <div class="item" v-for="item in list" @click='view(item.Id)'>
+        <div class="left-ctx"
         v-bind:class="{ 'warning': item.status=='待审核', 'danger': item.status=='未通过', 'success': item.status=='已通过' }">
           {{item.status}}
         </div>
@@ -18,14 +18,11 @@
 </template>
 
 <script>
-import { Group, Cell, Panel, XHeader } from 'vux';
+import {   XHeader } from 'vux';
 
 export default {
   name: 'appointment-list',
   components: {
-    Group,
-    Cell,
-    Panel,
     XHeader
   },
   data () {
@@ -34,36 +31,31 @@ export default {
       // with hot-reload because the reloaded component
       // preserves its current state and we are modifying
       // its initial state.
-      type: '1',
       list: [{
-        id: '1',
+        Id: '1',
         time: '2017-01-01 14:00:00',
         number: '50',
         status: '待审核'
-      }, 
+      },
       {
-        id: '2',
+        Id: '2',
         time: '2017-01-02 14:00:00',
         number: '51',
         status: '已通过'
-      }, 
+      },
       {
-        id: '3',
+        Id: '3',
         time: '2017-01-02 14:00:00',
         number: '50',
         status: '未通过'
-      }, 
-      ],
-      footer: {
-        // title: this.$t('more'),
-        url: 'http://vux.li'
-      }
+      },
+      ]
     };
   },
   methods: {
-    onImgError (item, $event) {
-      console.log(item, $event)
-    }
+    view(id){
+      this.$router.push({name: 'appointment-view', params: { 'id': id }});
+    },
   }
 };
 </script>
@@ -97,10 +89,10 @@ export default {
         }
       }
       .right-ctx {
-        
+
       }
 
     }
-    
+
   }
 </style>
