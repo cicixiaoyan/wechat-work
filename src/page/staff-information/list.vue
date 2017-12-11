@@ -1,10 +1,9 @@
 <template >
   <div class="myapp">
-    <x-header>成员列表({{totalNumber}})<a slot="left" @click="add">添加</a><a slot="right" @click='appointment'>预约</a></x-header>
+    <x-header>成员列表({{totalNumber}})<a slot="left" @click="showchecktime=true">添加</a><a slot="right" @click='appointment'>预约</a></x-header>
     <!-- <panel :footer="footer" :list="list" :type="type" @on-img-error="onImgError"></panel> -->
     <div class="list">
       <swipeout>
-
         <swipeout-item ref="swipeoutItem"  transition-mode="follow" v-for="(item, index) in list" :key="item.Id">
           <div slot="right-menu">
             <swipeout-button @click="deleteItem(index)" type="warn">删除</swipeout-button>
@@ -86,8 +85,8 @@ export default {
     Checklist,
     Flexbox,
     FlexboxItem,
-    Swipeout, 
-    SwipeoutItem, 
+    Swipeout,
+    SwipeoutItem,
     SwipeoutButton
   },
   data () {
@@ -100,6 +99,7 @@ export default {
       icd: '',
       checkAll: false,
       showpop: false,
+      showchecktime: false,
       checkedNumber: 0,
       totalNumber: 3,
       checkValue: [],
@@ -152,9 +152,6 @@ export default {
     },
     appointment() {
     },
-    add(){
-      this.showpop = true;
-    },
     submit() {
 
     },
@@ -167,7 +164,7 @@ export default {
       this.showpop = false;
     },
     deleteItem(index) {
-      
+
       let id = this.list[index].Id;
       // 根据id请求后台删除
 
@@ -239,7 +236,7 @@ export default {
   }
   .vux-flexbox.form-item{
     .px2px(font-size, 36);
-    
+
     .px2rem(padding-bottom, 36);
     > .form-item-left{
       flex-grow: 0;

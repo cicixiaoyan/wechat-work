@@ -34,14 +34,8 @@ const store = new Vuex.Store({
 		setNotMessageCount({commit}, count) {
 			commit('SETNOTMESSAGECOUNT', count);
 		},
-		updateDemoPosition (state, payload) {
-			state.demoScrollTop = payload.top
-		},
-		updateLoadingStatus (state, payload) {
-			state.isLoading = payload.isLoading
-		},
-		updateDirection (state, payload) {
-			state.direction = payload.direction
+		updateDemoPosition ({commit}, top) {
+			commit({type: 'updateDemoPosition', top: top})
 		}
 	},
 	mutations: {
@@ -65,8 +59,14 @@ const store = new Vuex.Store({
 		SETNOTMESSAGECOUNT (state, count) {
 			state.message_count = count;
 		},
-		updateDemoPosition ({commit}, top) {
-			commit({type: 'updateDemoPosition', top: top})
+		updateDemoPosition (state, payload) {
+			state.demoScrollTop = payload.top
+		},
+		updateLoadingStatus (state, payload) {
+			state.isLoading = payload.isLoading
+		},
+		updateDirection (state, payload) {
+			state.direction = payload.direction
 		}
 	},
 	getters: {

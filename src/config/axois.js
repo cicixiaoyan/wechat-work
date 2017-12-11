@@ -1,7 +1,5 @@
 import Vue from 'vue';
 import { AjaxPlugin, ToastPlugin } from 'vux';
-import { store } from '../store';
-
 
 function json2url (json) { //, isQueryToken
   var arr = [];
@@ -15,13 +13,14 @@ function json2url (json) { //, isQueryToken
 
 var getInfo = (url = '', data = {}, isQueryToken = true, type = 'post') => {
   var params = json2url(data); // , isQueryToken
-  // if()
-  // let header = isQueryToken? {'Authorization': "Bearer" + Vue.$store.state.userInfo.AccessToken} : {};
-let header = {};
+  let headers = {};
+  if(!!window.localStorage.getItem('userInfo') && isQueryToken){
+    let headers = {'Authorization': "Bearer" + window.localStorage.getItem('userInfo').AccessToken}
+  }
   if (type === 'get') {
     return AjaxPlugin.$http.get(url, params, {headers: header});
   } else if (type === 'get') {
-    return AjaxPlugin.$http.post(url, params , 
+    return AjaxPlugin.$http.post(url, params ,
       {headers: headers}
     ).then(function(response) {
       if(response.ResultType !== 0){
@@ -52,8 +51,8 @@ let header = {};
 
 
 
-// AjaxPlugin.$http.post("/apiv1/users/login", 
-// "username=ynkjd123456&pwd=ynk123456", 
+// AjaxPlugin.$http.post("/apiv1/users/login",
+// "username=ynkjd123456&pwd=ynk123456",
 // {
 // headers: {
 //   // Authorization: "Bearer" + user.access_token
