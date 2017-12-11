@@ -94,13 +94,20 @@ body {
 .danger{
   color: #f96868;
 }
+
+.gray{
+  color: #999;
+}
 .weui-icon.weui_icon_clear{
     .px2px(font-size, 24);
 }
 
 .app{
   .weui-cell{
-    padding: 0.4167rem 0.277rem;
+    .px2px(padding, 30); 
+
+    
+    // padding: 0.4167rem 0.277rem;
   }
   .list{
     position: relative;
@@ -111,7 +118,8 @@ body {
       -webkit-box-align: center;
       -ms-flex-align: center;
       align-items: center;
-      padding: 15px;
+      .px2px(padding, 30);
+      // padding: 15px;
       position: relative;
       background-color: #fff;
 
@@ -140,11 +148,13 @@ body {
 
       h3{
         .px2px(font-size, 36);
-        color: #333;
+        font-weight: normal;
+        color: #444;
       }
       h4{
         .px2px(font-size, 32);
-        color: #333;
+        font-weight: normal;
+        color: #444;
       }
       p{
         .px2px(font-size, 28);
@@ -167,6 +177,16 @@ body {
       -webkit-transform: scaleY(0.5);
       transform: scaleY(0.5);
     }
+  }
+
+  .vux-header .vux-header-left, .vux-header .vux-header-right{
+    // top: 14px;
+    .px2rem(top, 26);
+    display: block;
+    // font-size: 14px;
+    .px2px(font-size, 32);
+    .px2px(line-height, 40);
+    // line-height: 21px;
   }
 }
 </style>

@@ -15,7 +15,8 @@ export default [
         component: function (resolve) {
           require(['../components/tab'], resolve);
         }
-      },      {
+      },  
+      {
         path: '/app/upload-img',
         name: 'uploadImg',
         component: function (resolve) {

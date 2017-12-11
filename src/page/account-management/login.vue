@@ -15,11 +15,14 @@
         <input  placeholder="请输入登录"  type="password"  v-model="password">
       </div>
       <div class="remenber-password">
-        <div @click='remenberChange'>
-          <span class="iconfont icon-circle1" v-if="!remenber"></span>
-          <span class="iconfont icon-circle" v-if="remenber"></span>
-          <input  type="checkbox"  v-model="remenber">记住密码
-        </div>
+        <div >
+          <label for="" @click='remenberChange'>
+            <span class="iconfont icon-circle1" v-if="!remenber"></span>
+            <span class="iconfont icon-circle" v-if="remenber"></span>
+            <input  type="checkbox"  v-model="remenber">记住密码
+          </label>|
+          <a @click='findPwd'>忘记密码</a>
+          </div>
       </div>
 
       <button @click='login' class="login" :disabled="mobile===''|| password===''" >登陆</button>
@@ -28,8 +31,8 @@
 </template>
 
 <script>
-import { XHeader } from 'vux';
-
+import { XHeader, AjaxPlugin } from 'vux';
+import { Login } from '../../service/getdata';
 export default {
   name: 'login',
   components: {
@@ -44,12 +47,19 @@ export default {
   },
   methods: {
     login () {
-      console.log(1);
-      this.$router.push({path: '/app/register'});
+      let that = this;
+      let data = Login({username:'ynkjd123456',pwd:"ynk123456"});
+      if(data){
+        console.log(123);
+      }
+      // this.$router.push({path: '/app/register'});
     },
     remenberChange () {
       console.log(this.remenber);
       this.remenber = !this.remenber;
+    },
+    findPwd(){
+      this.$router.push({path: '/app/forgetPassword'});
     }
   }
 };
