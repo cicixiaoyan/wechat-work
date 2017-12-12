@@ -1,11 +1,11 @@
 <template>
 <div>
 <x-header>忘记密码</x-header>
-<div>
 <div class="text-center">
   <img src="../../assets/logo.png" class="logo" title="logo"/>
   <div class="title">从业人员健康体检信息大数据平台</div>
 </div>
+<div>
 <tab class="tablist" disabled-color="black">
   <tab-item selected @on-item-click="onItemClick">1.验证手机号</tab-item>
   <tab-item @on-item-click="onItemClick" class="thesecondtab">2.重置密码</tab-item>
@@ -94,6 +94,20 @@ export default {
   @import '../../style/common.less';
   body{
     background: #fff;
+  }
+  .logo{
+    .px2rem(width, 200);
+    .px2rem(height, 200);
+    .px2rem(border-radius, 40);
+    .px2rem(margin-top, 70);
+    .px2rem(margin-bottom, 30);
+    background: green;
+  }
+
+  .title{
+    .px2px(font-size, 32);
+    color: #3c9;
+    .px2rem(margin-bottom, 90);
   }
   .tablist
   {
