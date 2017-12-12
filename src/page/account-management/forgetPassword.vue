@@ -1,10 +1,14 @@
 <template>
 <div>
 <x-header>忘记密码</x-header>
+<div>
 <div class="text-center">
-<tab>
+  <img src="../../assets/logo.png" class="logo" title="logo"/>
+  <div class="title">从业人员健康体检信息大数据平台</div>
+</div>
+<tab class="tablist" disabled-color="black">
   <tab-item selected @on-item-click="onItemClick">1.验证手机号</tab-item>
-  <tab-item @on-item-click="onItemClick">2.重置密码</tab-item>
+  <tab-item @on-item-click="onItemClick" class="thesecondtab">2.重置密码</tab-item>
   <tab-item disabled="true">3.完成</tab-item>
 </tab>
 <div v-if="index" class="validate">
@@ -35,7 +39,7 @@
       <label class="remark">确认密码</label>
       <input  placeholder="请确认密码"  type="password" v-model="passwordRep">
     </div>
-      <button @click='updatepassword' class="btn" :disabled="username===''|| password==='' || password !== passwordRep ">下一步</button>
+      <button @click='updatepassword' class="btn" :disabled="mobile===''|| password==='' || password !== passwordRep ">下一步</button>
     </div>
 </div>
 </div>
@@ -65,18 +69,21 @@ export default {
   methods: {
         onItemClick (index)
         {
-
             console.log('on item click:', index),
             this.index = !this.index
               },
         validate()
         {
-
+            $(thesecondtab).index=true;
         },
         getCheckCode () {
           console.log('获取验证码');
         },
-        updatepassword(){}
+        updatepassword(){
+              console.log(2);
+              this.$router.push({path: '/app/login'});
+
+        }
 
   }
 };
@@ -88,12 +95,17 @@ export default {
   body{
     background: #fff;
   }
-  tab
+  .tablist
   {
-
+    .px2px(margin-top, 20);
     .px2px(margin-left, 70);
     .px2px(margin-right, 70);
+    tab-item
+    {
+        background:#CDD6D3;
+    }
   }
+
   .login-form{
     .px2px(margin-left, 70);
     .px2px(margin-right, 70);
