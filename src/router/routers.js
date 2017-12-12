@@ -15,7 +15,8 @@ export default [
         component: function (resolve) {
           require(['../components/tab'], resolve);
         }
-      },      {
+      },
+      {
         path: '/app/upload-img',
         name: 'uploadImg',
         component: function (resolve) {
@@ -51,7 +52,7 @@ export default [
         }
       },
       {
-        path: '/app/appointment/list',
+        path: '/tabbar/appointment/list',
         name: 'appointment-list',
         component: function (resolve) {
           require(['../page/appointment/list'], resolve);
@@ -93,7 +94,7 @@ export default [
         }
       },
       {
-        path: '/app/submit-information/view',
+        path: '/tabbar/submit-information/view',
         name: 'submit-information-view',
         component: function (resolve) {
           require(['../page/submit-information/view'], resolve);

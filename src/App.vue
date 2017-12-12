@@ -1,35 +1,40 @@
 <template>
   <div id="app" class="app">
-    <router-view></router-view>
-    <!-- <tabbar  v-show="!showTabbar" slot="bottom">
-      <tabbar-item  :link="{name: 'register' }">
-        <img slot="icon" class="iconfont icon-task_fill">
-        <span slot="label">体检</span>
+    <router-view :class="{'has-bottom-tabbar':!showTabbar}" class="router-view"></router-view>
+    <tabbar  v-show="showTabbar"  slot="bottom" style="position:fixed;">
+      <tabbar-item  :link="{name: 'staff-information-list' }">
+        <span slot="icon" class="iconfont icon-task_fill"></span>
+        <span slot="label">体检预约</span>
       </tabbar-item>
-      <tabbar-item show-dot :link="{path: '/app/register' }">
-        <img slot="icon" class="iconfont icon-task_fill">
-        <span slot="label" link="../page/appointment/add">审核</span>
+      <tabbar-item show-dot :link="{name: 'appointment-list' }">
+        <span slot="icon" class="iconfont icon-task_fill"></span>
+        <span slot="label" link="../page/appointment/add">审核记录</span>
       </tabbar-item>
-      <tabbar-item :link="{path: '/app/register' }">
-        <img slot="icon" class="iconfont icon-task_fill">
+      <tabbar-item :link="{name: 'login' }">
+        <span slot="icon" class="iconfont icon-task_fill"></span>
         <span slot="label" >个人中心</span>
       </tabbar-item>
-    </tabbar> -->
+    </tabbar>
   </div>
 </template>
 
 <script>
 import './utils/device';
+import { Tabbar, TabbarItem } from 'vux';
 export default {
   name: 'app',
+  components: {
+    Tabbar,
+    TabbarItem
+  },
   data() {
     return {
     }
   },
   computed: {
-    // showTabbar () {
-    //   return /tabbar/.test(this.$route.path);
-    // },
+    showTabbar () {
+      return /tabbar/.test(this.$route.path);
+    },
   },
   watch: {
     // path (path) {
@@ -94,13 +99,34 @@ body {
 .danger{
   color: #f96868;
 }
+
+.gray{
+  color: #999;
+}
 .weui-icon.weui_icon_clear{
     .px2px(font-size, 24);
 }
 
 .app{
+  > .router-view{
+    .px2rem(margin-top, 80);
+
+    &.has-bottom-tabbar{
+      .px2rem(margin-bottom, 100);
+    }
+  }
+
+
   .weui-cell{
-    padding: 0.4167rem 0.277rem;
+    .px2px(padding, 30);
+    // padding: 0.4167rem 0.277rem;
+  }
+  .vux-header{
+    width: 100%;
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    z-index: 100;
   }
   .list{
     position: relative;
@@ -111,7 +137,8 @@ body {
       -webkit-box-align: center;
       -ms-flex-align: center;
       align-items: center;
-      padding: 15px;
+      .px2px(padding, 30);
+      // padding: 15px;
       position: relative;
       background-color: #fff;
 
@@ -140,11 +167,13 @@ body {
 
       h3{
         .px2px(font-size, 36);
-        color: #333;
+        font-weight: normal;
+        color: #444;
       }
       h4{
         .px2px(font-size, 32);
-        color: #333;
+        font-weight: normal;
+        color: #444;
       }
       p{
         .px2px(font-size, 28);
@@ -167,6 +196,16 @@ body {
       -webkit-transform: scaleY(0.5);
       transform: scaleY(0.5);
     }
+  }
+
+  .vux-header .vux-header-left, .vux-header .vux-header-right{
+    // top: 14px;
+    .px2rem(top, 26);
+    display: block;
+    // font-size: 14px;
+    .px2px(font-size, 32);
+    .px2px(line-height, 40);
+    // line-height: 21px;
   }
 }
 </style>

@@ -9,10 +9,11 @@
         <x-input title="机构类型" v-model="ubusinesstype"></x-input>
         <x-input title="所属区域" v-model="areid"></x-input>
         <x-input title="经营地址" v-model="ubusinessaddress"></x-input>
-        <x-input title="身份证照" v-model="cardidimg0"></x-input>
-        <x-input title="营业执照" v-model="licenceimg0"></x-input>
-
-      </group> 
+        <x-input title="身份证照" @click.native v-model="cardidimg0"></x-input>
+        <!-- <x-input title="营业执照" v-model="licenceimg0"></x-input> -->
+        <!-- 文档：https://github.com/waynecz/vue-img-inputer -->
+        <div style="text-align:right;"><uploadImg :id='licenceimg0' name="licenceimg0" v-model="licenceimg0" theme="light"></uploadImg></div>
+      </group>
 
       <group>
         <div class="mid-title" @click='Optionalshow'>
@@ -28,8 +29,8 @@
           <x-input title="卫生许可" v-model="permitimg0"></x-input>
         </div>
       </group>
-        
-  
+
+
       <button @click='submit' class="round-big-btn"  >提交审核</button>
 
     </div>
@@ -38,13 +39,13 @@
 
 <script>
 import { XHeader, Group, XInput } from 'vux';
-// import uploadImg from '../../components/uploadImg'
+import uploadImg from '../../components/uploadImg'
 
 export default {
   name: 'submit-information-add',
   components: {
     XHeader,
-    // uploadImg,
+    uploadImg,
     XInput ,
     Group
   },

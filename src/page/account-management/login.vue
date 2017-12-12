@@ -8,18 +8,22 @@
     <div class="login-form">
       <div class="user">
         <span class="iconfont icon-mobilephone"></span>
-        <input type="number" placeholder="请输入用户名" v-model="mobile">
+        <input type="number" @input="judgePhone" @blur="judgePhone" maxlength="11" placeholder="请输入手机号" v-model="mobile">
+        <div class="validator-error" v-if="phoneInValid != ''">{{phoneInValid}}</div>
       </div>
       <div class="user">
         <span class="iconfont icon-mobilephone"></span>
-        <input  placeholder="请输入登录"  type="password"  v-model="password">
+        <input  placeholder="请输入登录" maxlength='6' @input type="password"  v-model="password">
       </div>
       <div class="remenber-password">
-        <div @click='remenberChange'>
-          <span class="iconfont icon-circle1" v-if="!remenber"></span>
-          <span class="iconfont icon-circle" v-if="remenber"></span>
-          <input  type="checkbox"  v-model="remenber">记住密码
-        </div>
+        <div >
+          <!-- <label for="" @click='remenberChange'>
+            <span class="iconfont icon-circle1" v-if="!remember"></span>
+            <span class="iconfont icon-circle" v-if="remember"></span>
+            <input  type="checkbox"  v-model="remember">记住密码
+          </label>| -->
+          <a @click='findPwd'>忘记密码?</a>
+          </div>
       </div>
 
       <button @click='login' class="login" :disabled="mobile===''|| password===''" >登陆</button>
@@ -28,8 +32,8 @@
 </template>
 
 <script>
-import { XHeader } from 'vux';
-
+import { XHeader, AjaxPlugin } from 'vux';
+import { Login } from '../../service/getdata';
 export default {
   name: 'login',
   components: {
@@ -39,18 +43,36 @@ export default {
     return {
       mobile: '13155555555',
       password: '123456',
-      remenber: false
+      remember: false,
+      phoneInValid: ''
     };
   },
   methods: {
     login () {
-      console.log(1);
-      this.$router.push({path: '/app/register'});
+      this.$router.push({name: 'register'});
+      // let that = this;
+      // let data = Login({username:'ynkjd123456',pwd:"ynk123456"});
+      // if(data){
+      //   window.localStorage.setItem('userInfo', data.AppendData);
+      //   this.$router.push({name: 'register'});
+      // }
     },
-    remenberChange () {
-      console.log(this.remenber);
-      this.remenber = !this.remenber;
-    }
+    // remenberChange () {
+    //   console.log(this.remenber);
+    //   this.remenber = !this.remenber;
+    // },
+    findPwd(){
+      this.$router.push({path: '/app/forgetPassword'});
+    },
+    judgePhone(){
+      if(/^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/.test(this.username)){
+        this.phoneInValid = '';
+      }else{
+        if(this.mobile.length == 0) return this.phoneInValid = '手机号必填';
+        this.phoneInValid = '请输入合法的手机号码';
+      }
+
+    },
   }
 };
 </script>
@@ -94,7 +116,7 @@ export default {
         // font-size: 3rem;
         position: absolute;
         left: 0;
-        bottom: 0;
+        .px2px(top, -16);
       }
       input{
         .px2rem(padding-bottom, 10);
@@ -110,6 +132,9 @@ export default {
           outline: none;
         }
       }
+      .validator-error{
+        color: #f96868;
+      }
 
     }
 
@@ -117,12 +142,10 @@ export default {
       .px2rem(border-radius, 60);
       .px2rem(padding, 24);
       .px2rem(font-size, 32);
+      .px2rem(margin-bottom, 10);
 
       background: #3c9;
       color: #fff;
-      // border-radius: 3rem;
-      // padding: 1.2rem;
-      // font-size: 1.6rem;
       width: 100%;
       box-shadow: none;
       border: none;

@@ -9,14 +9,17 @@ const store = new Vuex.Store({
 		isLogin : false,
 		// 保存登录信息
 		userInfo : {
-			'username' : '',
-			'photo' : '',
-			'uid' : '',
-			'accesstoken' : ''
+			// 'username' : '',
+			// 'photo' : '',
+			// 'uid' : '',
+			'AccessToken' : '',
+			'RefreshToken' : ''
 		},
 		// 用户未读消息条数
 		message_count : 0,
-
+		isLoading: false,
+		direction: 'forward',
+		demoScrollTop: 0,
 	},
 	actions: {
 		isLogin({commit}) {
@@ -30,6 +33,9 @@ const store = new Vuex.Store({
 		},
 		setNotMessageCount({commit}, count) {
 			commit('SETNOTMESSAGECOUNT', count);
+		},
+		updateDemoPosition ({commit}, top) {
+			commit({type: 'updateDemoPosition', top: top})
 		}
 	},
 	mutations: {
@@ -43,15 +49,25 @@ const store = new Vuex.Store({
 		},
 		// 设置登录用户信息
 		SETUSERINFO (state, userInfo) {
-			state.userInfo.username = userInfo.username;
-			state.userInfo.photo = userInfo.phpto;
-			state.userInfo.uid = userInfo.uid;
-			state.userInfo.accesstoken = userInfo.accesstoken;
+			// state.userInfo.username = userInfo.username;
+			// state.userInfo.photo = userInfo.phpto;
+			// state.userInfo.uid = userInfo.uid;
+			state.userInfo.AccessToken = userInfo.AccessToken;
+			state.userInfo.RefreshToken = userInfo.RefreshToken;
 		},
 		// 设置未读消息条数
 		SETNOTMESSAGECOUNT (state, count) {
 			state.message_count = count;
 		},
+		updateDemoPosition (state, payload) {
+			state.demoScrollTop = payload.top
+		},
+		updateLoadingStatus (state, payload) {
+			state.isLoading = payload.isLoading
+		},
+		updateDirection (state, payload) {
+			state.direction = payload.direction
+		}
 	},
 	getters: {
 		getLoginState (state) {
@@ -61,7 +77,10 @@ const store = new Vuex.Store({
 			return state.userInfo;
 		},
 		getUserInfoAccesstoken(state, getters) {
-			return getters.getUserInfo.accesstoken;
+			return getters.getUserInfo.AccessToken;
+		},
+		getUserInfoRefreshToken(state, getters) {
+			return getters.getUserInfo.RefreshToken;
 		},
 		getNotMessageCount (state) {
 			return state.message_count;
