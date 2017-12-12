@@ -7,7 +7,7 @@
         <x-input title="机构名称" v-model="uoname"></x-input>
         <selector title="机构类型" v-model="ubusinesstype"  :options="gettbsysbasicdatabycode" placeholder="请选择"></selector>
         <x-input title="执照代码" v-model="businessnumber"></x-input>
-      
+
         <!-- <x-input title="所属区域" v-model="areid"></x-input> -->
         <!-- <picker :data='areidList'  :columns="3" v-model='areid' @on-change='changeAreid'></picker> -->
         <!-- <popup-picker title="所属区域" :columns="2"  :data="areidList" v-model="areid"  placeholder="请选择"></popup-picker> -->
@@ -33,6 +33,7 @@
         <div v-show="showOptional">
           <x-input title="法人" v-model="ulowman"></x-input>
           <x-input title="身份证号" v-model="ucardid"></x-input>
+
           <x-input title="联系电话" v-model="utel"></x-input>
           <x-input title="附加说明" v-model="uremark"></x-input>
           <div class="photo-item" style="text-align:right;">

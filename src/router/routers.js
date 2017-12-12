@@ -80,7 +80,7 @@ export default [
         }
       },
       {
-        path: '/app/staff-information/edit',
+        path: '/app/staff-information/edit/:id/:read',
         name: 'staff-information-edit',
         component: function (resolve) {
           require(['../page/staff-information/edit'], resolve);

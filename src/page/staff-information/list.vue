@@ -88,7 +88,7 @@
 
 <script>
 import { XHeader, TransferDom, PopupHeader, Popup, Checklist, Flexbox, FlexboxItem, Swipeout, SwipeoutItem, SwipeoutButton } from 'vux';
-
+import { IdCardTo } from '../../utils/idc';
 export default {
   name: 'staff-information-list',
   directives: {
