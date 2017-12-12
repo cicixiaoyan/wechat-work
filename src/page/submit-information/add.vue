@@ -5,14 +5,23 @@
       <group>
         <div class="mid-title">必填项</div>
         <x-input title="机构名称" v-model="uoname"></x-input>
+        <selector title="机构类型" v-model="ubusinesstype"  :options="gettbsysbasicdatabycode" placeholder="请选择"></selector>
         <x-input title="执照代码" v-model="businessnumber"></x-input>
-        <x-input title="机构类型" v-model="ubusinesstype"></x-input>
-        <x-input title="所属区域" v-model="areid"></x-input>
+      
+        <!-- <x-input title="所属区域" v-model="areid"></x-input> -->
+        <!-- <picker :data='areidList'  :columns="3" v-model='areid' @on-change='changeAreid'></picker> -->
+        <!-- <popup-picker title="所属区域" :columns="2"  :data="areidList" v-model="areid"  placeholder="请选择"></popup-picker> -->
         <x-input title="经营地址" v-model="ubusinessaddress"></x-input>
-        <x-input title="身份证照" @click.native v-model="cardidimg0"></x-input>
-        <!-- <x-input title="营业执照" v-model="licenceimg0"></x-input> -->
         <!-- 文档：https://github.com/waynecz/vue-img-inputer -->
-        <div style="text-align:right;"><uploadImg :id='licenceimg0' name="licenceimg0" v-model="licenceimg0" theme="light"></uploadImg></div>
+        <div class="photo-item" style="text-align:right;">
+          <span>身份证照</span>
+          <uploadImg :inputId='cardidimg' name="cardidimg" v-model="cardidimg" theme="light"></uploadImg>
+        </div>
+        <div class="photo-item" style="text-align:right;">
+          <span>营业执照</span>
+          <uploadImg :inputId='licenceimg' name="licenceimg" v-model="licenceimg" theme="light"></uploadImg>
+        </div>
+
       </group>
 
       <group>
@@ -26,7 +35,10 @@
           <x-input title="身份证号" v-model="ucardid"></x-input>
           <x-input title="联系电话" v-model="utel"></x-input>
           <x-input title="附加说明" v-model="uremark"></x-input>
-          <x-input title="卫生许可" v-model="permitimg0"></x-input>
+          <div class="photo-item" style="text-align:right;">
+            <span>营业执照</span>
+            <uploadImg :inputId='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg>
+          </div>
         </div>
       </group>
 
@@ -38,7 +50,7 @@
 </template>
 
 <script>
-import { XHeader, Group, XInput } from 'vux';
+import { XHeader, Group, XInput, Selector, Picker, PopupPicker } from 'vux';
 import uploadImg from '../../components/uploadImg'
 
 export default {
@@ -47,7 +59,10 @@ export default {
     XHeader,
     uploadImg,
     XInput ,
-    Group
+    Group,
+    Selector,
+    Picker,
+    PopupPicker
   },
   data () {
     return {
@@ -57,15 +72,102 @@ export default {
       ubusinessaddress: '',
       areid: '',
       ulowman:'',
-      cardidimg0: '',
-      licenceimg0: '',
+      cardidimg: '',
+      licenceimg: '',
+      permitimg:'',
       ucardid: '',
       utel: '',
       uremark: '',
-      permitimg0: '',
-      showOptional: false
+      showOptional: false,
+      areidList: [
+        {
+          name: '2017-7-7',
+          value: '2017-7-7',
+          parent: 0
+        },
+        {
+          name: '上午',
+          value: '上午',
+          parent: "2017-7-7"
+        },
+        {
+          name: '下午',
+          value: '下午',
+          parent: "2017-7-7"
+        },
+        {
+          name: '2017-7-8',
+          value: '2017-7-8',
+          parent: 0
+        },
+        {
+          name: '上午',
+          value: '上午',
+          parent: "2017-7-8"
+        }
+      ]
+      // gettbsysbasicdatabycode: []
     };
   },
+  computed: {
+    gettbsysbasicdatabycode(){
+      let list = [
+        {
+          "BDID": 2,
+          "ParentID": 1,
+          "Name": "食品生产经营",
+          "Value": "食品生产经营",
+          "Code": "101001"
+        },
+        {
+          "BDID": 3,
+          "ParentID": 1,
+          "Name": "乳制品生产",
+          "Value": "乳制品生产",
+          "Code": "101002"
+        }
+      ]
+
+      list.forEach(function(value, index, array1){
+        list[index].key = value.Name;
+        list[index].value = value.Value;
+      });
+      return  list;
+    },
+    // areidList(){
+    //   let list = [
+    //     {
+    //       "AreID": 26,
+    //       "ParentId": 7,
+    //       "AreName": "红牌楼街道",
+    //       "AreCode": 5501
+    //     },
+    //     {
+    //       "AreID": 27,
+    //       "ParentId": 7,
+    //       "AreName": "双楠街道",
+    //       "AreCode": 5502
+    //     }
+    //   ];
+    //   list.forEach(function(value, index, array1){
+    //     list[index].name = value.AreName;
+    //     list[index].parent = 0;
+    //     list[index].value = value.AreID;
+    //     list.push({
+    //       "AreID": 26,
+    //       "ParentId": 7,
+    //       "AreName": "红牌楼街道",
+    //       "AreCode": 5501,
+    //       "name": '1',
+    //       "value": '1',
+    //       "parent": value.AreID
+    //     })
+    //   });
+    //   console.log(list);
+    //   return list;
+    // }
+  },
+
   methods: {
     submit () {
       this.$router.push({path: '/app/appointment/list'});
@@ -73,7 +175,12 @@ export default {
     Optionalshow() {
       console.log(this.showOptional);
       this.showOptional = !this.showOptional;
-    }
+    },
+    changeAreid(){
+
+    },
+    onShowAre(){},
+    onHideAre(){}
   }
 };
 </script>
@@ -120,6 +227,35 @@ export default {
     }
     .weui-label{
       color: #878f98;
+    }
+
+    .photo-item{
+      position: relative;
+      padding: 1em 1em 1em 0.138rem;
+      > span{
+        color: #999;
+        position: absolute;
+        left: 0.417rem;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      &::before{
+        content: " ";
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        height: 1px;
+        border-top: 1px solid #E5E5E5;
+        color: #E5E5E5;
+        -webkit-transform-origin: 0 0;
+        transform-origin: 0 0;
+        -webkit-transform: scaleY(0.5);
+        transform: scaleY(0.5);
+        left: 15px;
+
+      }
     }
 
   }

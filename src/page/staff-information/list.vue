@@ -58,9 +58,25 @@
               <input type="text" placeholder="身份证号" name="icd" value="">
             </flexbox-item>
           </flexbox>
+          <flexbox  class="form-item"  :gutter="0">
+            <flexbox-item class='form-item-left'>
+              <span class="iconfont icon-addressbook_fill"></span>
+            </flexbox-item>
+            <flexbox-item>
+              <input type="text" placeholder="手机号(选填)" name="icd" value="">
+            </flexbox-item>
+          </flexbox>
+          <!-- <flexbox  class="form-item"  :gutter="0">
+            <flexbox-item class='form-item-left'>
+              <span class="iconfont icon-addressbook_fill"></span>
+            </flexbox-item>
+            <flexbox-item>
+              <input type="text" placeholder="手机号(选填)" name="icd" value="">
+            </flexbox-item>
+          </flexbox> -->
         </div>
         <div>
-          <flexbox class="submit-box"  :gutter="0">
+          <flexbox class="submit-box1"  :gutter="0">
             <flexbox-item class="light" @click.native='cancel'>取消</flexbox-item>
             <flexbox-item class="primary" @click.native='addStaff'>完成</flexbox-item>
           </flexbox>
@@ -151,6 +167,7 @@ export default {
 
     },
     appointment() {
+      // this.$router.push({name: 'appointment-view', params: { 'id': id }});
     },
     submit() {
 
@@ -158,10 +175,10 @@ export default {
     addStaff(){
       // 添加
       // ...
-      this.showpop = false;
+      this.showchecktime = false;
     },
     cancel(){
-      this.showpop = false;
+      this.showchecktime = false;
     },
     deleteItem(index) {
 
@@ -266,7 +283,7 @@ export default {
 
   }
 
-  .vux-flexbox.submit-box{
+  .vux-flexbox.submit-box1{
     > .vux-flexbox-item{
       .px2rem(height, 85);
       .px2rem(line-height, 85);

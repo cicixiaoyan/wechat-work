@@ -10,7 +10,7 @@
         <span slot="icon" class="iconfont icon-task_fill"></span>
         <span slot="label" link="../page/appointment/add">审核记录</span>
       </tabbar-item>
-      <tabbar-item :link="{name: 'login' }">
+      <tabbar-item :link="{name: 'personal-center' }">
         <span slot="icon" class="iconfont icon-task_fill"></span>
         <span slot="label" >个人中心</span>
       </tabbar-item>

@@ -2,28 +2,31 @@
   <div class="myapp">
     <x-header>申请记录</x-header>
     <!-- <panel :footer="footer" :list="list" :type="type" @on-img-error="onImgError"></panel> -->
-    <div class="list">
-      <div class="item" v-for="item in list" @click='view(item.Id)'>
-        <div class="left-ctx"
-        v-bind:class="{ 'warning': item.status=='待审核', 'danger': item.status=='未通过', 'success': item.status=='已通过' }">
-          {{item.status}}
-        </div>
-        <div class="right-ctx">
-          <h4>{{item.time}}</h4>
-          <p>[{{item.number}}]&emsp;预约人数</p>
+    <vscroll :on-refresh="onRefresh" :on-infinite="onInfinite">
+      <div class="list">
+        <div class="item" v-for="item in list" @click='view(item.Id)'>
+          <div class="left-ctx"
+          v-bind:class="{ 'warning': item.status=='待审核', 'danger': item.status=='未通过', 'success': item.status=='已通过' }">
+            {{item.status}}
+          </div>
+          <div class="right-ctx">
+            <h4>{{item.time}}</h4>
+            <p>[{{item.number}}]&emsp;预约人数</p>
+          </div>
         </div>
       </div>
-    </div>
+    </vscroll>
   </div>
 </template>
 
 <script>
-import {   XHeader } from 'vux';
-
+import { XHeader } from 'vux';
+import vscroll  from '../../components/vscroll';
 export default {
   name: 'appointment-list',
   components: {
-    XHeader
+    XHeader,
+    vscroll
   },
   data () {
     return {
@@ -49,6 +52,30 @@ export default {
         number: '50',
         status: '未通过'
       },
+      {
+        Id: '4',
+        time: '2017-01-02 14:00:00',
+        number: '50',
+        status: '未通过'
+      },
+      {
+        Id: '5',
+        time: '2017-01-02 14:00:00',
+        number: '50',
+        status: '未通过'
+      },
+      {
+        Id: '6',
+        time: '2017-01-02 14:00:00',
+        number: '50',
+        status: '未通过'
+      },
+      {
+        Id: '7',
+        time: '2017-01-02 14:00:00',
+        number: '50',
+        status: '未通过'
+      },
       ]
     };
   },
@@ -56,6 +83,14 @@ export default {
     view(id){
       this.$router.push({name: 'appointment-view', params: { 'id': id }});
     },
+    onRefresh(done){
+      // 刷新
+      done();//必须有
+    },
+    onInfinite(done){
+      // 加载更多时间
+      done();
+    }
   }
 };
 </script>

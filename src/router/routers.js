@@ -7,13 +7,20 @@ export default [
     path: '/',
     // name: 'app',
     component: App,
-    redirect: '/app/login',
+    redirect: '/app/submit-information/add',
     children: [
       {
         path: '/app/tab',
         name: 'tab',
         component: function (resolve) {
           require(['../components/tab'], resolve);
+        }
+      },
+      {
+        path: '/app/vscroll',
+        name: 'vscroll',
+        component: function (resolve) {
+          require(['../components/vscroll'], resolve);
         }
       },
       {
@@ -80,7 +87,7 @@ export default [
         }
       },
       {
-        path: '/app/staff-information/list',
+        path: '/tabbar/staff-information/list',
         name: 'staff-information-list',
         component: function (resolve) {
           require(['../page/staff-information/list'], resolve);
@@ -94,10 +101,17 @@ export default [
         }
       },
       {
-        path: '/tabbar/submit-information/view',
+        path: '/app/submit-information/view',
         name: 'submit-information-view',
         component: function (resolve) {
           require(['../page/submit-information/view'], resolve);
+        }
+      },
+      {
+        path: '/tabbar/personal-center',
+        name: 'personal-center',
+        component: function (resolve) {
+          require(['../page/account-management/personal-center'], resolve);
         }
       }
     ]

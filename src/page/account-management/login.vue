@@ -3,12 +3,12 @@
     <x-header>用户登陆</x-header>
     <div class="text-center">
       <img src="../../assets/logo.png" class="logo" title="logo"/>
-      <div class="title">从业人员健康体检信息大数据平台</div>
+      <div class="title">成都市从业人员体检预约平台</div>
     </div>
     <div class="login-form">
       <div class="user">
         <span class="iconfont icon-mobilephone"></span>
-        <input type="number" @input="judgePhone" @blur="judgePhone" maxlength="11" placeholder="请输入手机号" v-model="mobile">
+        <input type="text" @input="judgePhone" @blur="judgePhone" maxlength="20" placeholder="请输入手机号/用户名" v-model="mobile">
         <div class="validator-error" v-if="phoneInValid != ''">{{phoneInValid}}</div>
       </div>
       <div class="user">
@@ -28,34 +28,69 @@
 
       <button @click='login' class="login" :disabled="mobile===''|| password===''" >登陆</button>
     </div>
+
+    <div v-transfer-dom>
+      <loading :show="showload" :text="loadtext"></loading>
+    </div>
   </div>
 </template>
 
 <script>
-import { XHeader, AjaxPlugin } from 'vux';
-import { Login } from '../../service/getdata';
+import { XHeader, AjaxPlugin,Loading, TransferDomDirective as TransferDom } from 'vux';
+import {_userLogin,_getUserMsg} from '../../service/userServices';
 export default {
   name: 'login',
+  directives: {
+    TransferDom
+  },
   components: {
-    XHeader
+    XHeader,
+    Loading
   },
   data () {
     return {
-      mobile: '13155555555',
-      password: '123456',
+      mobile: 'ynkjd123456',
+      password: 'ynk123456',
       remember: false,
-      phoneInValid: ''
+      phoneInValid: '',
+      showload: false,
+      loadtext: '登陆中'
     };
   },
   methods: {
     login () {
-      this.$router.push({name: 'register'});
-      // let that = this;
-      // let data = Login({username:'ynkjd123456',pwd:"ynk123456"});
-      // if(data){
-      //   window.localStorage.setItem('userInfo', data.AppendData);
-      //   this.$router.push({name: 'register'});
-      // }
+      // this.$router.push({name: 'register'});
+      // ynkjd123456
+      // ynk123456
+      let that = this;
+      that.showload = true;
+      _userLogin({"username": this.mobile,"pwd": this.password}).then(function(data){
+        if(data.ResultType == 0){
+          that.loadtext = "登陆成功";
+          window.localStorage.setItem('AccessToken', data.AppendData["AccessToken"]);
+          window.localStorage.setItem('RefreshToken', data.AppendData["RefreshToken"]);
+          //获取用户信息
+          _getUserMsg().then(function(data1){
+           
+            that.showload = false;
+             //已审核通过 转到 人员信息页面
+            if(data1.ULAudtiStatus == 3){
+               that.$router.push({name: 'staff-information-list'});
+               
+
+            }
+           
+            else{
+                that.$router.push({name: 'register'});
+                
+            }
+            
+          }).catch(function(err){console.log(err)})
+        }
+      }).catch(function(err){
+        that.showload = false;
+      })
+
     },
     // remenberChange () {
     //   console.log(this.remenber);
@@ -65,11 +100,18 @@ export default {
       this.$router.push({path: '/app/forgetPassword'});
     },
     judgePhone(){
-      if(/^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/.test(this.username)){
-        this.phoneInValid = '';
+      // if(/^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/.test(this.username)){
+      //   this.phoneInValid = '';
+      // }else{
+      //   if(this.mobile.length == 0) return this.phoneInValid = '必填项';
+      //   this.phoneInValid = '请输入合法的手机号码';
+      // }
+      if(this.mobile.length > 20){
+        this.phoneInValid = '用户名最长为20位';
+      }else if(this.mobile.length == 0){
+        this.phoneInValid = '必填项';
       }else{
-        if(this.mobile.length == 0) return this.phoneInValid = '手机号必填';
-        this.phoneInValid = '请输入合法的手机号码';
+        this.phoneInValid = '';
       }
 
     },

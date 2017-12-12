@@ -1,6 +1,7 @@
 <template>
   <div class="img-inputer" :class="[themeClass, sizeClass, nhe ? 'nhe': '', ]" ref="box">
-    <i class="iconfont img-inputer__icon" v-html="iconUnicode"></i>
+    <i class="iconfont  img-inputer__icon" :class='iconUnicode'></i>
+
     <p class="img-inputer__placeholder">{{placeholder}}</p>
 
     <div class="img-inputer__preview-box" v-if="imgSelected">
@@ -76,11 +77,11 @@
         type: String
       },
       bottomText: {
-        default: '点击修改图片',
+        default: '点击添加图片',
         type: String
       },
       placeholder: {
-        default: '点击修改图片',
+        default: '点击添加图片',
         type: String
       },
       value: {
@@ -167,9 +168,9 @@
       },
       iconUnicode () {
         let iconMap = {
-          img: '&#xe624;',
-          clip: '&#xe62d;',
-          img2: '&#xe62f;'
+          img: 'icon-add',
+          clip: 'icon-tailor',
+          img2: 'icon-addition_fill'
         };
         return this.customerIcon || iconMap[this.ICON]
       }
@@ -295,7 +296,7 @@
 position: relative;
 display: inline-block;
 .px2rem(width, 200);
-.px2rem(height, 300);
+.px2rem(height, 200);
 .px2rem(border-radius, 10);
 
 background: #f0f0f0;
@@ -381,6 +382,7 @@ transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
   top: 0;
   z-index: 2;
   width: 100%;
+  height: 100%;
 }
 
 &__label {
