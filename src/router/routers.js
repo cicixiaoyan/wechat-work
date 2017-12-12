@@ -7,7 +7,7 @@ export default [
     path: '/',
     // name: 'app',
     component: App,
-    redirect: '/app/login',
+    redirect: '/app/forgetPassword',
     children: [
       {
         path: '/app/tab',
