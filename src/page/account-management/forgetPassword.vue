@@ -5,7 +5,7 @@
 <tab>
   <tab-item selected @on-item-click="onItemClick">1.验证手机号</tab-item>
   <tab-item @on-item-click="onItemClick">2.重置密码</tab-item>
-  <tab-item @on-item-click="onItemClick" disabled="true">3.完成</tab-item>
+  <tab-item disabled="true">3.完成</tab-item>
 </tab>
 <div v-if="index" class="validate">
 <div class="login-form">
