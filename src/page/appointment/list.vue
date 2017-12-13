@@ -1,6 +1,6 @@
 <template >
   <div class="myapp">
-    <x-header>申请记录</x-header>
+    <x-header :left-options="{showBack: false}">申请记录</x-header>
     <!-- <panel :footer="footer" :list="list" :type="type" @on-img-error="onImgError"></panel> -->
     <vscroll :on-refresh="onRefresh" :on-infinite="onInfinite">
       <div class="list">
@@ -97,6 +97,9 @@ export default {
 
 <style lang="less">
   .myapp {
+    .list{
+      margin-bottom: 5px;
+    }
     .item{
       .left-ctx {
         width: 1.389rem;

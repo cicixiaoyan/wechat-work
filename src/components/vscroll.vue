@@ -133,7 +133,7 @@ export default {
 </script>
 <style lang='less'>
 @import '../style/common.less';
-@background_color_1: #ddd;
+@background_color_1: #f2f5f7;
 
 .yo-scroll {
     position: absolute;

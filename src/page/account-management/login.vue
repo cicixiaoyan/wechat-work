@@ -1,18 +1,18 @@
 <template>
   <div>
-    <x-header>用户登陆</x-header>
+    <x-header :left-options="{showBack: false}">用户登陆 <a slot="right" @click='register'>注册</a></x-header>
     <div class="text-center">
       <img src="../../assets/logo.png" class="logo" title="logo"/>
       <div class="title">成都市从业人员体检预约平台</div>
     </div>
     <div class="login-form">
       <div class="user">
-        <span class="iconfont icon-mobilephone"></span>
+        <span class="iconfont icon-gerenzhongxin"></span>
         <input type="text" @input="judgePhone" @blur="judgePhone" maxlength="20" placeholder="请输入手机号/用户名" v-model="mobile">
         <div class="validator-error" v-if="phoneInValid != ''">{{phoneInValid}}</div>
       </div>
       <div class="user">
-        <span class="iconfont icon-mobilephone"></span>
+        <span class="iconfont icon-mima"></span>
         <input  placeholder="请输入登录" maxlength='6' @input type="password"  v-model="password">
       </div>
       <div class="remenber-password">
@@ -25,7 +25,6 @@
           <a @click='findPwd'>忘记密码?</a>
           </div>
       </div>
-
       <button @click='login' class="login" :disabled="mobile===''|| password===''" >登陆</button>
     </div>
 
@@ -37,7 +36,7 @@
 
 <script>
 import { XHeader, AjaxPlugin,Loading, TransferDomDirective as TransferDom } from 'vux';
-import {_userLogin,_getUserMsg} from '../../service/userServices';
+import {_userServices} from '../../service/userServices';
 export default {
   name: 'login',
   directives: {
@@ -64,40 +63,52 @@ export default {
       // ynk123456
       let that = this;
       that.showload = true;
-      _userLogin({"username": this.mobile,"pwd": this.password}).then(function(data){
+  
+      _userServices._userLogin({"username": this.mobile,"pwd": this.password}).then(function(data){
         if(data.ResultType == 0){
           that.loadtext = "登陆成功";
+          //获取用户信息
           window.localStorage.setItem('AccessToken', data.AppendData["AccessToken"]);
           window.localStorage.setItem('RefreshToken', data.AppendData["RefreshToken"]);
-          //获取用户信息
-          _getUserMsg().then(function(data1){
-           
+
+          _userServices._getUserMsg().then(function(data1){
             that.showload = false;
              //已审核通过 转到 人员信息页面
             if(data1.ULAudtiStatus == 3){
-               that.$router.push({name: 'staff-information-list'});
-               
-
+              that.$router.push({name: 'staff-information-list'});
             }
-           
+            if(data1.ULAudtiStatus == 1 || data1.ULAudtiStatus == 2){
+              that.$router.push({name: 'submit-information-view'});
+            }
             else{
-                that.$router.push({name: 'register'});
-                
+              that.$router.push({name: 'submit-information-add'});
             }
+
             
-          }).catch(function(err){console.log(err)})
+          }).catch(function(err){
+            that.showload = false;
+          });
+
+          that.$store.commit('ISLOGIN');
+          that.$store.commit('updateUserInfoAccesstoken', data.AppendData["AccessToken"]);
+          that.$store.commit('updateUserInfoRefreshToken', data.AppendData["RefreshToken"]);
+
+        }else{
+          this.showload = false;
         }
       }).catch(function(err){
         that.showload = false;
       })
-
+    },
+    register() {
+      this.$router.push({name: 'register'});
     },
     // remenberChange () {
     //   console.log(this.remenber);
     //   this.remenber = !this.remenber;
     // },
     findPwd(){
-      this.$router.push({path: '/app/forgetPassword'});
+      this.$router.push({name: 'forgetPassword'});
     },
     judgePhone(){
       // if(/^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/.test(this.username)){

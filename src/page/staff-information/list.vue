@@ -1,35 +1,37 @@
 <template >
   <div class="myapp">
-    <x-header>成员列表({{totalNumber}})<a slot="left" @click="showchecktime=true">添加</a><a slot="right" @click='appointment'>预约</a></x-header>
+    <x-header :left-options="{showBack: false}">成员列表({{totalNumber}})<a slot="left" @click="showchecktime=true">添加</a><a slot="right" @click='appointment'>预约</a></x-header>
     <!-- <panel :footer="footer" :list="list" :type="type" @on-img-error="onImgError"></panel> -->
-    <div class="list">
-      <swipeout>
-        <swipeout-item ref="swipeoutItem"  transition-mode="follow" v-for="(item, index) in list" :key="item.Id">
-          <div slot="right-menu">
-            <swipeout-button @click="deleteItem(index)" type="warn">删除</swipeout-button>
-          </div>
-          <div slot="content">
-          <label class="item">
-            <div class="left-ctx"  @click='change(index)'>
-              <span v-show='!item.checked' class="iconfont icon-circle1"></span>
-              <span v-show='item.checked' class="iconfont icon-checkedon success"></span>
+    <vscroll :on-refresh="onRefresh" :on-infinite="onInfinite">
+      <div class="list">
+        <swipeout>
+          <swipeout-item ref="swipeoutItem"  transition-mode="follow" v-for="(item, index) in list" :key="item.Id">
+            <div slot="right-menu">
+              <swipeout-button @click="deleteItem(index)" type="warn">删除</swipeout-button>
             </div>
-            <div class="right-ctx">
-              <h4>{{item.username}}</h4>
-              <p>[{{item.idc}}]</p>
+            <div slot="content">
+            <label class="item">
+              <div class="left-ctx"  @click='change(index)'>
+                <span v-show='!item.checked' class="iconfont icon-checknormal"></span>
+                <span v-show='item.checked' class="iconfont icon-checkedon success"></span>
+              </div>
+              <div class="right-ctx">
+                <h4>{{item.phName}}</h4>
+                <p>[{{item.phcardid}}]</p>
+              </div>
+              <span class="iconfont icon-accessory" @click="$refs.swipeoutItem[index].open('right')"></span>
+            </label>
             </div>
-            <span class="iconfont icon-accessory" @click="$refs.swipeoutItem[index].open('right')"></span>
-          </label>
-          </div>
-        </swipeout-item>
-      </swipeout>
+          </swipeout-item>
+        </swipeout>
 
-    </div>
-    <!-- <checklist  :options="ilist" v-model="checkValue" @on-change="change"></checklist> -->
+      </div>
+    </vscroll>
+      <!-- <checklist  :options="ilist" v-model="checkValue" @on-change="change"></checklist> -->
     <flexbox align='stretch'  :gutter="0" class="fix-bottom">
       <flexbox-item @click.native='checkall'>
         <label>
-          <span v-show='!checkAll' class="iconfont icon-circle1 gray"></span>
+          <span v-show='!checkAll' class="iconfont icon-checknormal gray"></span>
           <span v-show='checkAll' class="iconfont icon-checkedon success"></span>
           全选
       </label>
@@ -37,43 +39,43 @@
       <flexbox-item>共计<span class="danger">{{checkedNumber}}人</span></flexbox-item>
       <flexbox-item @click.native='submit' class='flex-last'>提交体检预约申请</flexbox-item>
     </flexbox>
-
+    
     <div v-transfer-dom>
       <popup v-model="showchecktime" position="bottom">
         <popup-header left-text="" right-text="" title="新增成员"></popup-header>
         <div class="pop-content">
           <flexbox  class="form-item" :gutter="0">
             <flexbox-item class='form-item-left'>
-              <span class="iconfont icon-addressbook_fill"></span>
+              <span class="iconfont icon-gerenxinxi"></span>
             </flexbox-item>
             <flexbox-item>
-              <input type="text" placeholder="姓名" name="username" value="">
+              <input type="text" placeholder="姓名" name="phName" value="">
             </flexbox-item>
           </flexbox>
           <flexbox  class="form-item"  :gutter="0">
             <flexbox-item class='form-item-left'>
-              <span class="iconfont icon-addressbook_fill"></span>
+              <span class="iconfont icon-shenfenzhenghao"></span>
             </flexbox-item>
             <flexbox-item>
-              <input type="text" placeholder="身份证号" name="icd" value="">
+              <input type="text" placeholder="身份证号" name="phcardid" value="">
             </flexbox-item>
           </flexbox>
           <flexbox  class="form-item"  :gutter="0">
             <flexbox-item class='form-item-left'>
-              <span class="iconfont icon-addressbook_fill"></span>
+              <span class="iconfont icon-contextphone"></span>
             </flexbox-item>
             <flexbox-item>
-              <input type="text" placeholder="手机号(选填)" name="icd" value="">
+              <input type="text" placeholder="手机号(选填)" name="phTel" value="">
             </flexbox-item>
           </flexbox>
-          <!-- <flexbox  class="form-item"  :gutter="0">
+          <flexbox  class="form-item"  :gutter="0">
             <flexbox-item class='form-item-left'>
-              <span class="iconfont icon-addressbook_fill"></span>
+              <span class="iconfont icon-jigou"></span>
             </flexbox-item>
             <flexbox-item>
-              <input type="text" placeholder="手机号(选填)" name="icd" value="">
+              <input type="text" placeholder="单位" name="phunit" value="">
             </flexbox-item>
-          </flexbox> -->
+          </flexbox>
         </div>
         <div>
           <flexbox class="submit-box1"  :gutter="0">
@@ -89,6 +91,7 @@
 <script>
 import { XHeader, TransferDom, PopupHeader, Popup, Checklist, Flexbox, FlexboxItem, Swipeout, SwipeoutItem, SwipeoutButton } from 'vux';
 import { IdCardTo } from '../../utils/idc';
+import vscroll  from '../../components/vscroll';
 export default {
   name: 'staff-information-list',
   directives: {
@@ -103,7 +106,11 @@ export default {
     FlexboxItem,
     Swipeout,
     SwipeoutItem,
-    SwipeoutButton
+    SwipeoutButton,
+    vscroll
+  },
+  created(){
+
   },
   data () {
     return {
@@ -111,8 +118,10 @@ export default {
       // with hot-reload because the reloaded component
       // preserves its current state and we are modifying
       // its initial state.
-      username: '',
-      icd: '',
+      phName: '',
+      phTel: '',
+      phunit: '',
+      phcardid: '',
       checkAll: false,
       showpop: false,
       showchecktime: false,
@@ -129,20 +138,20 @@ export default {
       list: [
         {
           Id: '1',
-          username: '张三',
-          idc: '511322198910101010',
+          phName: '张三',
+          phcardid: '511322198910101010',
           checked: false
         },
         {
           Id: '2',
-          username: '李四',
-          idc: '511322198910101010',
+          phName: '李四',
+          phcardid: '511322198910101010',
           checked: false
         },
         {
           Id: '3',
-          username: '王五',
-          idc: '511322198910101010',
+          phName: '王五',
+          phcardid: '511322198910101010',
           checked: false
         }
       ]
@@ -188,6 +197,12 @@ export default {
 
       this.list.splice(index,1);
 
+    },
+    onRefresh(done){
+      done();
+      },
+    onInfinite(done){
+      done();
     }
   }
 };
@@ -197,7 +212,7 @@ export default {
   @import '../../style/common.less';
   .myapp {
     .list{
-      .px2rem(margin-bottom, 90);
+      .px2rem(margin-bottom, 5);
       .item{
         .left-ctx {
           width: 1.389rem;
@@ -221,14 +236,11 @@ export default {
 
       }
     }
-
-
-
     .fix-bottom{
       .px2rem(height, 90);
       .px2rem(line-height, 90);
       position: fixed;
-      bottom: 0;
+      .px2rem(bottom, 100);
       background: #fff;
       .px2px(font-size, 32);
       text-align: center;

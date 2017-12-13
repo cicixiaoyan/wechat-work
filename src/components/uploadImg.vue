@@ -53,7 +53,7 @@
       },
       // 默认情况下可能会导致选择框弹出慢的问题，请针对具体化图片类型即可解决
       accept: {
-        default: 'image/*,video/*;',
+        default: 'image/*',
         type: String
       },
       capture: {
@@ -221,6 +221,7 @@
       handleFileChange (e) {
         if (typeof e.target === 'undefined') this.file = e[0];
         else this.file = e.target.files[0];
+        console.log(e.target.files)
         this.errText = '';
         let size = Math.floor(this.file.size / 1024);
         if (size > this.maxSize) {

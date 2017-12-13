@@ -7,13 +7,13 @@ export default [
     path: '/',
     // name: 'app',
     component: App,
-    redirect: '/app/submit-information/add',
+    redirect: '/app/redirect',
     children: [
       {
-        path: '/app/tab',
-        name: 'tab',
+        path: '/app/redirect',
+        name: 'redirect',
         component: function (resolve) {
-          require(['../components/tab'], resolve);
+          require(['../page/account-management/redirect'], resolve);
         }
       },
       {

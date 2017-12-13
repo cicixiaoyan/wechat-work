@@ -5,27 +5,24 @@ import {getInfo, baseurl} from '../config/axois';
 /*****************************************************/
 
 /**
- * 登录接口
+ * 获取区域
  * @param {} openId,username,password
  */
-var Login = (params) => getInfo(baseurl + '/apiv1/users/login', params, "post", false);
+var _getlistbyparentid = (params={}) => getInfo(baseurl + '/employment/getlistbyparentid', params, "get", true);
+
 
 /**
- * 注册接口
- * @param {}
+ * 获取机构类型
+ * @param {} openId,username,password
  */
-var register = (params) => getInfo(baseurl + '/api/register', params);
+var _gettbsysbasicdatabycode = (params={}) => getInfo(baseurl + '/employment/gettbsysbasicdatabycode', params, "get", true);
 
-/**
- * 忘记密码
- * @param {}
- */
-var forgetPassword = (params) => getInfo(baseurl + '/api/forgetPassword', params);
+
 
 
 
 export {
-    Login,
-    register,
-    forgetPassword
+    _getlistbyparentid,
+    _gettbsysbasicdatabycode
+
 };

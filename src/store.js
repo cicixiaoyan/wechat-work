@@ -20,6 +20,8 @@ const store = new Vuex.Store({
 		isLoading: false,
 		direction: 'forward',
 		demoScrollTop: 0,
+		parmaCommon: 'h27EdZlBIm9R1ysOrDo1boC2KLlyuCRKNC8E7nO%2bcIo%3d'
+		// parmaCommon: 'h27EdZlBIm9R1ysOrDo1boC2KLlyuCRKNC8E7nO+cIo='
 	},
 	actions: {
 		isLogin({commit}) {
@@ -67,9 +69,18 @@ const store = new Vuex.Store({
 		},
 		updateDirection (state, payload) {
 			state.direction = payload.direction
+		},
+		updateUserInfoAccesstoken (state, val) {
+			state.getUserInfo.AccessToken = val;
+		},
+		updateUserInfoRefreshToken(state, val) {
+			state.getUserInfo.RefreshToken = val;
 		}
 	},
 	getters: {
+		gerParmaCommon(state) {
+			return state.parmaCommon;
+		},
 		getLoginState (state) {
 			return state.isLogin;
 		},

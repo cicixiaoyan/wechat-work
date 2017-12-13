@@ -1,6 +1,6 @@
 <template>
   <div>
-    <x-header>个人中心</x-header>
+    <x-header :left-options="{showBack: false}">个人中心</x-header>
     <div class="personal-top">
       <img src="../../assets/logo.png" style="    width: 80px;background: #fff;border-radius: 50%;"/>
       <div>{{item.name}}</div>
