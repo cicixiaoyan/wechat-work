@@ -17,6 +17,7 @@
         <div class="photo-item" style="text-align:right;">
           <span>营业执照</span>
           <uploadImg id='licenceimg' name="licenceimg" v-model="licenceimg" theme="light"></uploadImg>
+          <uploadImg v-if='licenceimg != []' id='licenceimg1' name="licenceimg1" v-model="licenceimg1" theme="light"></uploadImg>
         </div>
 
       </group>
@@ -34,13 +35,14 @@
           <div class="photo-item" style="text-align:right;">
             <span>营业执照</span>
             <uploadImg id='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg>
+            <uploadImg v-if='permitimg != []' id='permitimg1' name="permitimg1" v-model="permitimg1" theme="light"></uploadImg>
           </div>
         </div>
       </group>
 
 
       <button @click='submit' class="round-big-btn">提交审核</button>
-      
+
       <div v-transfer-dom>
         <popup v-model="showArea">
           <popup-header :left-text="haschidren?'返回上一级':''" @on-click-left="haschidren = false" right-text="" title="区域选择"></popup-header>
@@ -55,8 +57,9 @@
 </template>
 
 <script>
-import { XHeader, Group, Cell, XInput, Selector, Picker,Flexbox, Checklist, 
+import { XHeader, Group, Cell, XInput, Selector, Picker,Flexbox, Checklist,
  FlexboxItem,  PopupHeader, Popup, TransferDom } from 'vux';
+import { baseurl } from '../../config/axois';
 import uploadImg from '../../components/uploadImg';
 // import {_getlistbyparentid, _gettbsysbasicdatabycode} from '../../service/getdata';
 import {employmentServices} from '../../service/EmploymentRegister';
@@ -73,9 +76,9 @@ export default {
     Group,
     Selector,
     Picker,
-    PopupHeader, 
+    PopupHeader,
     Popup,
-    Flexbox, 
+    Flexbox,
     FlexboxItem,
     Checklist
   },
@@ -105,7 +108,9 @@ export default {
       },
       cardidimg:[],
       licenceimg:[],
+      licenceimg1:[],
       permitimg:[],
+      permitimg1:[],
       showOptional: false,
       showArea: false,
       areidList: [
@@ -152,11 +157,39 @@ export default {
   },
   methods: {
     submit() {
+      let formData = new FormData();
+      formData.append('uname', this.item.uname);
+      formData.append('usex', this.item.usex);
+      formData.append('utel', this.item.utel);
+      formData.append('ucardid', this.item.ucardid);
+      formData.append('uoname', this.item.uoname);
+      formData.append('areid', this.item.areid);
+      formData.append('arename', this.item.arename);
+      formData.append('ubusinessaddress', this.item.ubusinessaddress);
+      formData.append('ubusinesstype', this.item.ubusinesstype);
+      formData.append('ubusinesstypename', this.item.ubusinesstypename);
+      formData.append('ulowman', this.item.ulowman);
+      formData.append('uremark', this.item.uremark);
+      formData.append('upicurl', this.item.upicurl);
+      formData.append('ulaudtistatus', this.item.ulaudtistatus);
+      formData.append('ulstatus', this.item.ulstatus);
+      formData.append('description', this.item.description);
 
-      
-      this.item.cardidimg = this.cardidimg;
-      this.item.licenceimg = this.licenceimg;
-      this.item.permitimg = this.permitimg;
+      formData.append('cardidimg', [...this.cardidimg, ...this.cardidimg1]);
+      formData.append('licenceimg', [...this.licenceimg, ...this.licenceimg1]);
+      formData.append('permitimg', this.permitimg);
+
+
+      let header = {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': "Bearer " +  window.localStorage.getItem('AccessToken')
+      }
+
+      this.$http.post(baseurl+'/employment/editorganizeinfo', formData, config).then((res) =>{
+        console.log(data)
+      }).catch((err) => {
+
+      })
       // console.log(this.item)
       // employmentServices
       //   ._editorganizeinfo(this.item)
@@ -229,7 +262,7 @@ export default {
           });
           that.tbsysbasicdatabycode = list;
         }else{
-          
+
         }
       })
     },

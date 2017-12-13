@@ -77,7 +77,7 @@
         type: String
       },
       bottomText: {
-        default: '点击添加图片',
+        default: '点击修改图片',
         type: String
       },
       placeholder: {

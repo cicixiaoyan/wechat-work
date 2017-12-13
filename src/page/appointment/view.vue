@@ -32,6 +32,9 @@ export default {
     Cell,
     XHeader
   },
+  created(){
+
+  },
   data () {
     return {
       stateTitle: '审核说明',

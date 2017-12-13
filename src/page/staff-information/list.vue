@@ -39,7 +39,7 @@
       <flexbox-item>共计<span class="danger">{{checkedNumber}}人</span></flexbox-item>
       <flexbox-item @click.native='submit' class='flex-last'>提交体检预约申请</flexbox-item>
     </flexbox>
-    
+
     <div v-transfer-dom>
       <popup v-model="showchecktime" position="bottom">
         <popup-header left-text="" right-text="" title="新增成员"></popup-header>
@@ -92,6 +92,7 @@
 import { XHeader, TransferDom, PopupHeader, Popup, Checklist, Flexbox, FlexboxItem, Swipeout, SwipeoutItem, SwipeoutButton } from 'vux';
 import { IdCardTo } from '../../utils/idc';
 import vscroll  from '../../components/vscroll';
+import { _staffServce } from '../../service/staffServce';
 export default {
   name: 'staff-information-list',
   directives: {
@@ -110,7 +111,10 @@ export default {
     vscroll
   },
   created(){
+    _staffServce.getphysicalinfo()
+    .then((data) => {
 
+    }).catch(err => console.log(err));
   },
   data () {
     return {
@@ -159,7 +163,7 @@ export default {
   },
   methods: {
     view(id) {
-      this.$router.push({name: 'appointment-view', params: { 'id': id }});
+      this.$router.push({name: 'staff-information-edit', params: { 'id': id, 'read': true }});
     },
     change (index) {
       this.list[index].checked = !this.list[index].checked;
@@ -193,7 +197,10 @@ export default {
 
       let id = this.list[index].Id;
       // 根据id请求后台删除
-
+      _staffServce.deleteAppointment(id)
+      .then((data) => {
+        console.log("删除成功");
+      }).catch(err => {console.log(err)})
 
       this.list.splice(index,1);
 

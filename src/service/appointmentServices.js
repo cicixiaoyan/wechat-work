@@ -11,13 +11,13 @@ export var _appointmentServce = {
     },
     // 提交体检预约
     createAppointment: () => {
-        // tmodel.phAid	
+        // tmodel.phAid
         // query	string
-        // tmodel.phid	
+        // tmodel.phid
         // query	string
-        // tmodel.phaorcode	
+        // tmodel.phaorcode
         // query	integer
-        // tmodel.phadescription	
+        // tmodel.phadescription
         // query	string
         // tmodel.ppnid
         return getInfo(baseurl + '/employment/creattbphysicalappointment', { parma }, 'post', true);
@@ -30,6 +30,16 @@ export var _appointmentServce = {
     // 删除
     deleteAppointment: () => {
         return getInfo(baseurl + '/employment/deletetbphysicalappointment', {}, 'post', true);
+    },
+
+    // 获取体检预约机构
+    gettbsysorganize: () => {
+        return getInfo(baseurl + '/employment/gettbsysorganize', {}, 'get', true);
+    },
+
+    // 是否默认选中
+    defaultorganize: (id) => {
+        return getInfo(baseurl + '/employment/defaultorganize', {"orid": id}, 'post', true);
     },
 
     // 根据预约申请记录主键查询体检预约人员详细信息
