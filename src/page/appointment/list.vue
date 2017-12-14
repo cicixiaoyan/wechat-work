@@ -38,7 +38,7 @@
         <img src="../../assets/vux_logo.png" alt="无数据">
         亲，您目前还没有任何预约记录哦！点击预约
       </div>
-      
+
     </scroll>
   </div>
 </template>
@@ -136,7 +136,7 @@ export default {
       // 刷新
     },
     onInfinite(done) {
-      
+
       if (this.isLoading == false) {
         this.isLoading = true;
         this.page++;
@@ -147,9 +147,9 @@ export default {
       let that = this;
       // 加载更多时间
       setTimeout(() => {
-        that.nodata ? done(true) : done(); 
+        that.nodata ? done(true) : done();
       }, 1500)
-      
+
       console.log("加载更多数据");
       // console.log(
       //   "this.lastPageIndex = " +
@@ -161,8 +161,6 @@ export default {
 
     },
     loadData(pageindex = 1, pagesize = 10) {
-    //  scroll.methods.finishInfinite(true)
-      // this.$refs.my_scroller.finishInfinite(true);
       // this.maxPageIndex = pageindex;
       let that = this;
       this.isLoading = true;

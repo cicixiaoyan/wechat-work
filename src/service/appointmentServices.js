@@ -43,8 +43,8 @@ export var _appointmentServce = {
     },
 
     // 根据预约申请记录主键查询体检预约人员详细信息
-    getappointmentdetailbyphaid: (id) => { // 预约申请记录主键
-        return getInfo(baseurl + '/employment/getappointmentdetailbyphaid', { "phaid": id }, 'get', true);
+    getappointmentdetailbyphaid: (phaid, page=1, size=30) => { // 预约申请记录主键
+        return getInfo(baseurl + '/employment/getappointmentdetailbyphaid', { "phaid": phaid, 'pageindex': page, 'pagesize': size }, 'get', true);
     },
 
 };

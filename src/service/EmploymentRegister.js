@@ -18,6 +18,9 @@ var _editorganizeinfo = (params={}) => getInfo(baseurl + '/employment/editorgani
 //获取机构信息接口及机构状态
 var _getorganizeinfo=(params={})=>getInfo(baseurl+'/employment/getorganizeinfo',params,"get",true);
 
+// 获取机构信息
+var _getorganizebycode=(areacode='')=>getInfo(baseurl+'/employment/getorganizebycode',{'areacode':areacode},"get",true);
+
 export var employmentServices={
     _getareas,_getlistbyparentid,_getlistbyareidone,_gettbsysbasicdatabycode,_editorganizeinfo,_getorganizeinfo
 }

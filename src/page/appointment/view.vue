@@ -2,21 +2,23 @@
   <div>
     <x-header>预约详情</x-header>
     <div class="result">
-      <div class="success" v-if="item.Status == 3"><span class="iconfont icon-circle"></span>审核成功</div>
-      <div class="danger" v-if="item.Status == 2"><span class="iconfont icon-circle"></span>审核中</div>
-      <div calss="warning" v-if="item.Status == 1"><span class="iconfont icon-circle"></span>审核失败</div>
+      <div class="success" v-if="item.PhAStatus == 3"><span class="iconfont icon-circle"></span>审核成功</div>
+      <div class="danger" v-if="item.PhAStatus == 2"><span class="iconfont icon-circle"></span>审核中</div>
+      <div calss="warning" v-if="item.PhAStatus == 1"><span class="iconfont icon-circle"></span>审核失败</div>
 
     </div>
     <div class="content">
       <group>
-        <cell title="体检医院" :is-loading="!item.Hospital" :value="item.Hospital"></cell>
-        <cell title="成员列表" :value="item.Number+'人'" is-link :link="{name:'staff-information-list'}"></cell>
-        <cell title="体检时间" :is-loading="!item.Time" :value="item.Time"></cell>
+        <cell title="体检机构" readonly :is-loading="!item.PhaOrName" :value="item.PhaOrName"></cell>
+        <cell title="成员列表" :value="item.PhCount+'人'" is-link @click.native="viewStaffList"></cell>
+        <cell title="体检日期" readonly :is-loading="!item.PhADate" :value="item.PhADate"></cell>
+        <cell title="申请日期" readonly :is-loading="!item.CreateDate" :value="item.CreateDate"></cell>
+
         <!-- :is-loading="!item.Description" -->
-        <cell :title="stateTitle"  :value="item.Description"></cell>
-        <div v-if="item.Status == 3" class="result-tip danger"><span class="iconfont icon-circle"></span>
-          预约成功，请通知相关人员凭身份证按时到【{{item.Hospital}}】进行体检</div>
-        <div v-if="item.Status == 1" class="result-tip danger"><span class="iconfont icon-circle"></span>
+        <cell :title="stateTitle" readonly  :value="item.Description"></cell>
+        <div v-if="item.PhAStatus == 3" class="result-tip danger"><span class="iconfont icon-circle"></span>
+          预约成功，请通知相关人员凭身份证按时到【{{item.PhaOrName}}】进行体检</div>
+        <div v-if="item.PhAStatus == 1" class="result-tip danger"><span class="iconfont icon-circle"></span>
           预约失败了，可以删除这条申请，重新提交申请</div>
       </group>
     </div>
@@ -39,11 +41,12 @@ export default {
     var detail = this.$route.params.appointmentDetail;
     if (detail != null) {
       this.item = {
-        Status: detail.PhAStatus,
-        Hospital: detail.PhaOrName,
-        Number: detail.PhCount,
+        PhAStatus: detail.PhAPhAStatus,
+        PhaOrName: detail.PhaOrName,
+        PhCount: detail.PhCount,
         Listparma: id,
-        Time: detail.PhADate + " " + ["全天", "上午", "下午"][detail.PPNType],
+        PhADate: detail.PhADate + " " + ["全天", "上午", "下午"][detail.PPNType],
+        CreateDate: detail.CreateDate,
         Description: detail.PhABackOption
       };
     }
@@ -66,15 +69,21 @@ export default {
     //   }
     // });
   },
+  methods: {
+    viewStaffList(){
+      if(this.item.PhCount != 0)
+       this.$router.push({name: "staff-information-view-list", params: {phaid: this.item.Listparma }});
+    }
+  },
   data() {
     return {
       stateTitle: "审核说明",
       item: {
-        Status: "",
-        Hospital: "",
-        Number: "",
+        PhAStatus: "",
+        PhaOrName: "",
+        PhCount: 0,
         Listparma: "",
-        Time: "",
+        PhADate: "",
         Description: ""
       }
     };

@@ -73,10 +73,10 @@ export default [
         }
       },
       {
-        path: '/app/staff-information/add',
-        name: 'staff-information-add',
+        path: '/app/staff-information/view-list/:phaid',
+        name: 'staff-information-view-list',
         component: function (resolve) {
-          require(['../page/staff-information/add'], resolve);
+          require(['../page/staff-information/view-list'], resolve);
         }
       },
       {
