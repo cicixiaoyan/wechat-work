@@ -92,7 +92,7 @@
 import { XHeader, TransferDom, PopupHeader, Popup, Checklist, Flexbox, FlexboxItem, Swipeout, SwipeoutItem, SwipeoutButton } from 'vux';
 import { IdCardTo } from '../../utils/idc';
 import vscroll  from '../../components/vscroll';
-import { _staffServce } from '../../service/staffServce';
+import {_staffServce} from '../../service/staffService';
 export default {
   name: 'staff-information-list',
   directives: {

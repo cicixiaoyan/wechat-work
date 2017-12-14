@@ -7,7 +7,7 @@
     </div>
     <div class="login-form">
       <div class="user">
-        <span class="iconfont icon-gerenzhongxin"></span>
+        <span class="iconfont icon-gerenxinxi"></span>
         <input type="text" @input="judgePhone" @blur="judgePhone" maxlength="20" placeholder="请输入手机号/用户名" v-model="mobile">
         <div class="validator-error" v-if="phoneInValid != ''">{{phoneInValid}}</div>
       </div>
@@ -48,8 +48,8 @@ export default {
   },
   data () {
     return {
-      mobile: 'ynkjd123456',
-      password: 'ynk123456',
+      mobile: '',
+      password: '',
       remember: false,
       phoneInValid: '',
       showload: false,
@@ -78,7 +78,12 @@ export default {
               that.$router.push({name: 'staff-information-list'});
             }
             if(data1.ULAudtiStatus == 1 || data1.ULAudtiStatus == 2){
-              that.$router.push({name: 'submit-information-view'});
+              if(data1.ULAudtiStatus == 1){
+                that.$router.push({name: 'submit-information-view', params: { 'read': false }});
+              }else{
+                that.$router.push({name: 'submit-information-view', params: { 'read': true }});
+              }
+              
             }
             else{
               that.$router.push({name: 'submit-information-add'});
@@ -86,6 +91,7 @@ export default {
 
             
           }).catch(function(err){
+            console.log(err, 2)
             that.showload = false;
           });
 
@@ -94,9 +100,10 @@ export default {
           that.$store.commit('updateUserInfoRefreshToken', data.AppendData["RefreshToken"]);
 
         }else{
-          this.showload = false;
+          that.showload = false;
         }
       }).catch(function(err){
+        console.log(err, 1)
         that.showload = false;
       })
     },

@@ -24,7 +24,7 @@
 <script>
 import { Group, XInput, XHeader } from 'vux';
 import { IdCardTo } from '../../utils/idc';
-import { _staffServce } from '../../service/staffServce'
+import {_staffServce} from '../../service/staffService';
 export default {
   name: "staff-information-edit",
   components: {

@@ -50,8 +50,8 @@ export default {
       pwd: '',
       pwdRep: '',
       code: '',
-      // msg_id: '',
-      // ip: '',
+      msg_id: '',
+      ip: '',
       dirtyPhone: false,
       dirtyPwd: false,
       dirtyPwdRep: false,
@@ -106,51 +106,50 @@ export default {
           //   "AppendData": null
           // }
         if(data.ResultType == 0){
+          that.$vux.toast.show({
+            text: "注册成功",
+            type: 'success',
+            position: 'middle',
+            time: 2000
+          });
           that.$router.push({name: "login"});
         }
       }).catch(function(err){
         console.log(err);
 
       });
-      this.$router.push({path: '/app/submit-information/add'});
+      // this.$router.push({path: '/app/submit-information/add'});
     },
     getCheckCode () {
-     
-
-      //发送验证码  获取返回值隐藏变量  更新 msg_id expkey
-      // 返回值
-      // {
-      //   "ResultType": 0,
-      //   "Message": "",
-      //   "LogMessage": "",
-      //   "AppendData": {
-      //     "expkey": "gHz+B39B8Fyb0XGllCuwaJboGzojhFI71sAnw6igckHLYyLjtNohNetlnKZDxjtK",
-      //     "tel": null,
-      //     "msg_id": "392950982064"
-      //   }
-      // }
       let that = this;
-
-      // _userServices._sendCodeRegister({expkey:this.expkey,tel:this.username}).then(function(data){
+      if(that.enableCheckBtn = false) return;
+      _userServices._sendCodeRegister({expkey:this.expkey,tel:this.username}).then(function(data){
       //绑定模型 expkey 、msg_id  只要失败就提示 Message
-        this.expkey = data.AppendData.expkey;
-        this.msg_id = data.AppendData.msg_id
+        that.$vux.toast.show({
+          text: "验证码发送成功",
+          type: 'success',
+          position: 'middle',
+          time: 2000
+        });
+        that.expkey = data.AppendData.expkey;
+        that.msg_id = data.AppendData.msg_id;
         let number = 60;
-        this.enableCheckBtn = false;
+        that.enableCheckBtn = false;
         that.checkCodeName = "还剩<span style='color:#ff5722'>&nbsp;"+ number +"&nbsp;</span>S";
         let timer = window.setInterval(function growUp() {
           number -= 1;
           that.checkCodeName = "还剩<span style='color:#ff5722'>&nbsp;"+ number +"&nbsp;</span>S";
           if(number === 0){
-            this.enableCheckBtn = false;
+            that.checkCodeName = "获取验证码";
+            that.enableCheckBtn = true;
             window.clearInterval(timer);
           }
         }, 1000);
 
-      // }).catch(function(err){
+      }).catch(function(err){
 
-      //   console.log(err);
-      // });
+        console.log(err);
+      });
 
 
 

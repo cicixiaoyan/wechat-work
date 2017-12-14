@@ -13,7 +13,7 @@ var _getlistbyareidone= (params={})=>getInfo(baseurl+'/employment/getlistbyareid
 var _gettbsysbasicdatabycode=(params={})=>getInfo(baseurl+'/employment/gettbsysbasicdatabycode',params,"get",true);
 
 // 提交用户注册信息
-var _editorganizeinfo = (params={}) => getInfo(baseurl + '/employment/editorganizeinfo', params, "post", true);
+var _editorganizeinfo = (params={}) => getInfo(baseurl + '/employment/editorganizeinfo2', params, "post", true);
 
 //获取机构信息接口及机构状态
 var _getorganizeinfo=(params={})=>getInfo(baseurl+'/employment/getorganizeinfo',params,"get",true);

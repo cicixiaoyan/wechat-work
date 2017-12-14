@@ -57,16 +57,12 @@ export default {
   }
 };
 </script>
-<style src="./assets/iconfont/iconfont.css">
-
-</style>
-
+<style src="./assets/iconfont/iconfont.css"></style>
 
 <style lang="less">
 @import '/style/common.less';
 @import '~vux/src/styles/reset.less';
-// @import '//at.alicdn.com/t/font_502622_e609vzsilv0r7ldi.css';
-// @import 'assets/iconfont/iconfont.css';
+// @import '//at.alicdn.com/t/font_507624_dj5d8uffyfuvj9k9.css';
 
 html{
   font-size: 20px;
@@ -113,7 +109,7 @@ body {
 
 .app{
   > .router-view{
-    .px2rem(margin-top, 80);
+    .px2rem(margin-top, 100);
 
     &.has-bottom-tabbar{
       .px2rem(margin-bottom, 100);
@@ -139,6 +135,7 @@ body {
     left: 0px;
     top: 0px;
     z-index: 100;
+    .px2rem(height, 100);
   }
   .list{
     position: relative;

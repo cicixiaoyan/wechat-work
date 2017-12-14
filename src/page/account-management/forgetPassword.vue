@@ -22,7 +22,7 @@
       <label class="remark">验证码</label>
       <input  placeholder="请输入验证码"  type="password"  v-model="checkCode">
     </div>
-    <button @click='validate' class="btn btn-disabled" :disabled="username==='' || checkCode==''">下一步</button>
+    <button @click='validate' class="btn btn-disabled" :disabled="username==='' || checkCode==''">验证手机号</button>
     </div>
 </div>
 <div v-else-if="index == 1" class="reset">
@@ -73,11 +73,7 @@ export default {
       msgcode: "",
       validateResult: null,
       selected: "",
-      options: [
-        // { text: "One", value: "A" },
-        // { text: "Two", value: "B" },
-        // { text: "Three", value: "C" }
-      ]
+      options: [{ text: "成都同心用朔技有限公司", value: "uoso" }]
     };
   },
   methods: {
@@ -85,8 +81,6 @@ export default {
       console.log("on item click:", index), (this.index = index);
     },
     validate() {
-      // TODO : 检测验证码并跳转到输入密码页面
-
       if (this.msgcode.length > 5 && this.checkCode.length >= 6) {
         _forgetPasswordService
           .findpassword_step1(this.username, this.msgcode, this.checkCode)
@@ -94,7 +88,6 @@ export default {
             // 检查验证码是否正确
             if (data.ResultType == 0 && data.AppendData.status == 1) {
               this.validateResult = data.AppendData;
-              // TODO : 数据绑定到公司列表上
               let secretCodeArray = this.validateResult.listsecretcode;
               this.options = [];
               secretCodeArray.forEach(element => {
@@ -103,7 +96,8 @@ export default {
                   value: element.split("|")[0]
                 });
               });
-              alert('验证通过,请点击重置密码页设置您的新密码');
+              alert("验证通过,请点击重置密码页设置您的新密码");
+              // TODO : 跳转
             } else {
               alert("验证码错误");
             }
@@ -126,9 +120,10 @@ export default {
                 this.msgcode = response.AppendData.msg_id;
                 // TODO : 进入验证码三分钟有效期倒计时
               } else {
-                console.log("获取验证码失败", response.Message);
+                // console.log("获取验证码失败", response.Message);
+                alert(response.Message);
               }
-              console.log("获取验证码的返回值 : ", response);
+              // console.log("获取验证码的返回值 : ", response);
             });
         }
       });
@@ -161,7 +156,7 @@ export default {
               // console.log("密码修改成功 = ", result);
               // alert("密码修改成功");
               // TODO : 跳转到成功页面
-              alert('密码修改成功');
+              alert("密码修改成功");
             }
           });
       } else {

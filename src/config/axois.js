@@ -1,7 +1,10 @@
 import Vue from 'vue';
 import { AjaxPlugin, ToastPlugin } from 'vux';
+import main from '../main';
 
-var  baseurl = process.env.NODE_ENV === 'development' ? 'http://192.168.0.42:10062/apiv1' : 'http://192.168.0.42:10062/apiv1';
+var baseIp = process.env.NODE_ENV === 'development' ? 'http://192.168.0.73:10062' : 'http://192.168.0.73:10062';
+var  baseurl = baseIp + '/apiv1';
+var imgIp = process.env.NODE_ENV === 'development' ? 'http://192.168.0.73:10061' : 'http://192.168.0.73:10061';
 
 function json2url (json) { //, isQueryToken
   var arr = [];
@@ -20,12 +23,14 @@ let sucCallback = function(response, resolve, reject){
       type: 'warn',
       position: 'middle'
     });
-    Vue.$router.push({name: 'login'});
+    main.$router.push({name: 'login'});
+    reject(response.state);
   }else{
     if(!!response.data.ResultType){
       if(response.data.ResultType ===0){
         resolve(response.data);
       }else{
+        reject(response.data.Message);
         Vue.$vux.toast.show({
           text: response.data.Message,
           type: 'warn',
@@ -38,14 +43,16 @@ let sucCallback = function(response, resolve, reject){
   }
 }
 
-let errCallback = function(err, resolve, reject){
-  reject(err)
+let errCallback = function(err, resolve){
   Vue.$vux.toast.show({
-    text: err,
+    text: err.response.data.Message,
     type: 'warn',
     position: 'middle',
-    time: 500000
+    time: 5000
   });
+  if(err.response.status == 401){
+    main.$router.push({name: 'login'});
+  }
 }
 
 var getInfo = (url = '', data = {}, type = 'post', isQueryToken = true) => {
@@ -67,10 +74,10 @@ var getInfo = (url = '', data = {}, type = 'post', isQueryToken = true) => {
         sucCallback(response,resolve, reject);
       })
       .catch(function(err){
-        errCallback(err,resolve, reject);
+        errCallback(err,resolve);
+        reject(err);
       });
     }else{
-      // headers['Content-type'] = 'application/x-www-form-urlencoded';
       AjaxPlugin.$http(
         {
           method: type,
@@ -84,9 +91,10 @@ var getInfo = (url = '', data = {}, type = 'post', isQueryToken = true) => {
       })
       .catch(function(err){
         errCallback(err,resolve, reject);
+        reject(err);
       });
     }
 
   })
 };
-export { getInfo, baseurl };
+export { getInfo, baseurl, baseIp, imgIp };

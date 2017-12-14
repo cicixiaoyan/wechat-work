@@ -3,45 +3,48 @@
     <x-header>提交机构信息</x-header>
     <div class="add-form">
       <group>
-        <div class="mid-title">必填项</div>
-        <x-input title="机构名称" placeholder="机构名称" v-model="item.uoname"></x-input>
-        <selector title="机构类型"  v-model="item.ubusinesstype"  :options="tbsysbasicdatabycode" placeholder="请选择"></selector>
-        <x-input title="执照代码" placeholder="执照代码" v-model="item.businessnumber"></x-input>
-        <x-input title="所属区域" placeholder="所属区域"  @click.native="showArea=true"  v-model="item.arename"></x-input>
+        <div class="mid-title"><span>必填项</span></div>
+        <x-input title="机构名称" required :min="2"  :max="50" placeholder="机构名称" v-model="item.uoname"></x-input>
+        <selector title="机构类型" required  v-model="item.ubusinesstype"  :options="tbsysbasicdatabycode" placeholder="请选择"></selector>
+        <x-input title="执照代码" required :max="30" placeholder="营业执照统一社会信用代码" v-model="item.businessnumber"></x-input>
+        <x-input title="所属区域" required placeholder="所属区域"  @click.native="showArea=true"  v-model="item.arename"></x-input>
         <!-- <cell title="所属区域" text-left :value="item.arename" @click.native="showArea=true"></cell> -->
-        <x-input title="经营地址" placeholder="经营地址" v-model="item.ubusinessaddress"></x-input>
+        <x-input title="经营地址" required :max="200" placeholder="经营地址" v-model="item.ubusinessaddress"></x-input>
         <div class="photo-item" style="text-align:right;">
-          <span>身份证照</span>
-          <uploadImg id='cardidimg' name="cardidimg" @onChange="fileChange" v-model="cardidimg" theme="light"></uploadImg>
+          <span>身份证正面照<br><span style="font-size:small;color:red;">(必须原件)</span></span>
+          <uploadImg id='cardidimg' name="cardidimg" @onChange="cardidimgChange" v-model="cardidimg" theme="light"></uploadImg>
         </div>
         <div class="photo-item" style="text-align:right;">
-          <span>营业执照</span>
-          <uploadImg id='licenceimg' name="licenceimg" v-model="licenceimg" theme="light"></uploadImg>
-          <uploadImg v-if='licenceimg != []' id='licenceimg1' name="licenceimg1" v-model="licenceimg1" theme="light"></uploadImg>
+          <span>营业执照<br><span style="font-size:small;color:red;">(必须原件)</span></span>
+          <uploadImg  @onChange='licenceimgChange' id='licenceimg' name="licenceimg" v-model="licenceimg" theme="light"></uploadImg>
+          <uploadImg @onChange='licenceimgChange1' v-if='licenceimg.length!==0' id='licenceimg1' name="licenceimg1" v-model="licenceimg1" theme="light"></uploadImg>
         </div>
-
       </group>
+
       <group>
         <div class="mid-title" @click='Optionalshow'>
-          选填项
-          <span class="iconfont icon-add" v-if="!showOptional"></span>
-          <span class="iconfont icon-tailor" v-if="showOptional"></span>
+          <span>选填项
+          <span class="iconfont icon-iconfontplatformentrance" v-if="!showOptional"></span>
+          <span class="iconfont icon-down1" v-if="showOptional"></span>
+          </span>
         </div>
         <div v-show="showOptional">
-          <x-input title="法人" placeholder="法人" v-model="item.ulowman"></x-input>
-          <x-input title="身份证号" placeholder="身份证号" v-model="item.ucardid"></x-input>
-          <x-input title="联系电话" placeholder="电话" v-model="item.utel"></x-input>
-          <x-input title="附加说明" placeholder="说明" v-model="item.uremark"></x-input>
+          <x-input title="法人&emsp;&emsp;" :max="10" placeholder="法人" v-model="item.ulowman"></x-input>
+          <x-input title="身份证号" :max="18" :min="15" placeholder="身份证号" v-model="item.ucardid"></x-input>
+          <x-input title="联系电话" is-type="china-mobile" :max="11" :min="11" placeholder="电话" v-model="item.utel"></x-input>
+          <x-input title="附加说明" :max="200" placeholder="说明" v-model="item.uremark"></x-input>
           <div class="photo-item" style="text-align:right;">
-            <span>营业执照</span>
-            <uploadImg id='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg>
-            <uploadImg v-if='permitimg != []' id='permitimg1' name="permitimg1" v-model="permitimg1" theme="light"></uploadImg>
+            <span>营业执照<br><span style="font-size:small;;color:red;">(必须原件)</span></span>
+            <uploadImg  @onChange='permitimgChange' id='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg>
+            <uploadImg @onChange='permitimgChange1' v-if='permitimg.length != 0' id='permitimg1' name="permitimg1" v-model="permitimg1" theme="light"></uploadImg>
           </div>
         </div>
       </group>
 
 
-      <button @click='submit' class="round-big-btn">提交审核</button>
+      <button @click='submit' :disabled="item.uoname == '' || item.ubusinesstype == '' || item.businessnumber == '' ||
+            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0"
+      class="round-big-btn">提交审核</button>
 
       <div v-transfer-dom>
         <popup v-model="showArea">
@@ -99,9 +102,9 @@ export default {
         businessnumber:'',
         uremark:'',
         upicurl:'',
-        cardidimg:[],
-        licenceimg:[],
-        permitimg:[],
+        cardidimg: '',
+        licenceimg: '',
+        permitimg: '',
         ulaudtistatus:'',
         ulstatus:'',
         description:''
@@ -157,57 +160,37 @@ export default {
   },
   methods: {
     submit() {
-      let formData = new FormData();
-      formData.append('uname', this.item.uname);
-      formData.append('usex', this.item.usex);
-      formData.append('utel', this.item.utel);
-      formData.append('ucardid', this.item.ucardid);
-      formData.append('uoname', this.item.uoname);
-      formData.append('areid', this.item.areid);
-      formData.append('arename', this.item.arename);
-      formData.append('ubusinessaddress', this.item.ubusinessaddress);
-      formData.append('ubusinesstype', this.item.ubusinesstype);
-      formData.append('ubusinesstypename', this.item.ubusinesstypename);
-      formData.append('ulowman', this.item.ulowman);
-      formData.append('uremark', this.item.uremark);
-      formData.append('upicurl', this.item.upicurl);
-      formData.append('ulaudtistatus', this.item.ulaudtistatus);
-      formData.append('ulstatus', this.item.ulstatus);
-      formData.append('description', this.item.description);
-
-      formData.append('cardidimg', [...this.cardidimg, ...this.cardidimg1]);
-      formData.append('licenceimg', [...this.licenceimg, ...this.licenceimg1]);
-      formData.append('permitimg', this.permitimg);
-
-
-      let header = {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': "Bearer " +  window.localStorage.getItem('AccessToken')
-      }
-
-      this.$http.post(baseurl+'/employment/editorganizeinfo', formData, config).then((res) =>{
-        console.log(data)
-      }).catch((err) => {
-
-      })
-      // console.log(this.item)
-      // employmentServices
-      //   ._editorganizeinfo(this.item)
-      //   .then(function(data) {
-      //     if (data.ResultType == 0) {
-      //       this.$router.push({ path: "/app/appointment/view" });
-      //     }
-      //   })
-      //   .catch(function(err) {
-      //     console.log(err, "err");
-      //   });
+      let that = this;
+      this.item.cardidimg =  encodeURIComponent(this.cardidimg); 
+      this.item.licenceimg = encodeURIComponent(this.licenceimg+"|"+this.licenceimg1);
+      this.item.permitimg = encodeURIComponent(this.permitimg+"|"+this.permitimg1);
+      employmentServices
+        ._editorganizeinfo(this.item)
+        .then(function(data) {
+          if (data.ResultType == 0) {
+            that.$router.push({ name: "submit-information-view", params: {read: true}});
+          }
+        })
+        .catch(function(err) {
+          console.log(err, "err");
+        });
     },
-    fileChange(file, name){
-      // this.item.cardidimg[0] = file;
-
+    cardidimgChange(file, name){
+      this.cardidimg = file;
+    },
+    licenceimgChange(file, name){
+      this.licenceimg = file;
+    },
+    licenceimgChange1(file, name){
+      this.licenceimg1 = file;
+    },
+    permitimgChange(file, name){
+      this.permitimg = file;
+    },
+    permitimgChange1(file, name){
+      this.permitimg1 = file;
     },
     Optionalshow() {
-      console.log(this.showOptional);
       this.showOptional = !this.showOptional;
     },
     changeAreid(){
@@ -219,19 +202,21 @@ export default {
     changeArea(val, label){
       let that = this;
       if(val.length !== 0){
-        let parma = {"areid": val[0]}
+        let values =  val[0].split(",");
+        let parma = {"areid": values[0]}
         employmentServices._getlistbyparentid(parma)
         .then(function(data){
           let list = data.AppendData;
           if(list.length == 0){
             that.showArea = false;
             that.haschidren = false;
-            that.item.areid = val[0];
+            that.item.areid = values[1];
             that.item.arename = label[0];
           }else{
             that.haschidren = true;
+            that.showArea = true;
             list.forEach(function(value, index, array1){
-              list[index].key = value.AreID;
+              list[index].key = [value.AreID, value.AreCode].join(",");
               list[index].value = value.AreName;
             });
             that.objectList1 = list;
@@ -244,8 +229,9 @@ export default {
 
     },
     changeArea1(value, label){
-      if(value){
-        this.item.areid = value[0];
+      if(value.length != 0){
+        let values =  value[0].split(",");
+        this.item.areid = values[1];
         this.item.arename = label[0];
         this.showArea = false;
         this.haschidren = true;
@@ -257,7 +243,7 @@ export default {
         if(data.ResultType === 0){
           let list = data.AppendData;
           list.forEach(function(value, index, array1){
-            list[index].key = value.Name;
+            list[index].key = value.BDID;
             list[index].value = value.Value;
           });
           that.tbsysbasicdatabycode = list;
@@ -272,9 +258,10 @@ export default {
         if(data.ResultType === 0){
           let list = data.AppendData;
           list.forEach(function(value, index, array1){
-            list[index].key = value.AreID;
+            list[index].key = [value.AreID, value.AreCode].toString();
             list[index].value = value.AreName;
           });
+          console.log(list)
           that.objectList = list;
         }else{
         }
@@ -286,7 +273,7 @@ export default {
 
 
 <style lang="less">
-  .router-view{
+  body{
     background: #3c9;
   }
 
@@ -304,6 +291,10 @@ export default {
       background: #fff;
       color: #3c9;
       margin-top: 0.5rem;
+      &[disabled]{
+        background: #ccc;
+        color: cornsilk;
+      }
     }
 
     .weui-cells__title {
@@ -316,6 +307,10 @@ export default {
       background: #f5f2f2;
       color: #4caf50;
       position: relative;
+      >span{
+        border-left: .2em solid #3c9;
+        padding-left: .3em;
+      }
       .iconfont {
         position: absolute;
         right: 0.1rem;
@@ -335,6 +330,7 @@ export default {
       left: 0.417rem;
       top: 50%;
       transform: translateY(-50%);
+      text-align: left;
     }
 
     &::before {

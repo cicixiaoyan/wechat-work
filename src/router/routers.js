@@ -101,7 +101,7 @@ export default [
         }
       },
       {
-        path: '/app/submit-information/view',
+        path: '/app/submit-information/view/:read',
         name: 'submit-information-view',
         component: function (resolve) {
           require(['../page/submit-information/view'], resolve);
