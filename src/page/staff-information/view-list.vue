@@ -31,7 +31,7 @@
 
 <script>
 import { XHeader, TransferDom,  Swipeout, SwipeoutItem, SwipeoutButton } from 'vux';
-import _appointmentServce from '../../service/appointmentServices'
+import {_appointmentServce} from '../../service/appointmentServices'
 import scroll from '../../components/scroll';
 export default {
   name: 'staff-information-view-list',
@@ -64,8 +64,11 @@ export default {
           PhStatus: '0'
         }
       ],
-      page: 1,
+      page: 0,
       size: 20,
+      loadmore: true,
+      isLoading: false,
+      nodata: false,
     };
   },
   computed:{
@@ -94,6 +97,7 @@ export default {
     onRefresh(done) {
       this.page = 1;
       this.list = [];
+      this.loadmore = true;
       this.loadData();
       setTimeout(() => {
         done(); //必须有
@@ -108,7 +112,7 @@ export default {
       let that = this;
       // 加载更多时间
       setTimeout(() => {
-        that.nodata ? done(true) : done();
+        that.loadmore ? done() : done(true);
       }, 1500)
     },
     loadData(pageindex = 1, pagesize = 10) {
@@ -119,11 +123,17 @@ export default {
           if(data.AppendData.length !== 0){
             that.list = data.AppendData;
             that.nodata = false;
+            this.loadmore = true;
             this.isLoading = false;
             console.log(data.AppendData);
           }else{
-            that.nodata = true;
-            that.noDataText = that.page == 1 ? '' : '没有更多数据';
+            that.loadmore = false;
+            if(that.page == 1){
+              that.nodata = true
+              that.noDataText = "";
+            }else{
+              that.noDataText = '---- 我是底线 ----';
+            }
           }
         }
       }).catch(err => console.log(err));

@@ -33,11 +33,13 @@
         </div>
         <div v-show="showOptional">
           <x-input title="法人&emsp;&emsp;" :readonly='read':max="10" placeholder="法人" v-model="item.ulowman"></x-input>
-          <x-input title="身份证号" :readonly='read' :max="18" :min="15" placeholder="身份证号" v-model="item.ucardid"></x-input>
-          <x-input title="联系电话" :readonly='read' is-type="china-mobile" :max="11" :min="11" placeholder="电话" v-model="item.utel"></x-input>
+          <x-input title="身份证号" @on-change="getIdcValid" :readonly='read' :max="18" :min="15" placeholder="身份证号" v-model="item.ucardid"></x-input>
+          <div v-if="!idcValid" class="valid-err">请输入合法的身份证号码</div>
+          <x-input title="联系电话" @on-change="getTelValid" :readonly='read' is-type="china-mobile" :max="11" :min="11" placeholder="手机号" v-model="item.utel"></x-input>
+          <div v-if="!telValid" class="valid-err">请输入合法的电话号码</div>          
           <x-input title="附加说明" :readonly='read' :max="200" placeholder="说明" v-model="item.uremark"></x-input>
           <div class="photo-item" style="text-align:right;">
-            <span>营业执照<br><span style="font-size:small;;color:red;">(必须原件)</span></span>
+            <span>卫生许可<br><span style="font-size:small;;color:red;">(必须原件)</span></span>
             <uploadImg :readonly='read' @onChange='permitimgChange' :imgSrc="permitimg" id='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg>
             <uploadImg :readonly='read' @onChange='permitimgChange1' :imgSrc="permitimg1" v-if='permitimg.length != 0' id='permitimg1' name="permitimg1" v-model="permitimg1" theme="light"></uploadImg>
           </div>
@@ -46,7 +48,7 @@
 
 
       <button v-if='!read' @click='submit' :disabled="item.uoname == '' || item.ubusinesstype == '' || item.businessnumber == '' ||
-            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0"
+            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0 || !idcValid || !telValid" 
       class="round-big-btn">提交审核</button>
 
       <div v-transfer-dom>
@@ -126,7 +128,9 @@ export default {
       haschidren: false,
       objectListValue1: [],
       objectList1: [],
-      // gettbsysbasicdatabycode: []
+      // 验证类
+      idcValid: true,
+      telValid: true
     };
   },
   computed: {
@@ -141,7 +145,6 @@ export default {
       that.licenceimg1 = !!that.item.licenceimg[1]?imgIp+that.item.licenceimg[1]:'';
       that.permitimg = !!that.item.permitimg[0]?imgIp+that.item.permitimg[0]:'';
       that.permitimg1 = !!that.item.permitimg[1]?imgIp+that.item.permitimg[1]:'';
-       console.log(that.cardidimg,that.licenceimg,);
     }).catch(err => console.log(err))
     this.getareas();
     this.gettbsysbasicdatabycode();
@@ -149,57 +152,19 @@ export default {
   methods: {
     submit() {
       let that = this;
-      if(this.cardidimg !== imgIp+this.item.cardidimg[0])
-        this.item.cardidimg =  encodeURIComponent(this.cardidimg); 
-      else this.item.cardidimg = ""
-
-      if(this.licenceimg === imgIp + this.item.licenceimg[0]){
-        this.item.licenceimg = ''
-      }else{
-        if(this.item.licenceimg.length == 2){
-          if(this.licenceimg1 === imgIp+this.item.licenceimg[1]){
-            this.item.licenceimg = encodeURIComponent(this.licenceimg)
-          }else{
-            this.item.licenceimg = encodeURIComponent(this.licenceimg+'|'+this.licenceimg1)
-          }
-        }else{
-          if(this.licenceimg.length !== 0){
-            this.item.licenceimg = encodeURIComponent('|'+this.licenceimg1)
-          }else{
-            this.item.licenceimg = encodeURIComponent(this.licenceimg);
-          }
-          
-        }
-      }
-
-      if(this.item.permitimg.length == 0){
-        this.item.permitimg = encodeURIComponent(this.permitimg+"|"+this.permitimg1);
-      }else{
-        if(this.permitimg === imgIp + this.item.permitimg[0]){
-          this.item.permitimg = ''
-        }else{
-          if(this.item.permitimg.length == 2){
-            if(this.permitimg1 === imgIp+this.item.permitimg[1]){
-              this.item.permitimg = encodeURIComponent(this.permitimg)
-            }else{
-              this.item.permitimg = encodeURIComponent(this.permitimg+'|'+this.permitimg1)
-            }
-          }else{
-            if(this.licenceimg.length !== 0){
-              this.item.permitimg = encodeURIComponent('|'+this.permitimg)
-            }else{
-              this.item.permitimg = encodeURIComponent(this.permitimg);
-            }
-          }
-        }
-      }
-
-
-
+      if(this.item.cardidimg.length < 3) this.item.cardidimg = "";
+      if(this.item.licenceimg.length < 3) this.item.licenceimg = "";
+      if(this.item.permitimg.length < 3) this.item.permitimg = "";
+      // console.log("0: "+this.item.cardidimg.length, "1: "+ this.item.licenceimg.length, "2: "+ this.item.permitimg.length)
       employmentServices
         ._editorganizeinfo(this.item)
         .then(function(data) {
           if (data.ResultType == 0) {
+            Vue.$vux.toast.show({
+              text: "提交信息成功",
+              type: 'success',
+              position: 'middle'
+            });
             that.$router.push({ name: "submit-information-view", params: {read: true}});
           }
         })
@@ -208,25 +173,60 @@ export default {
         });
     },
     cardidimgChange(file, name){
+      if(this.cardidimg == imgIp + this.item.cardidimg[0]) return;
+            // console.log("cardidimgChange")
       this.cardidimg = file;
+      this.item.cardidimg = encodeURIComponent(file);
     },
     licenceimgChange(file, name){
-      this.licenceimg = file;
+      if(file == imgIp + this.item.licenceimg[0]) return;
+      // console.log("licenceimgChange")
+       this.licenceimg = file;
+      if(this.item.length == 1) {
+        this.item.licenceimg = encodeURIComponent(file + "|" + this.licenceimg1);
+      }else{
+        this.item.licenceimg = (this.licenceimg1 == imgIp + this.item.licenceimg[1])?
+          encodeURIComponent(file) : 
+          encodeURIComponent(file + "|" + this.licenceimg1)
+      }
     },
     licenceimgChange1(file, name){
+      if(!!this.item.licenceimg[1] && (file == imgIp + this.item.licenceimg[1])  ) return;
+      // console.log("licenceimgChange1");
       this.licenceimg1 = file;
+      this.item.licenceimg = (this.licenceimg == imgIp + this.item.licenceimg[0])?
+          encodeURIComponent("|"+file) : 
+          encodeURIComponent(this.licenceimg + "|" + file)
     },
     permitimgChange(file, name){
+      if(!!this.item.permitimg[0] && (file == imgIp + this.item.permitimg[0]) ) return;
+      // console.log("permitimgChange");
+      if(this.item.permitimg.length == 0 || this.item.permitimg.length == 1){
+        this.item.permitimg = encodeURIComponent(file + "|" + this.permitimg1)
+      }else{
+        this.item.permitimg = (this.permitimg1 == imgIp + this.item.permitimg[1])?
+          encodeURIComponent(file) :
+          encodeURIComponent(file + "|" + this.permitimg1)
+      }
+
       this.permitimg = file;
     },
     permitimgChange1(file, name){
+      if(!!this.item.permitimg[1] && (file == imgIp + this.item.permitimg[1])) return;
+      // console.log("permitimgChange1");
       this.permitimg1 = file;
+      if(this.item.permitimg.length == 0){
+        this.item.permitimg = encodeURIComponent(this.permitimg + "|" + file);
+      }
+      else{
+        this.item.permitimg = (this.permitimg == imgIp + this.item.permitimg[0])?
+        encodeURIComponent("|" + file):
+        encodeURIComponent( this.permitimg + "|" + file)
+      }
+      
     },
     Optionalshow() {
       this.showOptional = !this.showOptional;
-    },
-    changeAreid(){
-
     },
     set(){
       this.showArea = false;
@@ -293,11 +293,27 @@ export default {
             list[index].key = [value.AreID, value.AreCode].toString();
             list[index].value = value.AreName;
           });
-          console.log(list)
+          // console.log(list)
           that.objectList = list;
         }else{
         }
       })
+    },
+    getIdcValid(value){
+      var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/
+      if((this.item.ucardid.length == 15 || this.item.ucardid.length==18) && reg.test(this.item.ucardid)){
+        this.idcValid = true;
+      }else{
+        if(this.item.ucardid.length !== 0) this.idcValid = false;
+      }
+    },
+    getTelValid(value){
+      var reg = /^((13[0-9])|(14[5|7])|(15([0-9]))|(17[0-9])|(18[0-9]))\d{8}$/;
+      if((this.item.utel.length==11) && reg.test(this.item.utel)){
+        this.telValid = true;
+      }else{
+        if(this.item.utel.length !== 0) this.telValid = false;
+      }
     }
   }
 };
@@ -310,6 +326,11 @@ export default {
   }
 
 .myapp {
+  .valid-err{
+    text-align: center;
+    font-size: small;
+    color: red;
+  }
   .wait{
     color: yellow;
     text-align: center;

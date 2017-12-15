@@ -69,7 +69,7 @@
       },
       noDataText: {
         type: String,
-        default: '没有更多数据'
+        default: '----我是底线----'
       },
       width: {
         type: String,

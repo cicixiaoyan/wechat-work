@@ -2,14 +2,15 @@
   <div>
     <x-header>提交体检预约申请</x-header>
     <group>
-      <selector title="机构名称" v-model="item.Hospital"  :options="HospitalList"
-        @on-change='changeOrid' placeholder="请选择"></selector>
-      <cell title="体检日期" value-align="left" is-link @click.native="showpop=true" :is-loading="!item.Time" :value="item.Time"></cell>
-      <cell title="成员列表" value-align="left" :value="item.Number+'人'" is-link :link="{name:'staff-information-list'}"></cell>
-      <x-textarea title="预约说明" :max="100" placeholder="预约说明" :show-counter="true"  :rows="2"></x-textarea>
+      <selector title="机构名称" required v-model="item.PhAOrCode"  :options="orinfoList"  @on-change='changeOrcode' placeholder="请选择"></selector>
+      
+      <!-- <selector title="机构类型" required  v-model="item.ubusinesstype"  :options="tbsysbasicdatabycode" placeholder="请选择"></selector> -->
+      <cell title="体检日期" value-align="left" is-link @click.native="showpop=true"  :value="item.PPNID"></cell>
+      <cell title="成员列表" value-align="left" :value="pnumber+'人'" is-link :link="{name:'staff-information-list'}"></cell>
+      <x-textarea title="预约说明" v-model="item.PhADescription" :max="100" placeholder="预约说明" :show-counter="true"  :rows="2"></x-textarea>
     </group>
     <div class="submit-box">
-      <button @click='submit' class="round-big-btn" :disabled="item.Hospital===''|| item.Number===0|| item.Time==''" >完成并提交</button>
+      <button @click='submit' class="round-big-btn" :disabled="item.PhAOrCode===''|| pnumber===0|| item.PPNID==''" >完成并提交</button>
     </div>
 
     <div v-transfer-dom>
@@ -45,20 +46,12 @@ export default {
     Popup,
     Picker
   },
-  computed :{
-
-  },
   created(){
     // 机构列表
-    _appointmentServce.gettbsysorganize().then((data) => {
-      let list = data.AppendData;
-      list.forEach(function(value, index, array1){
-        list[index].key = value.AreID;
-        list[index].value = value.AreName;
-        this.HospitalList = list;
-      });
-    })
-    .catch((err) => {console.log(err);})
+    // this.gettbsysorganize();
+    this.item.phid = this.$route.params.phid;
+    this.pnumber = this.item.phid.length == 0?0:this.item.phid.split(',').length-1;
+    this.orinfoList = [{key:1, value:1},{key:2, value:2}]
   },
   data () {
     return {
@@ -91,15 +84,14 @@ export default {
         },
       ],
       mytime: [],
-      HospitalList: [{key: '1', value: '武侯区第一医院'}, {key: '2', value: '武侯区第二医院'}],
+      orinfoList: [],
       item: {
-        Status: '1',
-        Hospital: '成都市华西第四医院',
-        Number: '30',
-        Listparma: '123',
-        Time: '2017-04-04 上午',
-        Description: '批准申请',
-      }
+        phid: '',
+        PhAOrCode: '',
+        PPNID: '',
+        PhADescription: '批准申请',
+      },
+      pnumber: ''
     };
   },
   methods: {
@@ -107,17 +99,35 @@ export default {
       console.log('提交');
     },
     getTime() {
-      this.item.Time = this.mytime.join(" ");
+      this.item.PPNID = this.mytime.join(" ");
       this.showpop = false
     },
-    changeOrid(value, label) {
+    changeOrcode(value, label) {
+      console.log(value, label)
       // 根据体检机构获取预约剩余人数
       _appointmentServce.gettbphysicalpeoplenumber(value)
       .then((data) => {
         console.log(data);
       })
       .catch((err) => { console.log(err) })
-    }
+    },
+    gettbsysorganize(){
+      let that = this;
+      _appointmentServce.gettbsysorganize().then((data) => {
+        let list = data.AppendData;
+        let arr = [];
+        list.forEach(function(value, index, array1){
+          arr.push({
+            key: value.OrCode,
+            value: value.OrName
+          });
+          // list[index].key = value.OrCode;
+          // list[index].value = value.OrName;
+        });
+        that.orinfoList = [...arr];
+      })
+      .catch((err) => {console.log(err);})
+      }
   }
 };
 </script>

@@ -1,23 +1,7 @@
 <template >
   <div class="myapp">
     <x-header :left-options="{showBack: false}">申请记录</x-header>
-    <!-- <panel :footer="footer" :list="list" :type="type" @on-img-error="onImgError"></panel> -->
-    <!-- <vscroll :on-refresh="onRefresh" :on-infinite="onInfinite">
-      <div class="list">
-        <div class="item" v-for="item in list" @click='view(item.Id,item.originalData)'>
-          <div class="left-ctx"
-          v-bind:class="{ 'warning': item.status=='待审核', 'danger': item.status=='未通过', 'success': item.status=='已通过' }">
-            {{item.status}}
-          </div>
-          <div class="right-ctx">
-            <h4>{{item.time}}</h4>
-            <p>[{{item.number}}]&emsp;预约人数</p>
-          </div>
-        </div>
-      </div>
-      <div v-if='nodata'></div>
-    </vscroll> -->
-    <scroll style="top: 44px;"
+    <scroll class='scroll-normal'
           :on-refresh="onRefresh"
           :on-infinite="onInfinite"
           :noDataText='noDataText'
@@ -31,6 +15,7 @@
           <div class="right-ctx">
             <h4>{{item.time}}</h4>
             <p>[{{item.number}}]&emsp;预约人数</p>
+            <p>{{item.originalData.PhaOrName}}</p>
           </div>
         </div>
       </div>
@@ -55,68 +40,21 @@ export default {
     scroll
   },
   created() {
-    console.log("创建成功");
-    this.loadData();
+    // console.log("创建成功");
+    // this.loadData();
   },
   data() {
     return {
-      // note: changing this line won't causes changes
-      // with hot-reload because the reloaded component
-      // preserves its current state and we are modifying
-      // its initial state.
-      list: [
-        // {
-        //   Id: "1",
-        //   time: "2017-01-01 14:00:00",
-        //   number: "50",
-        //   status: "待审核"
-        // },
-        // {
-        //   Id: "2",
-        //   time: "2017-01-02 14:00:00",
-        //   number: "51",
-        //   status: "已通过"
-        // },
-        // {
-        //   Id: "3",
-        //   time: "2017-01-02 14:00:00",
-        //   number: "50",
-        //   status: "未通过"
-        // },
-        // {
-        //   Id: "4",
-        //   time: "2017-01-02 14:00:00",
-        //   number: "50",
-        //   status: "未通过"
-        // },
-        // {
-        //   Id: "5",
-        //   time: "2017-01-02 14:00:00",
-        //   number: "50",
-        //   status: "未通过"
-        // },
-        // {
-        //   Id: "6",
-        //   time: "2017-01-02 14:00:00",
-        //   number: "50",
-        //   status: "已通过"
-        // },
-        // {
-        //   Id: "7",
-        //   time: "2017-01-02 14:00:00",
-        //   number: "50",
-        //   status: "未通过"
-        // }
-      ],
+      list: [],
       maxPageIndex: 1,
       isLoading: false,
       nodata: false,
       noDataText: '',
-      page: 1,
+      loadmore: true,
+      page: 0,
       size: 10,
       snapping: false,
       showInfiniteLayer: false,
-
     };
   },
   methods: {
@@ -129,6 +67,7 @@ export default {
     onRefresh(done) {
       this.page = 1;
       this.list = [];
+      this.loadmore = true;
       this.loadData();
       setTimeout(() => {
         done(); //必须有
@@ -147,18 +86,9 @@ export default {
       let that = this;
       // 加载更多时间
       setTimeout(() => {
-        that.nodata ? done(true) : done();
+        that.loadmore ? done() : done(true);
       }, 1500)
-
       console.log("加载更多数据");
-      // console.log(
-      //   "this.lastPageIndex = " +
-      //     this.lastPageIndex +
-      //     " this.maxPageIndex = " +
-      //     this.maxPageIndex
-      // );
-
-
     },
     loadData(pageindex = 1, pagesize = 10) {
       // this.maxPageIndex = pageindex;
@@ -169,18 +99,18 @@ export default {
           if(data.AppendData.length !== 0){
             that.appendToList(data.AppendData);
             that.nodata = false;
-            this.isLoading = false;
-            // that.maxPageIndex = pageindex;
-            // setTimeout(() => {
-            //   // this.isLoading = false; // TODO
-            // }, 200);
-            // console.log(
-            //   "数据获取成功  pageindex = " + pageindex + " pagesize =" + pagesize
-            // );
+            that.loadmore = true;
+            that.isLoading = false;
             console.log(data.AppendData);
           }else{
-            that.nodata = true;
-            that.noDataText = that.page == 1 ? '' : '没有更多数据';
+            that.loadmore = false;
+            if(that.page == 1){
+              that.nodata = true
+              that.noDataText = "";
+            }else{
+              that.noDataText = '---- 我是底线 ----';
+            }
+            
           }
         }
       }).catch(err => console.log(err));

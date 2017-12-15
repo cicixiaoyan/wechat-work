@@ -11,12 +11,12 @@ export var _staffServce = {
         // string phcardid   身份证
         // string phtel  电话
         // string phunit 工作单位
-        return getInfo(baseurl + '/employment/creatphysicalinfo', parma, 'get', true);
+        return getInfo(baseurl + '/employment/creatphysicalinfo', parma, 'post', true);
     },
 
     // 获取某个体检人员信
     editphysicalinfo: (id) => {
-        return getInfo(baseurl + '/employment/editphysicalinfo', { "PhId": id }, 'post', true);
+        return getInfo(baseurl + '/employment/editphysicalinfo', { "PhId": id }, 'get', true);
     },
 
     // 修改体检人员信息

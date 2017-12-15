@@ -7,7 +7,7 @@ import App from './App';
 // import Home from './components/HelloFromVux'
 import store from './store';
 import routers from './router/routers';
-import { ToastPlugin, ConfirmPlugin, AjaxPlugin } from 'vux';
+import { ToastPlugin, ConfirmPlugin, AjaxPlugin, ConfigPlugin } from 'vux';
 
 Vue.use(VueRouter);
 Vue.use(ToastPlugin);
@@ -21,8 +21,13 @@ Vue.prototype.$http.defaults.baseURL = 'http://192.168.0.42:10062';
 // }]
 
 const router = new VueRouter({
+  // mode: "history",
   routes: routers
 });
+
+Vue.use(ConfigPlugin, {
+  $layout: 'VIEW_BOX' // global config for VUX
+})
 
 // simple history management
 const history = window.sessionStorage
@@ -79,8 +84,8 @@ router.afterEach(function (to) {
   isPush = false
   store.commit('updateLoadingStatus', {isLoading: false})
   if (process.env.NODE_ENV === 'production') {
-    ga && ga('set', 'page', to.fullPath)
-    ga && ga('send', 'pageview')
+    // ga && ga('set', 'page', to.fullPath)
+    // ga && ga('send', 'pageview')
   }
 })
 

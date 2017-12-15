@@ -25,7 +25,7 @@
           <a @click='findPwd'>忘记密码?</a>
           </div>
       </div>
-      <button @click='login' class="login" :disabled="mobile===''|| password===''" >登陆</button>
+      <button @click='login' class="login" :disabled="mobile==='' || phoneInValid != '' || password===''" >登陆</button>
     </div>
 
     <div v-transfer-dom>
@@ -45,6 +45,16 @@ export default {
   components: {
     XHeader,
     Loading
+  },
+  created(){
+    let that = this;
+    document.onkeydown = function(event){
+      var ev = event || window.event || arguments.callee.caller.arguments[0];
+      if (ev && ev.keyCode == 13) {
+          if(that.mobile==='' || that.phoneInValid != '' || that.password==='') return;
+          that.login();
+      }
+    };
   },
   data () {
     return {
@@ -73,11 +83,12 @@ export default {
 
           _userServices._getUserMsg().then(function(data1){
             that.showload = false;
+            window.localStorage.setItem('ULName', data1.ULName);
              //已审核通过 转到 人员信息页面
             if(data1.ULAudtiStatus == 3){
               that.$router.push({name: 'staff-information-list'});
             }
-            if(data1.ULAudtiStatus == 1 || data1.ULAudtiStatus == 2){
+            else if(data1.ULAudtiStatus == 1 || data1.ULAudtiStatus == 2){
               if(data1.ULAudtiStatus == 1){
                 that.$router.push({name: 'submit-information-view', params: { 'read': false }});
               }else{

@@ -30,11 +30,14 @@
         </div>
         <div v-show="showOptional">
           <x-input title="法人&emsp;&emsp;" :max="10" placeholder="法人" v-model="item.ulowman"></x-input>
-          <x-input title="身份证号" :max="18" :min="15" placeholder="身份证号" v-model="item.ucardid"></x-input>
-          <x-input title="联系电话" is-type="china-mobile" :max="11" :min="11" placeholder="电话" v-model="item.utel"></x-input>
+          <div v-if="item.ulowman>10" class="valid-err">最多输入10位</div>
+          <x-input title="身份证号" @on-change="getIdcValid" :max="18" :min="15" placeholder="身份证号" v-model="item.ucardid"></x-input>
+          <div v-if="!idcValid" class="valid-err">请输入合法的身份证号码</div>
+          <x-input title="联系电话" @on-change="getTelValid" is-type="china-mobile" :max="11" :min="11" placeholder="电话" v-model="item.utel"></x-input>
+          <div v-if="!telValid" class="valid-err">请输入合法的身份证号码</div>
           <x-input title="附加说明" :max="200" placeholder="说明" v-model="item.uremark"></x-input>
           <div class="photo-item" style="text-align:right;">
-            <span>营业执照<br><span style="font-size:small;;color:red;">(必须原件)</span></span>
+            <span>卫生许可<br><span style="font-size:small;;color:red;">(必须原件)</span></span>
             <uploadImg  @onChange='permitimgChange' id='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg>
             <uploadImg @onChange='permitimgChange1' v-if='permitimg.length != 0' id='permitimg1' name="permitimg1" v-model="permitimg1" theme="light"></uploadImg>
           </div>
@@ -43,7 +46,7 @@
 
 
       <button @click='submit' :disabled="item.uoname == '' || item.ubusinesstype == '' || item.businessnumber == '' ||
-            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0"
+            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0 || !idcValid || !telValid"
       class="round-big-btn">提交审核</button>
 
       <div v-transfer-dom>
@@ -116,39 +119,14 @@ export default {
       permitimg1:[],
       showOptional: false,
       showArea: false,
-      areidList: [
-        {
-          name: "2017-7-7",
-          value: "2017-7-7",
-          parent: 0
-        },
-        {
-          name: "上午",
-          value: "上午",
-          parent: "2017-7-7"
-        },
-        {
-          name: "下午",
-          value: "下午",
-          parent: "2017-7-7"
-        },
-        {
-          name: "2017-7-8",
-          value: "2017-7-8",
-          parent: 0
-        },
-        {
-          name: "上午",
-          value: "上午",
-          parent: "2017-7-8"
-        }
-      ],
       tbsysbasicdatabycode: [],
       objectListValue: [],
       objectList: [],
       haschidren: false,
       objectListValue1: [],
       objectList1: [],
+      idcValid: true,
+      telValid: true
       // gettbsysbasicdatabycode: []
     };
   },
@@ -168,6 +146,11 @@ export default {
         ._editorganizeinfo(this.item)
         .then(function(data) {
           if (data.ResultType == 0) {
+            Vue.$vux.toast.show({
+              text: "提交信息成功",
+              type: 'success',
+              position: 'middle'
+            });
             that.$router.push({ name: "submit-information-view", params: {read: true}});
           }
         })
@@ -266,6 +249,22 @@ export default {
         }else{
         }
       })
+    },
+    getIdcValid(value){
+      var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/
+      if((this.item.ucardid.length == 15 || this.item.ucardid.length==18) && reg.test(this.item.ucardid)){
+        this.idcValid = true;
+      }else{
+        if(this.item.ucardid.length !== 0) this.idcValid = false;
+      }
+    },
+    getTelValid(value){
+      var reg = /^((13[0-9])|(14[5|7])|(15([0-9]))|(17[0-9])|(18[0-9]))\d{8}$/;
+      if((this.item.utel.length==11) && reg.test(this.item.utel)){
+        this.telValid = true;
+      }else{
+        if(this.item.utel.length !== 0) this.telValid = false;
+      }
     }
   }
 };
@@ -278,6 +277,11 @@ export default {
   }
 
 .myapp {
+  .valid-err{
+    text-align: center;
+    font-size: small;
+    color: red;
+  }
   .add-form {
     margin: 28/72*1rem;
     > div {

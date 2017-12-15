@@ -2,22 +2,28 @@
   <div class="myapp">
     <x-header :left-options="{showBack: false}">成员列表({{totalNumber}})<a slot="left" @click="showchecktime=true">添加</a><a slot="right" @click='appointment'>预约</a></x-header>
     <!-- <panel :footer="footer" :list="list" :type="type" @on-img-error="onImgError"></panel> -->
-    <vscroll :on-refresh="onRefresh" :on-infinite="onInfinite">
+    <scroll :class='{"scroll-checkallow":checkAllow,"scroll-normal":!checkAllow}'
+          :on-refresh="onRefresh"
+          :noDataText='noDataText'
+          ref="my_scroller">
       <div class="list">
         <swipeout>
-          <swipeout-item ref="swipeoutItem"  transition-mode="follow" v-for="(item, index) in list" :key="item.Id">
+          <swipeout-item ref="swipeoutItem"  transition-mode="follow" v-for="(item, index) in list" :key="item.PhID">
             <div slot="right-menu">
-              <swipeout-button @click="deleteItem(index)" type="warn">删除</swipeout-button>
+              <swipeout-button v-if='item.IsLeave==0' @click.native.prevent="deleteItem(index)" type="warn">删除</swipeout-button>
+              <swipeout-button v-if='item.IsLeave==1' @click.native.prevent="recoverItem(index)" type="warn">复职</swipeout-button>
             </div>
             <div slot="content">
             <label class="item">
-              <div class="left-ctx"  @click='change(index)'>
+              <div class="left-ctx"  @click='change(index)' v-if="checkAllow && (item.PhStatus==0) && (item.IsLeave==0)">
                 <span v-show='!item.checked' class="iconfont icon-checknormal"></span>
                 <span v-show='item.checked' class="iconfont icon-checkedon success"></span>
               </div>
+              <div  class="left-ctx" v-if="checkAllow  && ((item.IsLeave!=0) || (item.PhStatus!=0))">&nbsp;</div>
               <div class="right-ctx">
-                <h4>{{item.phName}}</h4>
-                <p>[{{item.phcardid}}]</p>
+                <h4>{{item.PhName}}<span>[{{item.age}}岁]</span>&emsp;{{item.PhSex}}</h4>
+                <p>{{item.PhCardId}}</p>
+                <p>{{item.IsLeave == 0 ? '在职' : '离职'}}</p>
               </div>
               <span class="iconfont icon-accessory" @click="$refs.swipeoutItem[index].open('right')"></span>
             </label>
@@ -26,9 +32,8 @@
         </swipeout>
 
       </div>
-    </vscroll>
-      <!-- <checklist  :options="ilist" v-model="checkValue" @on-change="change"></checklist> -->
-    <flexbox align='stretch'  :gutter="0" class="fix-bottom">
+    </scroll>
+    <flexbox v-if="checkAllow" align='stretch'  :gutter="0" class="fix-bottom">
       <flexbox-item @click.native='checkall'>
         <label>
           <span v-show='!checkAll' class="iconfont icon-checknormal gray"></span>
@@ -49,38 +54,43 @@
               <span class="iconfont icon-gerenxinxi"></span>
             </flexbox-item>
             <flexbox-item>
-              <input type="text" placeholder="姓名" name="phName" value="">
+              <input type="text" placeholder="姓名" @input="testName" maxlength="8" name="phName" v-model="addData.phName">
             </flexbox-item>
           </flexbox>
+          <div class="valid-err" v-if='!nameValid'>{{addData.phName == "" ? '姓名必填':''}}{{addData.phName.length > 10 ? '姓名最多可输入10位':''}}</div>
           <flexbox  class="form-item"  :gutter="0">
             <flexbox-item class='form-item-left'>
               <span class="iconfont icon-shenfenzhenghao"></span>
             </flexbox-item>
             <flexbox-item>
-              <input type="text" placeholder="身份证号" name="phcardid" value="">
+              <input type="text" @input="testIdc" placeholder="身份证号" maxlength="18" name="phcardid" v-model="addData.phcardid">
             </flexbox-item>
           </flexbox>
+          <div class="valid-err" v-if='!idcValid'>{{addData.phcardid.length==0?'身份证号必填':'请输入合法的身份证号'}}</div>
           <flexbox  class="form-item"  :gutter="0">
             <flexbox-item class='form-item-left'>
               <span class="iconfont icon-contextphone"></span>
             </flexbox-item>
             <flexbox-item>
-              <input type="text" placeholder="手机号(选填)" name="phTel" value="">
+              <input type="text"  @input="textPhone" maxlength="11" placeholder="手机号(选填)" name="phTel" v-model="addData.phTel">
             </flexbox-item>
           </flexbox>
+          <div class="valid-err" v-if='!phoneValid'>请输入合法的手机号</div>
           <flexbox  class="form-item"  :gutter="0">
             <flexbox-item class='form-item-left'>
               <span class="iconfont icon-jigou"></span>
             </flexbox-item>
             <flexbox-item>
-              <input type="text" placeholder="单位" name="phunit" value="">
+              <input type="text" placeholder="单位" name="phunit" v-model="addData.phunit">
             </flexbox-item>
           </flexbox>
+          <div class="valid-err" v-if='addData.phunit.length==0'>单位名称必填</div>
         </div>
         <div>
           <flexbox class="submit-box1"  :gutter="0">
             <flexbox-item class="light" @click.native='cancel'>取消</flexbox-item>
-            <flexbox-item class="primary" @click.native='addStaff'>完成</flexbox-item>
+            <flexbox-item class="primary" :disabled="!nameValid || !idcValid || !phoneValid || addData.phunit.length==0" 
+            @click.native='addStaff'>完成</flexbox-item>
           </flexbox>
         </div>
       </popup>
@@ -91,8 +101,9 @@
 <script>
 import { XHeader, TransferDom, PopupHeader, Popup, Checklist, Flexbox, FlexboxItem, Swipeout, SwipeoutItem, SwipeoutButton } from 'vux';
 import { IdCardTo } from '../../utils/idc';
-import vscroll  from '../../components/vscroll';
+import scroll from '../../components/scroll';
 import {_staffServce} from '../../service/staffService';
+import {PhysicalInfoServices} from '../../service/EmpPhysicalInfo';
 export default {
   name: 'staff-information-list',
   directives: {
@@ -108,20 +119,13 @@ export default {
     Swipeout,
     SwipeoutItem,
     SwipeoutButton,
-    vscroll
+    scroll
   },
   created(){
-    _staffServce.getphysicalinfo()
-    .then((data) => {
-
-    }).catch(err => console.log(err));
+    this.loadData();
   },
   data () {
     return {
-      // note: changing this line won't causes changes
-      // with hot-reload because the reloaded component
-      // preserves its current state and we are modifying
-      // its initial state.
       phName: '',
       phTel: '',
       phunit: '',
@@ -132,33 +136,22 @@ export default {
       checkedNumber: 0,
       totalNumber: 3,
       checkValue: [],
-      ilist: [
-        {
-          key:'1',
-          value:'张三',
-          inlineDesc:'511322198910101010'
-        }
-      ],
-      list: [
-        {
-          Id: '1',
-          phName: '张三',
-          phcardid: '511322198910101010',
-          checked: false
-        },
-        {
-          Id: '2',
-          phName: '李四',
-          phcardid: '511322198910101010',
-          checked: false
-        },
-        {
-          Id: '3',
-          phName: '王五',
-          phcardid: '511322198910101010',
-          checked: false
-        }
-      ]
+      checkAllow: false,
+      list: [],
+      isLoading: false,
+      nodata: false,
+      noDataText: '',
+      page: 0,
+      size: 10,
+      addData: {
+        phname:'',
+        phcardid :'',
+        phtel :'',
+        phunit :window.localStorage.getItem("ULName")||''
+      },
+      nameValid: true,
+      idcValid: true,
+      phoneValid: true
     };
   },
   methods: {
@@ -173,44 +166,123 @@ export default {
     checkall() {
       let that = this;
       this.checkAll = !this.checkAll;
-      this.checkedNumber = this.checkAll ? this.list.length : 0;
+      let number = 0;
       this.list.forEach(function (item, index, array) {
-        item.checked = that.checkAll;
+        if(item.PhStatus == 0 && item.IsLeave==0){
+          item.checked = that.checkAll;
+          that.checkAll ? number++ : '';
+        }
       });
-
+      this.checkedNumber = number;
     },
     appointment() {
+      this.checkAllow = !this.checkAllow;
       // this.$router.push({name: 'appointment-view', params: { 'id': id }});
     },
     submit() {
+      let that = this;
+      let phids = '';
+      this.list.forEach(function (item, index, array) {
+        phids += (item.checked ? item.PhID+',' : '');
+      });
+      this.$router.push({name:'appointment-add', params: {"phid": phids }});
 
     },
     addStaff(){
       // 添加
-      // ...
+      let that = this;
+      _staffServce.creatphysicalinfo(this.addData)
+      .then(data => {
+        that.addData = '';
+        that.phcardid = '';
+        that.phtel = '';
+        Vue.$vux.toast.show({
+          text: "添加成员成功",
+          type: 'success',
+          position: 'middle'
+        });
+
+      }).catch(err => console.log(err))
       this.showchecktime = false;
     },
     cancel(){
+      this.addData = '';
+      this.phcardid = '';
+      this.phtel = '';
       this.showchecktime = false;
     },
     deleteItem(index) {
 
-      let id = this.list[index].Id;
+      let PhID = this.list[index].PhID;
       // 根据id请求后台删除
-      _staffServce.deleteAppointment(id)
+      _staffServce.deleteAppointment(PhID)
       .then((data) => {
-        console.log("删除成功");
+        this.list[index].IsLeave = 1;
+        Vue.$vux.toast.show({
+          text: "删除成功",
+          type: 'success',
+          position: 'middle'
+        });
       }).catch(err => {console.log(err)})
 
-      this.list.splice(index,1);
-
     },
-    onRefresh(done){
-      done();
-      },
-    onInfinite(done){
-      done();
-    }
+    recoverItem(index){
+      let PhID = this.list[index].PhID;
+      // 根据id请求后台删除
+      _staffServce.deleteAppointment(PhID)
+      .then((data) => {
+        this.list[index].IsLeave = 0;
+        Vue.$vux.toast.show({
+          text: "复职成功",
+          type: 'success',
+          position: 'middle'
+        });
+      }).catch(err => {console.log(err)})
+    },
+    onRefresh(done) {
+      this.page = 1;
+      this.list = [];
+      this.loadmore = true;
+      this.loadData();
+      setTimeout(() => {
+        done(); //必须有
+      }, 1500)
+    },
+    loadData() {
+      let that = this;
+      _staffServce.getphysicalinfo()
+      .then((data) => {
+        if(data.AppendData.length != 0){
+          that.list = data.AppendData;
+          that.nodata = false;
+        }else{
+          that.nodata = true;
+        }
+      }).catch(err => console.log(err));
+    },
+    testName(){
+      if(this.addData.phName == "" || this.addData.phName.length > 10){
+        this.nameValid = false;
+      }else{
+        this.nameValid = true;
+      }
+    },
+    testIdc(){
+      var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
+      if(reg.test(this.addData.phcardid)){
+        this.idcValid = true;
+      }else{
+        this.idcValid = false;
+      }
+    },
+    textPhone(){
+      let reg = /^((13[0-9])|(14[5|7])|(15([0-9]))|(17[0-9])|(18[0-9]))\d{8}$/;
+      if(reg.test(this.addData.phTel)){
+        this.phoneValid = true;
+      }else{
+        this.phoneValid = false;
+      }
+    },
   }
 };
 </script>
@@ -218,6 +290,20 @@ export default {
 <style lang="less">
   @import '../../style/common.less';
   .myapp {
+    // position: relative;
+    ._v-container.scroll-normal > {
+      .px2rem(top, 100);
+      .px2rem(bottom, 0);
+      position: fixed;
+      height: auto!important;
+    }
+
+    ._v-container.scroll-checkallow >{
+      .px2rem(top, 100);
+      .px2rem(bottom, 90);
+      position: fixed;
+      height: auto!important;
+    }
     .list{
       .px2rem(margin-bottom, 5);
       .item{
@@ -265,6 +351,17 @@ export default {
     }
 
   }
+
+
+
+  .valid-err{
+    position: relative;
+    // top: -5px;
+    .px2rem(top, -20);
+    text-align: center;
+    color: red;
+  }
+
   .pop-content{
     .px2rem(padding-left, 100);
     .px2rem(padding-right, 100);

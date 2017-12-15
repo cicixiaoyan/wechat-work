@@ -19,7 +19,7 @@ function json2url (json) { //, isQueryToken
 let sucCallback = function(response, resolve, reject){
   if(response.status === 401){
     Vue.$vux.toast.show({
-      text: response.data.Message,
+      text: "登陆已失效",
       type: 'warn',
       position: 'middle'
     });

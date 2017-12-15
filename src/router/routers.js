@@ -52,7 +52,7 @@ export default [
         }
       },
       {
-        path: '/app/appointment/add',
+        path: '/app/appointment/add/:phid',
         name: 'appointment-add',
         component: function (resolve) {
           require(['../page/appointment/add'], resolve);

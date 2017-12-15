@@ -9,9 +9,6 @@ const store = new Vuex.Store({
 		isLogin : false,
 		// 保存登录信息
 		userInfo : {
-			// 'username' : '',
-			// 'photo' : '',
-			// 'uid' : '',
 			'AccessToken' : '',
 			'RefreshToken' : ''
 		},
@@ -71,10 +68,10 @@ const store = new Vuex.Store({
 			state.direction = payload.direction
 		},
 		updateUserInfoAccesstoken (state, val) {
-			state.getUserInfo.AccessToken = val;
+			state.userInfo.AccessToken = val;
 		},
 		updateUserInfoRefreshToken(state, val) {
-			state.getUserInfo.RefreshToken = val;
+			state.userInfo.RefreshToken = val;
 		}
 	},
 	getters: {
@@ -87,11 +84,11 @@ const store = new Vuex.Store({
 		getUserInfo (state) {
 			return state.userInfo;
 		},
-		getUserInfoAccesstoken(state, getters) {
-			return getters.getUserInfo.AccessToken;
+		getUserInfoAccesstoken(state) {
+			return state.userInfo.AccessToken;
 		},
-		getUserInfoRefreshToken(state, getters) {
-			return getters.getUserInfo.RefreshToken;
+		getUserInfoRefreshToken(state) {
+			return state.userInfo.RefreshToken;
 		},
 		getNotMessageCount (state) {
 			return state.message_count;

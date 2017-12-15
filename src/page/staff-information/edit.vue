@@ -3,7 +3,7 @@
     <x-header>员工详情<a slot="right" v-if="!read && item.phName==='' && !icdValid && !phoneValid" @click='edit' >保存</a></x-header>
     <group>
       <x-input title="姓名" require text-align="right" v-model="item.phName" :readonly='read' placeholder='姓名'></x-input>
-      <div class="validerror" v-if="item.phName > 8 && !read">
+      <div class="validerror" v-if="item.phName > 18 && !read">
         姓名不能大于8位
       </div>
       <x-input title="身份证号" @on-change="testIcd"  require  text-align="right" placeholder='身份证号' v-model="item.icd" :readonly='read'></x-input>
@@ -77,7 +77,7 @@ export default {
   },
   methods: {
     testIcd(){
-      var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+      var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
       if((this.item.phCardId.length == 15 || this.item.phCardId.length==18) && reg.test(this.item.icd)){
         this.icdValid = true;
         this.item.age = IdCardTo(this.item.phCardId, 3);
@@ -88,7 +88,7 @@ export default {
       }
     },
     textPhone(){
-      let reg = new RegExp("^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$");
+      let reg = /^((13[0-9])|(14[5|7])|(15([0-9]))|(17[0-9])|(18[0-9]))\d{8}$/;
       if(reg.test(this.item.phTel)){
         this.phoneValid = true;
       }else{

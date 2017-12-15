@@ -108,12 +108,23 @@ body {
 }
 
 .app{
+  ._v-container.scroll-normal > {
+    .px2rem(top, 100);
+    .px2rem(bottom, 0);
+    position: fixed;
+    height: auto!important;
+  }
+  
   > .router-view{
     .px2rem(margin-top, 100);
 
     &.has-bottom-tabbar{
       .px2rem(margin-bottom, 100);
     }
+  }
+
+  .weui-tabbar__item{
+    .px2rem(height, 100);
   }
 
   .weui-tabbar__icon .iconfont{
