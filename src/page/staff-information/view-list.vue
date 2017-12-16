@@ -1,14 +1,15 @@
 <template>
   <div>
     <x-header>员工列表</x-header>
+    <!-- :on-infinite="onInfinite" -->
     <scroll style="top: 44px;"
           :on-refresh="onRefresh"
-          :on-infinite="onInfinite"
+          
           :noDataText='noDataText'
           ref="my_scroller">
       <div class="list">
         <swipeout>
-          <swipeout-item ref="swipeoutItem"  transition-mode="follow" v-for="(item, index) in list" :key="item.PhId">
+          <swipeout-item ref="swipeoutItem" disabled  transition-mode="follow" v-for="(item, index) in list" :key="item.PhId">
             <div slot="right-menu">
               <swipeout-button @click="deleteItem(index)" type="warn">删除</swipeout-button>
             </div>
@@ -77,7 +78,7 @@ export default {
     }
   },
   created(){
-    // _appointmentServices.getappointmentdetailbyphaid()
+    this.loadData();
   },
   methods: {
     deleteItem(index) {
@@ -103,22 +104,22 @@ export default {
         done(); //必须有
       }, 1500)
     },
-    onInfinite(done) {
-      if (this.isLoading == false) {
-        this.isLoading = true;
-        this.page++;
-        this.loadData(this.page);
-      }
-      let that = this;
-      // 加载更多时间
-      setTimeout(() => {
-        that.loadmore ? done() : done(true);
-      }, 1500)
-    },
-    loadData(pageindex = 1, pagesize = 10) {
+    // onInfinite(done) {
+    //   if (this.isLoading == false) {
+    //     this.isLoading = true;
+    //     this.page++;
+    //     this.loadData(this.page);
+    //   }
+    //   let that = this;
+    //   // 加载更多时间
+    //   setTimeout(() => {
+    //     that.loadmore ? done() : done(true);
+    //   }, 1500)
+    // },
+    loadData(pageindex = 1, pagesize = 10, phaid = this.$route.params.phaid) {
       let that = this;
       this.isLoading = true;
-      _appointmentServce.getAppointmentList(this.phaid, pageindex, pagesize).then(data => {
+      _appointmentServce.getappointmentdetailbyphaid( pageindex, pagesize,this.phaid).then(data => {
         if (data.ResultType == 0) {
           if(data.AppendData.length !== 0){
             that.list = data.AppendData;

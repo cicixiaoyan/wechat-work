@@ -22,7 +22,7 @@
             <span class="iconfont icon-circle" v-if="remember"></span>
             <input  type="checkbox"  v-model="remember">记住密码
           </label>| -->
-          <a @click='findPwd'>忘记密码?</a>
+          <!-- <a @click='findPwd'>忘记密码?</a> -->
           </div>
       </div>
       <button @click='login' class="login" :disabled="mobile==='' || phoneInValid != '' || password===''" >登陆</button>
@@ -150,7 +150,7 @@ export default {
 
 <style lang="less">
   @import '../../style/common.less';
-  body{
+  body[data-path=login]{
     background: #fff;
   }
   .logo{

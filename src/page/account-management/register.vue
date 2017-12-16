@@ -161,7 +161,7 @@ export default {
 
 <style lang="less">
   @import '../../style/common.less';
-  body{
+  body[data-path=register]{
     background: #fff;
   }
   .logo{

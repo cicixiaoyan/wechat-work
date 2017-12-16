@@ -37,5 +37,9 @@ export var _staffServce = {
     // 删除体检人员信息
     deleteAppointment: (id) => {
         return getInfo(baseurl + '/employment/deletephysicalinfo', { "PhId": id }, 'post', true);
-    }
+    },
+
+    //复职体检人员
+    recoverphysicalinfo: (PhID) => getInfo(baseurl + '/employment/recoverphysicalinfo', {PhID:PhID}, "post", true)
+
 };

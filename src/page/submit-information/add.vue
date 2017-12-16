@@ -16,7 +16,7 @@
         </div>
         <div class="photo-item" style="text-align:right;">
           <span>营业执照<br><span style="font-size:small;color:red;">(必须原件)</span></span>
-          <uploadImg  @onChange='licenceimgChange' id='licenceimg' name="licenceimg" v-model="licenceimg" theme="light"></uploadImg>
+          <uploadImg  @onChange='licenceimgChange' id='licenceimg' name="licenceimg" v-model="licenceimg" theme="light"></uploadImg><br/>
           <uploadImg @onChange='licenceimgChange1' v-if='licenceimg.length!==0' id='licenceimg1' name="licenceimg1" v-model="licenceimg1" theme="light"></uploadImg>
         </div>
       </group>
@@ -34,11 +34,11 @@
           <x-input title="身份证号" @on-change="getIdcValid" :max="18" :min="15" placeholder="身份证号" v-model="item.ucardid"></x-input>
           <div v-if="!idcValid" class="valid-err">请输入合法的身份证号码</div>
           <x-input title="联系电话" @on-change="getTelValid" is-type="china-mobile" :max="11" :min="11" placeholder="电话" v-model="item.utel"></x-input>
-          <div v-if="!telValid" class="valid-err">请输入合法的身份证号码</div>
+          <div v-if="!telValid" class="valid-err">请输入合法的电话号码</div>
           <x-input title="附加说明" :max="200" placeholder="说明" v-model="item.uremark"></x-input>
           <div class="photo-item" style="text-align:right;">
             <span>卫生许可<br><span style="font-size:small;;color:red;">(必须原件)</span></span>
-            <uploadImg  @onChange='permitimgChange' id='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg>
+            <uploadImg  @onChange='permitimgChange' id='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg><br>
             <uploadImg @onChange='permitimgChange1' v-if='permitimg.length != 0' id='permitimg1' name="permitimg1" v-model="permitimg1" theme="light"></uploadImg>
           </div>
         </div>
@@ -46,7 +46,7 @@
 
 
       <button @click='submit' :disabled="item.uoname == '' || item.ubusinesstype == '' || item.businessnumber == '' ||
-            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0 || !idcValid || !telValid"
+            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0 || !idcValid || !telValid || item.ubusinessaddress==''"
       class="round-big-btn">提交审核</button>
 
       <div v-transfer-dom>
@@ -146,12 +146,12 @@ export default {
         ._editorganizeinfo(this.item)
         .then(function(data) {
           if (data.ResultType == 0) {
-            Vue.$vux.toast.show({
+            that.$vux.toast.show({
               text: "提交信息成功",
               type: 'success',
               position: 'middle'
             });
-            that.$router.push({ name: "submit-information-view", params: {read: true}});
+            that.$router.push({ name: "submit-information-view", params: {read: 'true'}});
           }
         })
         .catch(function(err) {
@@ -244,7 +244,6 @@ export default {
             list[index].key = [value.AreID, value.AreCode].toString();
             list[index].value = value.AreName;
           });
-          console.log(list)
           that.objectList = list;
         }else{
         }
@@ -272,7 +271,7 @@ export default {
 
 
 <style lang="less">
-  body{
+  body[data-path=submit-information-add]{
     background: #3c9;
   }
 

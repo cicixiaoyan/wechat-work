@@ -7,10 +7,10 @@ export var _appointmentServce = {
     },
     // 查询体检预约列表
     getAppointmentList: (pageindex, pagesize) => {
-        return getInfo(baseurl + '/employment/gettbphysicalappointment', { pagesize: pagesize, pageindex: pageindex }, 'get', true);
+        return getInfo(baseurl + '/employment/gettbphysicalappointment', {  pageindex: pageindex, pagesize: pagesize }, 'get', true);
     },
     // 提交体检预约
-    createAppointment: () => {
+    createAppointment: (parma) => {
         // tmodel.phAid
         // query	string
         // tmodel.phid
@@ -20,7 +20,7 @@ export var _appointmentServce = {
         // tmodel.phadescription
         // query	string
         // tmodel.ppnid
-        return getInfo(baseurl + '/employment/creattbphysicalappointment', { parma }, 'post', true);
+        return getInfo(baseurl + '/employment/creattbphysicalappointment', parma , 'post', true);
     },
 
     // 重新提交体检预约
@@ -36,14 +36,28 @@ export var _appointmentServce = {
     gettbsysorganize: () => {
         return getInfo(baseurl + '/employment/gettbsysorganize', {}, 'get', true);
     },
+    // 获取体检预约机构信息
+    getorganizebycode: (areacode='') => {
+        return getInfo(baseurl + '/employment/getorganizebycode', {areacode:areacode}, 'get', true);
+    },
 
     // 是否默认选中
     defaultorganize: (id) => {
         return getInfo(baseurl + '/employment/defaultorganize', {"orid": id}, 'post', true);
     },
 
+    // 获取单个预约申请信息
+    getmodeltbphysicalappointment: (phaid) => { // 预约申请记录主键
+        return getInfo(baseurl + '/employment/getmodeltbphysicalappointment', { "phaid": phaid }, 'get', true);
+    },
+
+    // 获取单个预约申请信息
+    getmodeltbphysicalappointment: (phaid) => { // 预约申请记录主键
+        return getInfo(baseurl + '/employment/getmodeltbphysicalappointment', { "phaid": phaid }, 'get', true);
+    },
+
     // 根据预约申请记录主键查询体检预约人员详细信息
-    getappointmentdetailbyphaid: (phaid, page=1, size=30) => { // 预约申请记录主键
+    getappointmentdetailbyphaid: ( page=1, size=30, phaid) => { // 预约申请记录主键
         return getInfo(baseurl + '/employment/getappointmentdetailbyphaid', { "phaid": phaid, 'pageindex': page, 'pagesize': size }, 'get', true);
     },
 

@@ -2,9 +2,9 @@
   <div>
     <x-header>预约详情</x-header>
     <div class="result">
-      <div class="success" v-if="item.PhAStatus == 3"><span class="iconfont icon-circle"></span>审核成功</div>
-      <div class="danger" v-if="item.PhAStatus == 2"><span class="iconfont icon-circle"></span>审核中</div>
-      <div calss="warning" v-if="item.PhAStatus == 1"><span class="iconfont icon-circle"></span>审核失败</div>
+      <div class="success" v-if="item.PhAStatus == 3"><span class="iconfont icon-checkedon"></span>审核成功</div>
+      <div class="danger" v-if="item.PhAStatus == 2"><span class="iconfont icon-shenhezhong"></span>审核中</div>
+      <div calss="warning" v-if="item.PhAStatus == 1"><span class="iconfont icon-fail"></span>审核失败</div>
 
     </div>
     <div class="content">
@@ -15,10 +15,16 @@
         <cell title="申请日期" readonly :is-loading="!item.CreateDate" :value="item.CreateDate"></cell>
 
         <!-- :is-loading="!item.Description" -->
-        <cell :title="stateTitle" readonly  :value="item.Description"></cell>
-        <div v-if="item.PhAStatus == 3" class="result-tip danger"><span class="iconfont icon-circle"></span>
-          预约成功，请通知相关人员凭身份证按时到【{{item.PhaOrName}}】进行体检</div>
-        <div v-if="item.PhAStatus == 1" class="result-tip danger"><span class="iconfont icon-circle"></span>
+        <cell :title="stateTitle" readonly  :value="item.Description" placeholder="无"></cell>
+        <div v-if="item.PhAStatus == 3" class="result-tip danger"><span class="iconfont icon-fail"></span>
+          预约成功，请通知相关人员凭身份证按时到【{{item.PhaOrName}}】进行体检
+          <div>
+            --体检机构电话：{{phinfo.OrTel}}<br>
+            --体检机构地址：{{phinfo.OrAddress}}
+
+          </div>
+        </div>
+        <div v-if="item.PhAStatus == 1" class="result-tip danger"><span class="iconfont icon-fail"></span>
           预约失败了，可以删除这条申请，重新提交申请</div>
       </group>
     </div>
@@ -38,54 +44,42 @@ export default {
   },
   created() {
     var id = this.$route.params.id;
-    var detail = this.$route.params.appointmentDetail;
-    if (detail != null) {
-      this.item = {
-        PhAStatus: detail.PhAPhAStatus,
-        PhaOrName: detail.PhaOrName,
-        PhCount: detail.PhCount,
-        Listparma: id,
-        PhADate: detail.PhADate + " " + ["全天", "上午", "下午"][detail.PPNType],
-        CreateDate: detail.CreateDate,
-        Description: detail.PhABackOption
-      };
-    }
-
-    console.log("审核内容", detail);
-    // PhABackOption PhADescription
 
     // let desc = "";
     // if (detail.PhABackOption != null) {
     //   desc = detail.PhABackOption;
     // }
-
-    // _appointmentServce.getappointmentdetailbyphaid(id).then(data => {
-    //   if (data.ResultType == 0) {
-    //     // Show
-    //     console.log('获取成功');
-    //     console.log(data.AppendData);
-    //   } else {
-    //     alert('获取失败');
-    //   }
-    // });
+    let that = this;
+    _appointmentServce.getmodeltbphysicalappointment(id).then(data => {
+      if (data.ResultType == 0) {
+        this.item = data.AppendData[0];
+        // 获取体检机构信息
+        _appointmentServce.getorganizebycode(this.item.PhAAreaID).then(data => {
+          that.phinfo = data.AppendData;
+        }).catch(err => console.log(err));
+      } else {
+        alert('获取失败');
+      }
+    });
   },
   methods: {
     viewStaffList(){
       if(this.item.PhCount != 0)
-       this.$router.push({name: "staff-information-view-list", params: {phaid: this.item.Listparma }});
+       this.$router.push({name: "staff-information-view-list", params: {phaid: this.item.PhAID }});
     }
   },
   data() {
     return {
       stateTitle: "审核说明",
       item: {
-        PhAStatus: "",
+        PhAStatus: 2,
         PhaOrName: "",
         PhCount: 0,
         Listparma: "",
         PhADate: "",
         Description: ""
-      }
+      },
+      phinfo:{}
     };
   }
 };
@@ -101,6 +95,7 @@ export default {
   text-align: center;
 
   .iconfont {
+    vertical-align: sub;
     .px2px(font-size, 56);
   }
 }
@@ -115,7 +110,7 @@ export default {
     position: absolute;
     .px2px(font-size, 40);
     .px2rem(left, 10);
-    top: 0;
+    .px2rem(top, 8);
   }
 }
 </style>

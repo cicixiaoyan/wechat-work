@@ -3,12 +3,12 @@
     <x-header :left-options="{showBack: false}">个人中心</x-header>
     <div class="personal-top">
       <img src="../../assets/logo.png" style="    width: 80px;background: #fff;border-radius: 50%;"/>
-      <div>{{item.name}}</div>
+      <div>{{item.ULName}}</div>
     </div>
     <group>
       <!-- <cell title="机构名称" value-align="right" :value="item.name"></cell> -->
-      <cell title="机构地址" value-align="right" :value="item.addr"></cell>
-      <cell title="机构类型" value-align="right" :value="item.type"></cell>
+      <!-- <cell title="机构地址" value-align="right" :value="item.addr"></cell> -->
+      <cell title="机构类型" value-align="right" :value="type"></cell>
       <!-- <x-textarea title="预约说明" :max="100" placeholder="预约说明" :show-counter="true"  :rows="2"></x-textarea> -->
     </group>
     <div class="submit-box">
@@ -21,6 +21,9 @@
 <script>
 import { Group, Cell, XHeader, XTextarea, XInput, Selector, TransferDom, PopupHeader, Popup, Picker } from 'vux';
 import uploadImg from '../../components/uploadImg';
+import { _userServices } from '../../service/userServices';
+import { employmentServices } from '../../service/EmploymentRegister';
+
 export default {
   name: 'personal-center',
   directives: {
@@ -38,28 +41,30 @@ export default {
     Picker,
     uploadImg
   },
-  computed :{
-    // HospitalList() {
-    //   return [{key: '1', value: '武侯区第一医院'}, {key: '2', value: '武侯区第二医院'}]
-    // }
+  created(){
+    let that = this;
+    _userServices._getUserMsg().then(function(data){
+      that.item = data;
+      employmentServices._gettbsysbasicdatabycode().then((data1) => {
+        console.log(data1)
+        data1.AppendData.forEach(function(value,index, arr) {
+          console.log(value)
+          if(value.BDID == data.ULType) return that.type = value.Name;
+        });
+      }).catch(err1 => console.log(err1))
+    }).catch(err => console.log(err));
   },
   data () {
     return {
-      item: {
-        addr: '四川省成都市高新区',
-        name: '成都市华西第四医院',
-        type: 'IT'
-      }
+      item: {ULName: ''},
+      type: ''
     };
   },
   methods: {
     quit(){
-      console.log('退出登录');
+      window.localStorage.clear();
+      this.$router.push({name: 'login'});
     },
-    getTime() {
-      this.item.Time = this.mytime.join(" ");
-      this.showpop = false
-    }
   }
 };
 </script>

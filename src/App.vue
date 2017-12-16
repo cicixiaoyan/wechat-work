@@ -86,7 +86,7 @@ body {
   }
 
   &[disabled]{
-    background: #ccc;
+    background: #ccc!important;
   }
 }
 

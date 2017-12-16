@@ -44,14 +44,20 @@ let sucCallback = function(response, resolve, reject){
 }
 
 let errCallback = function(err, resolve){
-  Vue.$vux.toast.show({
-    text: err.response.data.Message,
-    type: 'warn',
-    position: 'middle',
-    time: 5000
-  });
   if(err.response.status == 401){
+    Vue.$vux.toast.show({
+      text: "登陆已失效",
+      type: 'warn',
+      position: 'middle'
+    });
     main.$router.push({name: 'login'});
+  }else{
+    Vue.$vux.toast.show({
+      text: err.response.data.Message,
+      type: 'warn',
+      position: 'middle',
+      time: 5000
+    });
   }
 }
 

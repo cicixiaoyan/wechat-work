@@ -1,6 +1,6 @@
 <template >
   <div class="myapp">
-    <x-header :left-options="{showBack: false}">成员列表({{totalNumber}})<a slot="left" @click="showchecktime=true">添加</a><a slot="right" @click='appointment'>预约</a></x-header>
+    <x-header :left-options="{showBack: false}">成员列表({{totalNumber}})<a slot="left" @click="showchecktime=true">添加</a><a slot="right" @click='appointment'>{{checkAllow?'取消预约':'预约'}}</a></x-header>
     <!-- <panel :footer="footer" :list="list" :type="type" @on-img-error="onImgError"></panel> -->
     <scroll :class='{"scroll-checkallow":checkAllow,"scroll-normal":!checkAllow}'
           :on-refresh="onRefresh"
@@ -11,6 +11,7 @@
           <swipeout-item ref="swipeoutItem"  transition-mode="follow" v-for="(item, index) in list" :key="item.PhID">
             <div slot="right-menu">
               <swipeout-button v-if='item.IsLeave==0' @click.native.prevent="deleteItem(index)" type="warn">删除</swipeout-button>
+              <swipeout-button  @click.native.prevent="editAction(index)" type="primary">修改</swipeout-button>
               <swipeout-button v-if='item.IsLeave==1' @click.native.prevent="recoverItem(index)" type="warn">复职</swipeout-button>
             </div>
             <div slot="content">
@@ -23,7 +24,8 @@
               <div class="right-ctx">
                 <h4>{{item.PhName}}<span>[{{item.age}}岁]</span>&emsp;{{item.PhSex}}</h4>
                 <p>{{item.PhCardId}}</p>
-                <p>{{item.IsLeave == 0 ? '在职' : '离职'}}</p>
+                <p>{{item.IsLeave == 0 ? '在职' : '离职'}}&emsp;{{item.PhStatus == 0? '未预约':'已预约'}}</p>
+                <!-- PhStatus:体检人员状态 0:未提交过预约  1:预约未审核 -->
               </div>
               <span class="iconfont icon-accessory" @click="$refs.swipeoutItem[index].open('right')"></span>
             </label>
@@ -54,10 +56,10 @@
               <span class="iconfont icon-gerenxinxi"></span>
             </flexbox-item>
             <flexbox-item>
-              <input type="text" placeholder="姓名" @input="testName" maxlength="8" name="phName" v-model="addData.phName">
+              <input type="text" placeholder="姓名" @input="testName" maxlength="8" name="phName" v-model="addData.phname">
             </flexbox-item>
           </flexbox>
-          <div class="valid-err" v-if='!nameValid'>{{addData.phName == "" ? '姓名必填':''}}{{addData.phName.length > 10 ? '姓名最多可输入10位':''}}</div>
+          <div class="valid-err" v-if='!nameValid'>{{addData.phname == "" ? '姓名必填':''}}{{addData.phname.length > 10 ? '姓名最多可输入10位':''}}</div>
           <flexbox  class="form-item"  :gutter="0">
             <flexbox-item class='form-item-left'>
               <span class="iconfont icon-shenfenzhenghao"></span>
@@ -66,13 +68,13 @@
               <input type="text" @input="testIdc" placeholder="身份证号" maxlength="18" name="phcardid" v-model="addData.phcardid">
             </flexbox-item>
           </flexbox>
-          <div class="valid-err" v-if='!idcValid'>{{addData.phcardid.length==0?'身份证号必填':'请输入合法的身份证号'}}</div>
+          <div class="valid-err" v-if='!idcValid'>{{addData.phcardid==""?'身份证号必填':'请输入合法的身份证号'}}</div>
           <flexbox  class="form-item"  :gutter="0">
             <flexbox-item class='form-item-left'>
               <span class="iconfont icon-contextphone"></span>
             </flexbox-item>
             <flexbox-item>
-              <input type="text"  @input="textPhone" maxlength="11" placeholder="手机号(选填)" name="phTel" v-model="addData.phTel">
+              <input type="text"  @input="textPhone" maxlength="11" placeholder="手机号(选填)" name="phtel" v-model="addData.phtel">
             </flexbox-item>
           </flexbox>
           <div class="valid-err" v-if='!phoneValid'>请输入合法的手机号</div>
@@ -89,8 +91,10 @@
         <div>
           <flexbox class="submit-box1"  :gutter="0">
             <flexbox-item class="light" @click.native='cancel'>取消</flexbox-item>
-            <flexbox-item class="primary" :disabled="!nameValid || !idcValid || !phoneValid || addData.phunit.length==0" 
-            @click.native='addStaff'>完成</flexbox-item>
+            <flexbox-item v-if="!edit" class="primary"  
+            @click.native='(nameValid && idcValid && phoneValid && addData.phunit.length!=0 && addData.phname.length!=0 && addData.phcardid.length!=0) ? addStaff():""'>完成</flexbox-item>
+            <flexbox-item v-if="edit" class="primary"  
+            @click.native='(nameValid && idcValid && phoneValid && addData.phunit.length!=0 && addData.phname.length!=0 && addData.phcardid.length!=0) ?  editSubmit(): ""'>完成</flexbox-item>
           </flexbox>
         </div>
       </popup>
@@ -99,13 +103,24 @@
 </template>
 
 <script>
-import { XHeader, TransferDom, PopupHeader, Popup, Checklist, Flexbox, FlexboxItem, Swipeout, SwipeoutItem, SwipeoutButton } from 'vux';
-import { IdCardTo } from '../../utils/idc';
-import scroll from '../../components/scroll';
-import {_staffServce} from '../../service/staffService';
-import {PhysicalInfoServices} from '../../service/EmpPhysicalInfo';
+import {
+  XHeader,
+  TransferDom,
+  PopupHeader,
+  Popup,
+  Checklist,
+  Flexbox,
+  FlexboxItem,
+  Swipeout,
+  SwipeoutItem,
+  SwipeoutButton
+} from "vux";
+import { IdCardTo } from "../../utils/idc";
+import scroll from "../../components/scroll";
+import { _staffServce } from "../../service/staffService";
+import { PhysicalInfoServices } from "../../service/EmpPhysicalInfo";
 export default {
-  name: 'staff-information-list',
+  name: "staff-information-list",
   directives: {
     TransferDom
   },
@@ -121,15 +136,12 @@ export default {
     SwipeoutButton,
     scroll
   },
-  created(){
+  created() {
     this.loadData();
   },
-  data () {
+  data() {
     return {
-      phName: '',
-      phTel: '',
-      phunit: '',
-      phcardid: '',
+      edit: false,
       checkAll: false,
       showpop: false,
       showchecktime: false,
@@ -140,14 +152,14 @@ export default {
       list: [],
       isLoading: false,
       nodata: false,
-      noDataText: '',
+      noDataText: "",
       page: 0,
       size: 10,
       addData: {
-        phname:'',
-        phcardid :'',
-        phtel :'',
-        phunit :window.localStorage.getItem("ULName")||''
+        phname: "",
+        phcardid: "",
+        phtel: "",
+        phunit: window.localStorage.getItem("ULName") || ""
       },
       nameValid: true,
       idcValid: true,
@@ -156,9 +168,12 @@ export default {
   },
   methods: {
     view(id) {
-      this.$router.push({name: 'staff-information-edit', params: { 'id': id, 'read': true }});
+      this.$router.push({
+        name: "staff-information-edit",
+        params: { id: id, read: true }
+      });
     },
-    change (index) {
+    change(index) {
       this.list[index].checked = !this.list[index].checked;
       let dec = this.list[index].checked ? 1 : -1;
       this.checkedNumber = this.checkedNumber + dec;
@@ -167,10 +182,10 @@ export default {
       let that = this;
       this.checkAll = !this.checkAll;
       let number = 0;
-      this.list.forEach(function (item, index, array) {
-        if(item.PhStatus == 0 && item.IsLeave==0){
+      this.list.forEach(function(item, index, array) {
+        if (item.PhStatus == 0 && item.IsLeave == 0) {
           item.checked = that.checkAll;
-          that.checkAll ? number++ : '';
+          that.checkAll ? number++ : "";
         }
       });
       this.checkedNumber = number;
@@ -181,63 +196,110 @@ export default {
     },
     submit() {
       let that = this;
-      let phids = '';
-      this.list.forEach(function (item, index, array) {
-        phids += (item.checked ? item.PhID+',' : '');
+      let phids = "";
+      this.list.forEach(function(item, index, array) {
+        phids += item.checked ? item.PhID + "," : "";
       });
-      this.$router.push({name:'appointment-add', params: {"phid": phids }});
-
+      this.$router.push({ name: "appointment-add", params: { phid: phids } });
     },
-    addStaff(){
+    addStaff() {
+      //console.log(this.addData)
+      //console.log(!this.nameValid || !this.idcValid || !this.phoneValid || this.addData.phunit.length==0||this.addData.phname.length==0||this.addData.phcardid.length==0)
       // 添加
       let that = this;
-      _staffServce.creatphysicalinfo(this.addData)
-      .then(data => {
-        that.addData = '';
-        that.phcardid = '';
-        that.phtel = '';
-        Vue.$vux.toast.show({
-          text: "添加成员成功",
-          type: 'success',
-          position: 'middle'
-        });
-
-      }).catch(err => console.log(err))
-      this.showchecktime = false;
+      _staffServce
+        .creatphysicalinfo(this.addData)
+        .then(data => {
+          that.$vux.toast.show({
+            text: data.Message,
+            type: "success",
+            position: "middle"
+          });
+          if (data.ResultType == 0) {
+            this.addData.phname = "";
+            this.addData.phcardid = "";
+            this.addData.phtel = "";
+            this.loadData();
+            this.showchecktime = false;
+          }
+        })
+        .catch(err => console.log(err));
     },
-    cancel(){
-      this.addData = '';
-      this.phcardid = '';
-      this.phtel = '';
+    editAction(index){
+      this.edit = true;
+      this.showchecktime = true;
+      let data = this.list[index];
+      console.log(data);
+      this.addData.phname = data.PhName;
+      this.addData.phcardid = data.PhCardId;
+      this.addData.phtel = data.PhTel;
+      this.addData.phunit = data.PhUnit;
+      this.addData.phid = data.PhID;
+    },
+    editSubmit(){
+      let that = this;
+      _staffServce
+        .updatephysicalinfo(this.addData)
+        .then(data => {
+          that.$vux.toast.show({
+            text: data.Message,
+            type: "success",
+            position: "middle"
+          });
+          if (data.ResultType == 0) {
+            this.addData.phname = "";
+            this.addData.phcardid = "";
+            this.addData.phtel = "";
+            this.loadData();
+            this.showchecktime = false;
+          }
+          this.edit = false;
+        })
+        .catch(err => console.log(err));
+         this.addData.phid = null;
+    },
+    cancel() {
+      this.addData.phname = "";
+      this.addData.phcardid = "";
+      this.addData.phtel = "";
       this.showchecktime = false;
+      this.addData.phid = null;
     },
     deleteItem(index) {
-
       let PhID = this.list[index].PhID;
+      let that = this;
       // 根据id请求后台删除
-      _staffServce.deleteAppointment(PhID)
-      .then((data) => {
-        this.list[index].IsLeave = 1;
-        Vue.$vux.toast.show({
-          text: "删除成功",
-          type: 'success',
-          position: 'middle'
+      _staffServce
+        .deleteAppointment(PhID)
+        .then(data => {
+          that.list[index].IsLeave = 1;
+          that.$vux.toast.show({
+            text: "删除成功",
+            type: "success",
+            position: "middle"
+          });
+        })
+        .catch(err => {
+          console.log(err);
         });
-      }).catch(err => {console.log(err)})
-
     },
-    recoverItem(index){
+    recoverItem(index) {
       let PhID = this.list[index].PhID;
+      let that = this;
       // 根据id请求后台删除
-      _staffServce.deleteAppointment(PhID)
-      .then((data) => {
-        this.list[index].IsLeave = 0;
-        Vue.$vux.toast.show({
-          text: "复职成功",
-          type: 'success',
-          position: 'middle'
+      _staffServce
+        .recoverphysicalinfo(PhID)
+        .then(data => {
+          that.list[index].IsLeave = 0;
+          that.$vux.toast.show({
+            text: "复职成功",
+            type: "success",
+            position: "middle"
+          });
+        })
+        .catch(err => {
+          console.log(err);
         });
-      }).catch(err => {console.log(err)})
     },
     onRefresh(done) {
       this.page = 1;
@@ -246,175 +308,169 @@ export default {
       this.loadData();
       setTimeout(() => {
         done(); //必须有
-      }, 1500)
+      }, 1500);
     },
     loadData() {
       let that = this;
-      _staffServce.getphysicalinfo()
-      .then((data) => {
-        if(data.AppendData.length != 0){
-          that.list = data.AppendData;
-          that.nodata = false;
-        }else{
-          that.nodata = true;
-        }
-      }).catch(err => console.log(err));
+      _staffServce
+        .getphysicalinfo()
+        .then(data => {
+          if (data.AppendData.length != 0) {
+            that.list = data.AppendData;
+            that.nodata = false;
+          } else {
+            that.nodata = true;
+          }
+        })
+        .catch(err => console.log(err));
     },
-    testName(){
-      if(this.addData.phName == "" || this.addData.phName.length > 10){
+    testName() {
+      if (this.addData.phname == "" || this.addData.phname.length > 10) {
         this.nameValid = false;
-      }else{
+      } else {
         this.nameValid = true;
       }
     },
-    testIdc(){
-      var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
-      if(reg.test(this.addData.phcardid)){
+    testIdc() {
+      var reg = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
+      if (reg.test(this.addData.phcardid)) {
         this.idcValid = true;
-      }else{
+      } else {
         this.idcValid = false;
       }
     },
-    textPhone(){
+    textPhone() {
       let reg = /^((13[0-9])|(14[5|7])|(15([0-9]))|(17[0-9])|(18[0-9]))\d{8}$/;
-      if(reg.test(this.addData.phTel)){
+      if (reg.test(this.addData.phtel)) {
         this.phoneValid = true;
-      }else{
+      } else {
         this.phoneValid = false;
       }
-    },
+    }
   }
 };
 </script>
 
 <style lang="less">
-  @import '../../style/common.less';
-  .myapp {
-    // position: relative;
-    ._v-container.scroll-normal > {
-      .px2rem(top, 100);
-      .px2rem(bottom, 0);
-      position: fixed;
-      height: auto!important;
-    }
-
-    ._v-container.scroll-checkallow >{
-      .px2rem(top, 100);
-      .px2rem(bottom, 90);
-      position: fixed;
-      height: auto!important;
-    }
-    .list{
-      .px2rem(margin-bottom, 5);
-      .item{
-        .left-ctx {
-          width: 1.389rem;
-          height: 1.389rem;
-          line-height: 1.389rem;
-          border-radius: 50%;
-          align-self: center;
-          margin-right: 0.278rem;
-          text-align: center;
-          color: #999;
-          .iconfont{
-            .px2px(font-size, 52);
-          }
-        }
-        >.iconfont{
-          position: absolute;
-          right: 1em;
-          color: #ebc650;
-          font-size: large;
-        }
-
-      }
-    }
-    .fix-bottom{
-      .px2rem(height, 90);
-      .px2rem(line-height, 90);
-      position: fixed;
-      .px2rem(bottom, 100);
-      background: #fff;
-      .px2px(font-size, 32);
-      text-align: center;
-      .iconfont{
-        .px2px(font-size, 52);
-        position: relative;
-        .px2rem(bottom, 4);
-        vertical-align: middle;
-      }
-      > .flex-last{
-        flex: 0 0 10em;
-        background: #3c9;
-        color: #fff;
-      }
-    }
-
+@import "../../style/common.less";
+.myapp {
+  // position: relative;
+  ._v-container.scroll-normal >  {
+    .px2rem(top, 100);
+    .px2rem(bottom, 0);
+    position: fixed;
+    height: auto !important;
   }
 
-
-
-  .valid-err{
-    position: relative;
-    // top: -5px;
-    .px2rem(top, -20);
+  ._v-container.scroll-checkallow >  {
+    .px2rem(top, 100);
+    .px2rem(bottom, 90);
+    position: fixed;
+    height: auto !important;
+  }
+  .list {
+    .px2rem(margin-bottom, 5);
+    .item {
+      .left-ctx {
+        width: 1.389rem;
+        height: 1.389rem;
+        line-height: 1.389rem;
+        border-radius: 50%;
+        align-self: center;
+        margin-right: 0.278rem;
+        text-align: center;
+        color: #999;
+        .iconfont {
+          .px2px(font-size, 52);
+        }
+      }
+      > .iconfont {
+        position: absolute;
+        right: 1em;
+        color: #ebc650;
+        font-size: large;
+      }
+    }
+  }
+  .fix-bottom {
+    .px2rem(height, 90);
+    .px2rem(line-height, 90);
+    position: fixed;
+    .px2rem(bottom, 100);
+    background: #fff;
+    .px2px(font-size, 32);
     text-align: center;
-    color: red;
-  }
-
-  .pop-content{
-    .px2rem(padding-left, 100);
-    .px2rem(padding-right, 100);
-    padding-top: .5rem;
-  }
-  .vux-flexbox.form-item{
-    .px2px(font-size, 36);
-
-    .px2rem(padding-bottom, 36);
-    > .form-item-left{
-      flex-grow: 0;
-      flex-shrink: 0;
-      .px2rem(flex-basis, 84);
+    .iconfont {
+      .px2px(font-size, 52);
+      position: relative;
+      .px2rem(bottom, 4);
+      vertical-align: middle;
     }
+    > .flex-last {
+      flex: 0 0 10em;
+      background: #3c9;
+      color: #fff;
+    }
+  }
+}
 
+.valid-err {
+  position: relative;
+  // top: -5px;
+  .px2rem(top, -20);
+  text-align: center;
+  color: red;
+}
 
-    .iconfont{
-      .px2px(font-size, 56);
+.pop-content {
+  .px2rem(padding-left, 100);
+  .px2rem(padding-right, 100);
+  padding-top: 0.5rem;
+}
+.vux-flexbox.form-item {
+  .px2px(font-size, 36);
+
+  .px2rem(padding-bottom, 36);
+  > .form-item-left {
+    flex-grow: 0;
+    flex-shrink: 0;
+    .px2rem(flex-basis, 84);
+  }
+
+  .iconfont {
+    .px2px(font-size, 56);
+    color: #3c9;
+  }
+  input {
+    width: 100%;
+    border: 1px solid #ddd;
+    .px2rem(height, 72);
+    .px2rem(padding-left, 10);
+    .px2rem(padding-right, 10);
+    &:focus {
+      outline: none;
+      border-color: #3c9;
+      // border-style: solid;
+      border-width: 1px;
+    }
+  }
+}
+
+.vux-flexbox.submit-box1 {
+  > .vux-flexbox-item {
+    .px2rem(height, 85);
+    .px2rem(line-height, 85);
+    text-align: center;
+    .px2px(font-size, 32);
+    &.light {
+      background: #fff;
       color: #3c9;
     }
-    input{
-      width: 100%;
-      border: 1px solid #ddd;
-      .px2rem(height, 72);
-      .px2rem(padding-left, 10);
-      .px2rem(padding-right, 10);
-      &:focus{
-        outline: none;
-        border-color: #3c9;
-        // border-style: solid;
-        border-width: 1px;
-      }
-    }
 
-
-  }
-
-  .vux-flexbox.submit-box1{
-    > .vux-flexbox-item{
-      .px2rem(height, 85);
-      .px2rem(line-height, 85);
-      text-align: center;
-      .px2px(font-size, 32);
-      &.light{
-        background: #fff;
-        color: #3c9;
-      }
-
-      &.primary{
-        background: #3c9;
-        color: #fff;
-      }
+    &.primary {
+      background: #3c9;
+      color: #fff;
     }
   }
-
+}
 </style>

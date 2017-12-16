@@ -6,13 +6,11 @@
       <div class="validerror" v-if="item.phName > 18 && !read">
         姓名不能大于8位
       </div>
-      <x-input title="身份证号" @on-change="testIcd"  require  text-align="right" placeholder='身份证号' v-model="item.icd" :readonly='read'></x-input>
+      <x-input title="身份证号" @on-change="testIcd"  require  text-align="right" placeholder='身份证号' v-model="item.phCardId" :readonly='read'></x-input>
       <div class="validerror" v-if="!icdValid && !read">
         请输入合法的身份证号
       </div>
-      <x-input title="性别"  text-align="right" v-model="item.phSex" placeholder='性别'  readonly></x-input>
-      <x-input title="年龄"  text-align="right" v-model="item.age" placeholder='年龄' readonly></x-input>
-      <!-- <x-input title="电话号码" @on-change="textPhone" require  text-align="right" placeholder='电话号码' v-model="item.phTel" :disabled='read' :placeholder='phoneholder'></x-input> -->
+      <x-input title="电话号码" @on-change="textPhone" require  text-align="right" placeholder='电话号码' v-model="item.phTel" :disabled='read' :placeholder='phoneholder'></x-input>
       <div class="validerror" v-if="!phoneValid && !read">
         请输入合法的手机号
       </div>
@@ -39,10 +37,10 @@ export default {
        this.uonameholder = "";
     }
     // 获取详情
-    _staffServce.editphysicalinfo(this.$route.params.id)
-    .then((data) => {
-      console.log(data)
-    }).catch(err => console.log(err))
+    // _staffServce.editphysicalinfo(this.$route.params.id)
+    // .then((data) => {
+    //   let 
+    // }).catch(err => console.log(err))
 
   },
   computed: {
@@ -77,7 +75,7 @@ export default {
   },
   methods: {
     testIcd(){
-      var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
+      var reg = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
       if((this.item.phCardId.length == 15 || this.item.phCardId.length==18) && reg.test(this.item.icd)){
         this.icdValid = true;
         this.item.age = IdCardTo(this.item.phCardId, 3);
@@ -96,10 +94,15 @@ export default {
       }
     },
     edit(){
+      let that = this;
       // 保存
       _staffServce.updatephysicalinfo(this.item)
       .then((data) => {
-        console.log(data);
+        that.$vux.toast.show({
+            text: data.Message,
+            type: "success",
+            position: "middle"
+          });
       }).catch(err => console.log(err))
     }
   }

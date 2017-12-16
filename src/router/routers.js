@@ -94,6 +94,13 @@ export default [
         }
       },
       {
+        path: '/app/staff-information/check/:phids',
+        name: 'staff-information-check',
+        component: function (resolve) {
+          require(['../page/staff-information/check'], resolve);
+        }
+      },
+      {
         path: '/app/submit-information/add',
         name: 'submit-information-add',
         component: function (resolve) {

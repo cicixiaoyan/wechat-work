@@ -8,7 +8,8 @@
       <group>
         <div class="mid-title"><span>必填项</span></div>
         <x-input title="机构名称" :readonly='read' required :min="2"  :max="50" placeholder="机构名称" v-model="item.uoname"></x-input>
-        <selector title="机构类型" direction="left" :readonly='read' required  v-model="item.ubusinesstype"  :options="tbsysbasicdatabycode" placeholder="请选择"></selector>
+        <selector title="机构类型" direction="left" v-if="!read" required  v-model="item.ubusinesstype"  :options="tbsysbasicdatabycode" placeholder="请选择"></selector>
+        <x-input title="机构类型" readonly v-if="read"  v-model="item.ubusinesstypename"></x-input>
         <x-input title="执照代码" :readonly='read' required :max="30" placeholder="营业执照统一社会信用代码" v-model="item.businessnumber"></x-input>
         <x-input title="所属区域" :readonly='read' :disabled="read" required placeholder="所属区域"  @click.native="!read?showArea=true:''"  v-model="item.arename"></x-input>
         <!-- <cell title="所属区域" text-left :value="item.arename" @click.native="showArea=true"></cell> -->
@@ -19,7 +20,7 @@
         </div>
         <div class="photo-item" style="text-align:right;">
           <span>营业执照<br><span style="font-size:small;color:red;">(必须原件)</span></span>
-          <uploadImg :readonly='read'  @onChange='licenceimgChange' :imgSrc="licenceimg" id='licenceimg' name="licenceimg" v-model="licenceimg" theme="light"></uploadImg>
+          <uploadImg :readonly='read'  @onChange='licenceimgChange' :imgSrc="licenceimg" id='licenceimg' name="licenceimg" v-model="licenceimg" theme="light"></uploadImg><br/>
           <uploadImg :readonly='read'  @onChange='licenceimgChange1' :imgSrc="licenceimg1" v-if='licenceimg.length!==0' id='licenceimg1' name="licenceimg1" v-model="licenceimg1" theme="light"></uploadImg>
         </div>
       </group>
@@ -40,7 +41,7 @@
           <x-input title="附加说明" :readonly='read' :max="200" placeholder="说明" v-model="item.uremark"></x-input>
           <div class="photo-item" style="text-align:right;">
             <span>卫生许可<br><span style="font-size:small;;color:red;">(必须原件)</span></span>
-            <uploadImg :readonly='read' @onChange='permitimgChange' :imgSrc="permitimg" id='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg>
+            <uploadImg :readonly='read' @onChange='permitimgChange' :imgSrc="permitimg" id='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg><br>
             <uploadImg :readonly='read' @onChange='permitimgChange1' :imgSrc="permitimg1" v-if='permitimg.length != 0' id='permitimg1' name="permitimg1" v-model="permitimg1" theme="light"></uploadImg>
           </div>
         </div>
@@ -48,7 +49,7 @@
 
 
       <button v-if='!read' @click='submit' :disabled="item.uoname == '' || item.ubusinesstype == '' || item.businessnumber == '' ||
-            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0 || !idcValid || !telValid" 
+            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0 || !idcValid || !telValid|| item.ubusinessaddress" 
       class="round-big-btn">提交审核</button>
 
       <div v-transfer-dom>
@@ -71,6 +72,7 @@ import { imgIp } from '../../config/axois';
 import uploadImg from '../../components/uploadImg';
 // import {_getlistbyparentid, _gettbsysbasicdatabycode} from '../../service/getdata';
 import {employmentServices} from '../../service/EmploymentRegister';
+import {_userServices} from '../../service/userServices';
 export default {
   name: "submit-information-add",
   directives: {
@@ -90,6 +92,10 @@ export default {
     FlexboxItem,
     Checklist
   },
+    beforeRouteUpdate (to, from, next) {
+    next()
+  }
+,
   data() {
     return {
       read: true,
@@ -137,7 +143,19 @@ export default {
   },
   created(){
     let that = this;
-    this.read = this.$route.params.read=="true" ? true :false;
+    _userServices._getUserMsg().then(function(data1){
+      that.read = that.$route.params.read=="true" ? true :false;
+      if(data1.ULAudtiStatus == 1){
+        if(that.read) that.$router.push({name: 'submit-information-view', params: { 'read': false }});
+      }else{
+        if(!that.read)  that.$router.push({name: 'submit-information-view', params: { 'read': true }});
+      }
+    }).catch(function(err){
+      console.log(err)
+    });
+
+    console.log(this.$route.params.read);
+    console.log(that.read);
     employmentServices._getorganizeinfo().then((data) => {
       that.item = data.AppendData;
       that.cardidimg = imgIp+that.item.cardidimg[0]
@@ -148,6 +166,9 @@ export default {
     }).catch(err => console.log(err))
     this.getareas();
     this.gettbsysbasicdatabycode();
+  },
+  beforeRouteUpdate (to, from, next) {
+    next()
   },
   methods: {
     submit() {
@@ -160,7 +181,7 @@ export default {
         ._editorganizeinfo(this.item)
         .then(function(data) {
           if (data.ResultType == 0) {
-            Vue.$vux.toast.show({
+            that.$vux.toast.show({
               text: "提交信息成功",
               type: 'success',
               position: 'middle'
@@ -230,6 +251,9 @@ export default {
     },
     set(){
       this.showArea = false;
+    },
+    changetype(val, label){
+      console.log(val, label)
     },
     changeArea(val, label){
       let that = this;
@@ -321,95 +345,96 @@ export default {
 
 
 <style lang="less">
-  body{
+  body[data-path=submit-information-view]{
     background: #3c9;
-  }
+    
+    .myapp {
+      .valid-err{
+        text-align: center;
+        font-size: small;
+        color: red;
+      }
+      .wait{
+        color: yellow;
+        text-align: center;
+        font-size: 1.2em;
+        .iconfont{
+          font-family: 30px;
+        }
+      }
 
-.myapp {
-  .valid-err{
-    text-align: center;
-    font-size: small;
-    color: red;
-  }
-  .wait{
-    color: yellow;
-    text-align: center;
-    font-size: 1.2em;
-    .iconfont{
-      font-family: 30px;
-    }
-  }
+      .add-form {
+        margin: 28/72*1rem;
+        > div {
+          background: #fff;
+          border-radius: 0.2rem;
+          .weui-cells {
+            border-radius: 0.2rem;
+          }
+        }
+        .round-big-btn {
+          background: #fff;
+          color: #3c9;
+          margin-top: 0.5rem;
+          &[disabled]{
+            background: #ccc;
+            color: cornsilk;
+          }
+        }
 
-  .add-form {
-    margin: 28/72*1rem;
-    > div {
-      background: #fff;
-      border-radius: 0.2rem;
-      .weui-cells {
-        border-radius: 0.2rem;
+        .weui-cells__title {
+          padding-top: 0.333rem;
+          padding-bottom: 0.333rem;
+        }
+
+        .mid-title {
+          padding: 0.29rem 0.2rem;
+          background: #f5f2f2;
+          color: #4caf50;
+          position: relative;
+          >span{
+            border-left: .2em solid #3c9;
+            padding-left: .3em;
+          }
+          .iconfont {
+            position: absolute;
+            right: 0.1rem;
+          }
+        }
+      }
+      .weui-label {
+        color: #878f98;
+      }
+
+      .photo-item {
+        position: relative;
+        padding: 1em 1em 1em 0.138rem;
+        > span {
+          color: #999;
+          position: absolute;
+          left: 0.417rem;
+          top: 50%;
+          transform: translateY(-50%);
+          text-align: left;
+        }
+
+        &::before {
+          content: " ";
+          position: absolute;
+          left: 0;
+          top: 0;
+          right: 0;
+          height: 1px;
+          border-top: 1px solid #e5e5e5;
+          color: #e5e5e5;
+          -webkit-transform-origin: 0 0;
+          transform-origin: 0 0;
+          -webkit-transform: scaleY(0.5);
+          transform: scaleY(0.5);
+          left: 15px;
+        }
       }
     }
-    .round-big-btn {
-      background: #fff;
-      color: #3c9;
-      margin-top: 0.5rem;
-      &[disabled]{
-        background: #ccc;
-        color: cornsilk;
-      }
-    }
-
-    .weui-cells__title {
-      padding-top: 0.333rem;
-      padding-bottom: 0.333rem;
-    }
-
-    .mid-title {
-      padding: 0.29rem 0.2rem;
-      background: #f5f2f2;
-      color: #4caf50;
-      position: relative;
-      >span{
-        border-left: .2em solid #3c9;
-        padding-left: .3em;
-      }
-      .iconfont {
-        position: absolute;
-        right: 0.1rem;
-      }
-    }
-  }
-  .weui-label {
-    color: #878f98;
   }
 
-  .photo-item {
-    position: relative;
-    padding: 1em 1em 1em 0.138rem;
-    > span {
-      color: #999;
-      position: absolute;
-      left: 0.417rem;
-      top: 50%;
-      transform: translateY(-50%);
-      text-align: left;
-    }
-
-    &::before {
-      content: " ";
-      position: absolute;
-      left: 0;
-      top: 0;
-      right: 0;
-      height: 1px;
-      border-top: 1px solid #e5e5e5;
-      color: #e5e5e5;
-      -webkit-transform-origin: 0 0;
-      transform-origin: 0 0;
-      -webkit-transform: scaleY(0.5);
-      transform: scaleY(0.5);
-      left: 15px;
-    }
-  }
-}
 </style>

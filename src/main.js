@@ -50,7 +50,9 @@ methods.forEach(key => {
 
 router.beforeEach(function (to, from, next) {
   store.commit('updateLoadingStatus', {isLoading: true})
-
+  console.log(to, from)
+  var body=document.getElementsByTagName("body")[0];
+  body.setAttribute("data-path", to.name);
   const toIndex = history.getItem(to.path)
   const fromIndex = history.getItem(from.path)
 
