@@ -2,7 +2,7 @@
   <div>
     <x-header :left-options="{showBack: false}">个人中心</x-header>
     <div class="personal-top">
-      <img src="../../assets/logo.png" style="    width: 80px;background: #fff;border-radius: 50%;"/>
+      <img src="../../assets/loginpic.png" style="width: 8em;background: #fff;padding:0.2em;border-radius: 50%;"/>
       <div>{{item.ULName}}</div>
     </div>
     <group>
@@ -37,7 +37,7 @@ export default {
     XInput,
     Selector ,
     PopupHeader,
-    Popup, 
+    Popup,
     Picker,
     uploadImg
   },

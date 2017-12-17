@@ -139,7 +139,7 @@ export default {
   methods: {
     submit() {
       let that = this;
-      this.item.cardidimg =  encodeURIComponent(this.cardidimg); 
+      this.item.cardidimg =  encodeURIComponent(this.cardidimg);
       this.item.licenceimg = encodeURIComponent(this.licenceimg+"|"+this.licenceimg1);
       this.item.permitimg = encodeURIComponent(this.permitimg+"|"+this.permitimg1);
       employmentServices
@@ -271,85 +271,84 @@ export default {
 
 
 <style lang="less">
-  body[data-path=submit-information-add]{
-    background: #3c9;
-  }
-
-.myapp {
-  .valid-err{
-    text-align: center;
-    font-size: small;
-    color: red;
-  }
-  .add-form {
-    margin: 28/72*1rem;
-    > div {
-      background: #fff;
-      border-radius: 0.2rem;
-      .weui-cells {
+body[data-path=submit-information-add]{
+  background: #3c9;
+  .myapp {
+    .valid-err{
+      text-align: center;
+      font-size: small;
+      color: red;
+    }
+    .add-form {
+      margin: 28/72*1rem;
+      > div {
+        background: #fff;
         border-radius: 0.2rem;
+        .weui-cells {
+          border-radius: 0.2rem;
+        }
+      }
+      .round-big-btn {
+        background: #fff;
+        color: #3c9;
+        margin-top: 0.5rem;
+        &[disabled]{
+          background: #ccc;
+          color: cornsilk;
+        }
+      }
+
+      .weui-cells__title {
+        padding-top: 0.333rem;
+        padding-bottom: 0.333rem;
+      }
+
+      .mid-title {
+        padding: 0.29rem 0.2rem;
+        background: #f5f2f2;
+        color: #4caf50;
+        position: relative;
+        >span{
+          border-left: .2em solid #3c9;
+          padding-left: .3em;
+        }
+        .iconfont {
+          position: absolute;
+          right: 0.1rem;
+        }
       }
     }
-    .round-big-btn {
-      background: #fff;
-      color: #3c9;
-      margin-top: 0.5rem;
-      &[disabled]{
-        background: #ccc;
-        color: cornsilk;
-      }
+    .weui-label {
+      color: #878f98;
     }
 
-    .weui-cells__title {
-      padding-top: 0.333rem;
-      padding-bottom: 0.333rem;
-    }
-
-    .mid-title {
-      padding: 0.29rem 0.2rem;
-      background: #f5f2f2;
-      color: #4caf50;
+    .photo-item {
       position: relative;
-      >span{
-        border-left: .2em solid #3c9;
-        padding-left: .3em;
-      }
-      .iconfont {
+      padding: 1em 1em 1em 0.138rem;
+      > span {
+        color: #999;
         position: absolute;
-        right: 0.1rem;
+        left: 0.417rem;
+        top: 50%;
+        transform: translateY(-50%);
+        text-align: left;
       }
-    }
-  }
-  .weui-label {
-    color: #878f98;
-  }
 
-  .photo-item {
-    position: relative;
-    padding: 1em 1em 1em 0.138rem;
-    > span {
-      color: #999;
-      position: absolute;
-      left: 0.417rem;
-      top: 50%;
-      transform: translateY(-50%);
-      text-align: left;
-    }
-
-    &::before {
-      content: " ";
-      position: absolute;
-      left: 0;
-      top: 0;
-      right: 0;
-      height: 1px;
-      border-top: 1px solid #e5e5e5;
-      color: #e5e5e5;
-      -webkit-transform-origin: 0 0;
-      transform-origin: 0 0;
-      -webkit-transform: scaleY(0.5);
-      transform: scaleY(0.5);
-      left: 15px;
+      &::before {
+        content: " ";
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        height: 1px;
+        border-top: 1px solid #e5e5e5;
+        color: #e5e5e5;
+        -webkit-transform-origin: 0 0;
+        transform-origin: 0 0;
+        -webkit-transform: scaleY(0.5);
+        transform: scaleY(0.5);
+        left: 15px;
+      }
     }
   }
 }

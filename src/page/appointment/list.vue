@@ -7,17 +7,26 @@
           :noDataText='noDataText'
           ref="my_scroller">
       <div class="list">
-        <div class="item" v-for="item in list" @click='view(item.Id,item.originalData)'>
-          <div class="left-ctx"
-          v-bind:class="{ 'warning': item.status=='待审核', 'danger': item.status=='未通过', 'success': item.status=='已通过' }">
-            {{item.status}}
-          </div>
-          <div class="right-ctx">
-            <h4>{{item.time}}</h4>
-            <p>[{{item.number}}]&emsp;预约人数</p>
-            <p>{{item.originalData.PhaOrName}}</p>
-          </div>
-        </div>
+        <swipeout>
+          <swipeout-item ref="swipeoutItem"   transition-mode="follow" v-for="(item, index) in list" :key="item.PhAID">
+            <div slot="right-menu" v-if='item.PhAStatus=!3'>
+              <swipeout-button  @click.native.prevent="deleteItem(index)" type="warn">删除</swipeout-button>
+            </div>
+            <div slot="content">
+              <div class="item"  @click='view(item.Id,item.originalData)'>
+                <div class="left-ctx"
+                  v-bind:class="{ 'warning': item.status=='待审核', 'danger': item.status=='未通过', 'success': item.status=='已通过' }">
+                  {{item.status}}
+                </div>
+                <div class="right-ctx">
+                  <h4>{{item.time}}</h4>
+                  <p>[{{item.number}}]&emsp;预约人数</p>
+                  <p>{{item.originalData.PhaOrName}}</p>
+                </div>
+              </div>
+            </div>
+          </swipeout-item>
+        </swipeout>
       </div>
       <div v-if='nodata' class="nodata" @click="goAppoinment">
         <img src="../../assets/vux_logo.png" alt="无数据">
@@ -29,7 +38,7 @@
 </template>
 
 <script>
-import { XHeader } from "vux";
+import { XHeader, Swipeout, SwipeoutItem, SwipeoutButton } from "vux";
 // import vscroll from "../../components/vscroll";
 import { _appointmentServce } from "../../service/appointmentServices";
 import scroll from '../../components/scroll';
@@ -37,7 +46,10 @@ export default {
   name: "appointment-list",
   components: {
     XHeader,
-    scroll
+    scroll,
+    Swipeout,
+    SwipeoutItem,
+    SwipeoutButton
   },
   created() {
     // console.log("创建成功");
@@ -110,12 +122,32 @@ export default {
             }else{
               that.noDataText = '---- 我是底线 ----';
             }
-            
+
           }
         }
       }).catch(err => console.log(err));
     },
-
+    deleteItem(index){
+      let id = this.list[index].PhAID;
+      let that = this;
+      _appointmentServce.deleteAppointment(id)
+      .then(data => {
+        if(data.PerrationResultType == 0){
+          that.$vux.toast.show({
+            text: "删除预约成功",
+            type: 'success',
+            position: 'middle'
+          });
+          that.list.splice(index, 1);
+        }else{
+          that.$vux.toast.show({
+            text: data.Message,
+            type: 'warn',
+            position: 'middle'
+          });
+        }
+      })
+    },
     appendToList(AppendData) {
       let that = this;
       AppendData.forEach(item => {

@@ -28,8 +28,8 @@ export var _appointmentServce = {
         return getInfo(baseurl + '/employment/edittbphysicalappointment', { parma }, 'post', true);
     },
     // 删除
-    deleteAppointment: () => {
-        return getInfo(baseurl + '/employment/deletetbphysicalappointment', {}, 'post', true);
+    deleteAppointment: (phids='') => {
+        return getInfo(baseurl + '/employment/deletetbphysicalappointment', {"phaids": phids}, 'post', true);
     },
 
     // 获取体检预约机构

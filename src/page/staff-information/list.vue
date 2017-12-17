@@ -91,9 +91,9 @@
         <div>
           <flexbox class="submit-box1"  :gutter="0">
             <flexbox-item class="light" @click.native='cancel'>取消</flexbox-item>
-            <flexbox-item v-if="!edit" class="primary"  
+            <flexbox-item v-if="!edit" class="primary"
             @click.native='(nameValid && idcValid && phoneValid && addData.phunit.length!=0 && addData.phname.length!=0 && addData.phcardid.length!=0) ? addStaff():""'>完成</flexbox-item>
-            <flexbox-item v-if="edit" class="primary"  
+            <flexbox-item v-if="edit" class="primary"
             @click.native='(nameValid && idcValid && phoneValid && addData.phunit.length!=0 && addData.phname.length!=0 && addData.phcardid.length!=0) ?  editSubmit(): ""'>完成</flexbox-item>
           </flexbox>
         </div>
@@ -353,123 +353,122 @@ export default {
 
 <style lang="less">
 @import "../../style/common.less";
-.myapp {
-  // position: relative;
-  ._v-container.scroll-normal >  {
-    .px2rem(top, 100);
-    .px2rem(bottom, 0);
-    position: fixed;
-    height: auto !important;
-  }
+body[data-path=staff-information-list]{
+  .myapp {
+    // position: relative;
+    ._v-container.scroll-normal >  {
+      .px2rem(top, 100);
+      .px2rem(bottom, 0);
+      position: fixed;
+      height: auto !important;
+    }
 
-  ._v-container.scroll-checkallow >  {
-    .px2rem(top, 100);
-    .px2rem(bottom, 90);
-    position: fixed;
-    height: auto !important;
-  }
-  .list {
-    .px2rem(margin-bottom, 5);
-    .item {
-      .left-ctx {
-        width: 1.389rem;
-        height: 1.389rem;
-        line-height: 1.389rem;
-        border-radius: 50%;
-        align-self: center;
-        margin-right: 0.278rem;
-        text-align: center;
-        color: #999;
-        .iconfont {
-          .px2px(font-size, 52);
+    ._v-container.scroll-checkallow >  {
+      .px2rem(top, 100);
+      .px2rem(bottom, 90);
+      position: fixed;
+      height: auto !important;
+    }
+    .list {
+      .px2rem(margin-bottom, 5);
+      .item {
+        .left-ctx {
+          width: 1.389rem;
+          height: 1.389rem;
+          line-height: 1.389rem;
+          border-radius: 50%;
+          align-self: center;
+          margin-right: 0.278rem;
+          text-align: center;
+          color: #999;
+          .iconfont {
+            .px2px(font-size, 52);
+          }
+        }
+        > .iconfont {
+          position: absolute;
+          right: 1em;
+          color: #ebc650;
+          font-size: large;
         }
       }
-      > .iconfont {
-        position: absolute;
-        right: 1em;
-        color: #ebc650;
-        font-size: large;
+    }
+    .fix-bottom {
+      .px2rem(height, 90);
+      .px2rem(line-height, 90);
+      position: fixed;
+      .px2rem(bottom, 100);
+      background: #fff;
+      .px2px(font-size, 32);
+      text-align: center;
+      .iconfont {
+        .px2px(font-size, 52);
+        position: relative;
+        .px2rem(bottom, 4);
+        vertical-align: middle;
+      }
+      > .flex-last {
+        flex: 0 0 10em;
+        background: #3c9;
+        color: #fff;
       }
     }
   }
-  .fix-bottom {
-    .px2rem(height, 90);
-    .px2rem(line-height, 90);
-    position: fixed;
-    .px2rem(bottom, 100);
-    background: #fff;
-    .px2px(font-size, 32);
+  .valid-err {
+    position: relative;
+    // top: -5px;
+    .px2rem(top, -20);
     text-align: center;
+    color: red;
+  }
+  .pop-content {
+    .px2rem(padding-left, 100);
+    .px2rem(padding-right, 100);
+    padding-top: 0.5rem;
+  }
+  .vux-flexbox.form-item {
+    .px2px(font-size, 36);
+
+    .px2rem(padding-bottom, 36);
+    > .form-item-left {
+      flex-grow: 0;
+      flex-shrink: 0;
+      .px2rem(flex-basis, 84);
+    }
+
     .iconfont {
-      .px2px(font-size, 52);
-      position: relative;
-      .px2rem(bottom, 4);
-      vertical-align: middle;
-    }
-    > .flex-last {
-      flex: 0 0 10em;
-      background: #3c9;
-      color: #fff;
-    }
-  }
-}
-
-.valid-err {
-  position: relative;
-  // top: -5px;
-  .px2rem(top, -20);
-  text-align: center;
-  color: red;
-}
-
-.pop-content {
-  .px2rem(padding-left, 100);
-  .px2rem(padding-right, 100);
-  padding-top: 0.5rem;
-}
-.vux-flexbox.form-item {
-  .px2px(font-size, 36);
-
-  .px2rem(padding-bottom, 36);
-  > .form-item-left {
-    flex-grow: 0;
-    flex-shrink: 0;
-    .px2rem(flex-basis, 84);
-  }
-
-  .iconfont {
-    .px2px(font-size, 56);
-    color: #3c9;
-  }
-  input {
-    width: 100%;
-    border: 1px solid #ddd;
-    .px2rem(height, 72);
-    .px2rem(padding-left, 10);
-    .px2rem(padding-right, 10);
-    &:focus {
-      outline: none;
-      border-color: #3c9;
-      // border-style: solid;
-      border-width: 1px;
-    }
-  }
-}
-
-.vux-flexbox.submit-box1 {
-  > .vux-flexbox-item {
-    .px2rem(height, 85);
-    .px2rem(line-height, 85);
-    text-align: center;
-    .px2px(font-size, 32);
-    &.light {
-      background: #fff;
+      .px2px(font-size, 56);
       color: #3c9;
     }
+    input {
+      width: 100%;
+      border: 1px solid #ddd;
+      .px2rem(height, 72);
+      .px2rem(padding-left, 10);
+      .px2rem(padding-right, 10);
+      &:focus {
+        outline: none;
+        border-color: #3c9;
+        // border-style: solid;
+        border-width: 1px;
+      }
+    }
+  }
+  .vux-flexbox.submit-box1 {
+    > .vux-flexbox-item {
+      .px2rem(height, 85);
+      .px2rem(line-height, 85);
+      text-align: center;
+      .px2px(font-size, 32);
+      &.light {
+        background: #fff;
+        color: #3c9;
+      }
 
-    &.primary {
-      background: #3c9;
-      color: #fff;
+      &.primary {
+        background: #3c9;
+        color: #fff;
+      }
     }
   }
 }

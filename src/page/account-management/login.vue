@@ -73,7 +73,7 @@ export default {
       // ynk123456
       let that = this;
       that.showload = true;
-  
+
       _userServices._userLogin({"username": this.mobile,"pwd": this.password}).then(function(data){
         if(data.ResultType == 0){
           that.loadtext = "登陆成功";
@@ -94,13 +94,13 @@ export default {
               }else{
                 that.$router.push({name: 'submit-information-view', params: { 'read': true }});
               }
-              
+
             }
             else{
               that.$router.push({name: 'submit-information-add'});
             }
 
-            
+
           }).catch(function(err){
             console.log(err, 2)
             that.showload = false;
@@ -152,14 +152,16 @@ export default {
   @import '../../style/common.less';
   body[data-path=login]{
     background: #fff;
-  }
+
   .logo{
     .px2rem(width, 200);
     .px2rem(height, 200);
     .px2rem(border-radius, 40);
     .px2rem(margin-top, 70);
     .px2rem(margin-bottom, 30);
-    background: green;
+    padding: 0.6em;
+    background: #3c9;
+    box-sizing: border-box;
   }
 
   .title{
@@ -241,7 +243,7 @@ export default {
       }
     }
   }
-
+  }
 
 
 </style>

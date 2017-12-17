@@ -70,7 +70,7 @@ export default {
 //      "Message": "",
 //       "LogMessage": "",
 //      "AppendData": "gHz+B39B8Fyb0XGllCuwaIlFv8QGP2CeW0wKxnbvlK7qfylPt3YYqYMK81sQDZ3A" //expkey
-// }  
+// }
     let that = this;
     _userServices._getCodeExpkey({key:this.$store.state.parmaCommon}).then(function(data){
           //绑定模型 expkey
@@ -163,113 +163,115 @@ export default {
   @import '../../style/common.less';
   body[data-path=register]{
     background: #fff;
-  }
-  .logo{
-    .px2rem(width, 200);
-    .px2rem(height, 200);
-    .px2rem(border-radius, 40);
-    .px2rem(margin-top, 70);
-    .px2rem(margin-bottom, 30);
-    background: green;
-  }
 
-  .title{
-    .px2px(font-size, 32);
-    color: #3c9;
-    .px2rem(margin-bottom, 90);
-  }
-  .login-form{
-    .px2px(margin-left, 70);
-    .px2px(margin-right, 70);
-    // margin: 0 3.5rem;
-
-    .user{
-      &.has-btn{
-        .px2rem(padding-right, 80);
-      }
-      border-bottom: 1px solid #d4dce1;
-      .px2px(font-size, 24);
-      .px2rem(padding-left, 84);
-      .px2rem(margin-bottom, 40);
-      color: #3c9;
-      position: relative;
-      .iconfont{
-        .px2px(font-size, 60);
-        position: absolute;
-        left: 0;
-        .px2px(top, -16);
-      }
-
-      .CheckCodeBtn{
-        position: absolute;
-        right: 0;
-        .px2rem(line-height, 52);
-        .px2rem(border-radius, 40);
-        .px2rem(top, 10);
-        width: 6.5em;
-        text-align: center;
-        background: #3c9;
-        display: inline-block;
-        color: #fff;
-        &[disabled]{
-          background: #bbb;
-          pointer-events: none;
-        }
-      }
-      input{
-        .px2rem(padding-bottom, 10);
-        .px2rem(height, 70);
-        // height: 3.5rem;
-        border: none;
-        width: 100%;
-        .px2px(font-size, 26);
-        // font-size: 1.3rem;
-        display: block;
-
-        &:focus{
-          outline: none;
-        }
-      }
-      .validator-error{
-        color: #f96868;
-      }
+    .logo{
+      .px2rem(width, 200);
+      .px2rem(height, 200);
+      .px2rem(border-radius, 40);
+      .px2rem(margin-top, 70);
+      .px2rem(margin-bottom, 30);
+      padding: 0.6em;
+      background: #3c9;
+      box-sizing: border-box;
     }
 
-    // .login{
-    //   .px2rem(border-radius, 60);
-    //   .px2rem(padding, 24);
-    //   .px2rem(font-size, 32);
-
-    //   background: #3c9;
-    //   color: #fff;
-    //   // border-radius: 3rem;
-    //   // padding: 1.2rem;
-    //   // font-size: 1.6rem;
-    //   width: 100%;
-    //   box-shadow: none;
-    //   border: none;
-    // }
-
-    .remenber-password{
+    .title{
       .px2px(font-size, 32);
-      .px2rem(padding-bottom, 50);
-
-      // font-size: 1.6rem;
-      // padding-bottom: 2.5rem;
-      text-align: right;
       color: #3c9;
-      input{
-        display: none;
+      .px2rem(margin-bottom, 90);
+    }
+    .login-form{
+      .px2px(margin-left, 70);
+      .px2px(margin-right, 70);
+      // margin: 0 3.5rem;
+
+      .user{
+        &.has-btn{
+          .px2rem(padding-right, 80);
+        }
+        border-bottom: 1px solid #d4dce1;
+        .px2px(font-size, 24);
+        .px2rem(padding-left, 84);
+        .px2rem(margin-bottom, 40);
+        color: #3c9;
+        position: relative;
+        .iconfont{
+          .px2px(font-size, 60);
+          position: absolute;
+          left: 0;
+          .px2px(top, -16);
+        }
+
+        .CheckCodeBtn{
+          position: absolute;
+          right: 0;
+          .px2rem(line-height, 52);
+          .px2rem(border-radius, 40);
+          .px2rem(top, 10);
+          width: 6.5em;
+          text-align: center;
+          background: #3c9;
+          display: inline-block;
+          color: #fff;
+          &[disabled]{
+            background: #bbb;
+            pointer-events: none;
+          }
+        }
+        input{
+          .px2rem(padding-bottom, 10);
+          .px2rem(height, 70);
+          // height: 3.5rem;
+          border: none;
+          width: 100%;
+          .px2px(font-size, 26);
+          // font-size: 1.3rem;
+          display: block;
+
+          &:focus{
+            outline: none;
+          }
+        }
+        .validator-error{
+          color: #f96868;
+        }
       }
 
-      .iconfont{
-        .px2px(font-size, 40);
-        // font-size: 2rem;
-        vertical-align: middle;
+      // .login{
+      //   .px2rem(border-radius, 60);
+      //   .px2rem(padding, 24);
+      //   .px2rem(font-size, 32);
+
+      //   background: #3c9;
+      //   color: #fff;
+      //   // border-radius: 3rem;
+      //   // padding: 1.2rem;
+      //   // font-size: 1.6rem;
+      //   width: 100%;
+      //   box-shadow: none;
+      //   border: none;
+      // }
+
+      .remenber-password{
+        .px2px(font-size, 32);
+        .px2rem(padding-bottom, 50);
+
+        // font-size: 1.6rem;
+        // padding-bottom: 2.5rem;
+        text-align: right;
+        color: #3c9;
+        input{
+          display: none;
+        }
+
+        .iconfont{
+          .px2px(font-size, 40);
+          // font-size: 2rem;
+          vertical-align: middle;
+        }
       }
     }
   }
-
 
 
 </style>

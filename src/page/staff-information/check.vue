@@ -181,6 +181,7 @@ export default {
 
 <style lang="less">
   @import '../../style/common.less';
+body[data-path=staff-information-check]{
   .myapp {
     // position: relative;
 
@@ -237,9 +238,6 @@ export default {
     }
 
   }
-
-
-
   .valid-err{
     position: relative;
     // top: -5px;
@@ -247,7 +245,6 @@ export default {
     text-align: center;
     color: red;
   }
-
   .pop-content{
     .px2rem(padding-left, 100);
     .px2rem(padding-right, 100);
@@ -284,7 +281,6 @@ export default {
 
 
   }
-
   .vux-flexbox.submit-box1{
     > .vux-flexbox-item{
       .px2rem(height, 85);
@@ -302,5 +298,5 @@ export default {
       }
     }
   }
-
+}
 </style>

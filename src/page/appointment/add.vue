@@ -159,13 +159,13 @@ export default {
                 arr.push({
                   name : value.PPNDate,
                   value : value.PPNDate,
-                  parent : 0 
-                }); 
+                  parent : 0
+                });
                 arr.push({
                   name : ["全天","上午","下午"][value.PPNType]+"("+value.UsedNumber+"/"+value.Number+")",
                   value :  value.PPNID+","+["全天","上午","下午"][value.PPNType]+','+(value.Number-value.UsedNumber),
                   parent : value.PPNDate
-                }) 
+                })
               }
             });
             that.timedatas = arr;
@@ -190,6 +190,7 @@ export default {
 </script>
 
 <style lang="less">
+body[data-path=appointment-add]{
   .weui-cell__ft.vux-cell-align-left{
     padding-left: 1em;
   }
@@ -199,4 +200,6 @@ export default {
       background: #ebc650;
     }
   }
+}
+
 </style>
