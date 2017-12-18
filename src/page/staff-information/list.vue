@@ -34,6 +34,10 @@
         </swipeout>
 
       </div>
+      <div v-if='nodata' class="nodata" @click="goAppoinment">
+        <img src="../../assets/nodata.png" alt="无数据">
+        亲，您目前还没有添加任何员工哦！左上角添加
+      </div>
     </scroll>
     <flexbox v-if="checkAllow" align='stretch'  :gutter="0" class="fix-bottom">
       <flexbox-item @click.native='checkall'>
@@ -115,10 +119,11 @@ import {
   SwipeoutItem,
   SwipeoutButton
 } from "vux";
-import { IdCardTo } from "../../utils/idc";
 import scroll from "../../components/scroll";
 import { _staffServce } from "../../service/staffService";
 import { PhysicalInfoServices } from "../../service/EmpPhysicalInfo";
+import { IdentityCodeValid } from '../../utils/idc-valid';
+import { employmentServices } from '../../service/EmploymentRegister';
 export default {
   name: "staff-information-list",
   directives: {
@@ -137,7 +142,17 @@ export default {
     scroll
   },
   created() {
-    this.loadData();
+    let that = this;
+    if(!!window.localStorage.getItem('UoName')){
+      that.addData.phunit = window.localStorage.getItem('UoName');
+    }else{
+      employmentServices._getorganizeinfo().then(data => {
+        that.addData.phunit = data.AppendData.uoname;
+        window.localStorage.setItem('UoName', data.AppendData.uoname);
+      });
+    }
+
+    that.loadData();
   },
   data() {
     return {
@@ -332,8 +347,8 @@ export default {
       }
     },
     testIdc() {
-      var reg = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
-      if (reg.test(this.addData.phcardid)) {
+      // var reg = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
+      if (IdentityCodeValid(this.addData.phcardid)) {
         this.idcValid = true;
       } else {
         this.idcValid = false;
@@ -355,10 +370,20 @@ export default {
 @import "../../style/common.less";
 body[data-path=staff-information-list]{
   .myapp {
+      .nodata{
+    text-align: center;
+    color: #3c9;
+    padding: 20px;
+    margin-top: 50%;
+    transform: translateY(-50%);
+    img{
+      width: 100%;
+    }
+  }
     // position: relative;
     ._v-container.scroll-normal >  {
       .px2rem(top, 100);
-      .px2rem(bottom, 0);
+      .px2rem(bottom, 70);
       position: fixed;
       height: auto !important;
     }

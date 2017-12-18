@@ -15,7 +15,7 @@
         <cell title="申请日期" readonly :is-loading="!item.CreateDate" :value="item.CreateDate"></cell>
 
         <!-- :is-loading="!item.Description" -->
-        <cell :title="stateTitle" readonly  :value="item.Description" placeholder="无"></cell>
+        <cell :title="stateTitle" readonly  :value="item.PhABackOption" placeholder="无"></cell>
         <div v-if="item.PhAStatus == 3" class="result-tip danger"><span class="iconfont icon-fail"></span>
           预约成功，请通知相关人员凭身份证按时到【{{item.PhaOrName}}】进行体检
           <div>
@@ -67,6 +67,9 @@ export default {
       if(this.item.PhCount != 0)
        this.$router.push({name: "staff-information-view-list", params: {phaid: this.item.PhAID }});
     }
+  },
+  beforeRouteUpdate (to, from, next) {
+    next()
   },
   data() {
     return {

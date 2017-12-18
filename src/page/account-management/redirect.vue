@@ -1,5 +1,14 @@
 <template>
     <div class="firstContainer">
+      <div v-if='showtip' class="uatip">
+        您当前使用非微信浏览器访问!
+        <br/>
+        <br/>
+        请切换到微信中访问。。。
+        <br>
+        <br>
+        <span>如已切换，<a href='javascript:void(0)' @click='reload'>点击刷新...</a></span>
+      </div>
 
     </div>
 </template>
@@ -12,11 +21,20 @@
     name: 'redirect',
     data(){
       return{
-
+        showtip: false
       }
     },
     created(){
+      // 验证是否在微信环境中   main.js第54行解除注释
+      // var ua = window.navigator.userAgent.toLowerCase(); 
+      // if (ua.match(/MicroMessenger/i) == 'micromessenger') { 
+      //     this.redirect();
+      // } else { 
+      //   this.showtip = true;
+      // }
+
       this.redirect();
+      
     },
 
     components:{
@@ -45,13 +63,29 @@
         }else{
           this.$router.push({name: 'login'});
         }
+      },
+      reload(){
+        window.location.reload();
       }
 
     },
   }
 </script>
 <style lang="less">
-
+body[data-path=redirect]{
+  .uatip{
+    text-align: center;
+    font-size: large;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    color: #3c9;
+    span{
+      font-size: small;
+    }
+  }
+}
 </style>
 
 

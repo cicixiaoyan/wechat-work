@@ -87,7 +87,7 @@ export default {
           position: 'middle'
         });
       }
-      console.log(this.item)
+      // console.log(this.item)
       _appointmentServce.createAppointment(this.item)
       .then(data => {
         that.$vux.toast.show({
@@ -95,13 +95,12 @@ export default {
           type: 'success',
           position: 'middle'
         });
-        that.$router.push({name: "staff-information-list"});
+        that.$router.push({name: "appointment-list"});
       }).catch(err => console.log(err));
 
 
     },
     getTime() {
-      console.log(this.mytime[1].split(","));
       this.item.PPNID = this.mytime[1].split(",")[0];
       this.ptime = this.mytime[0]+' '+ this.mytime[1].split(",")[1];
       this.maxNumber = this.mytime[1].split(",")[2];

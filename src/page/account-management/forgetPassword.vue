@@ -21,14 +21,16 @@
 <div class="login-form">
     <div class="user has-btn">
       <label class="remark">手机号</label>
-      <input type="number" placeholder="请输入手机号" maxlength="11"  v-model="username">
-      <a class="CheckCodeBtn" @click='getCheckCode'>获取验证码</a>
+      <input type="number" @input='judgePhone' @focus='dirtyPhone=true'  placeholder="请输入手机号" maxlength="11"  v-model="username">
+      <a class="CheckCodeBtn" @click='getCheckCode' :disabled="username.length !== 11 || !enableCheckBtn"><span v-html="checkCodeName"></span></a>
     </div>
+    <div class="validator-error" v-if="!enableCheckBtn && dirtyPhone">{{phoneInValid}}</div>
     <div class="user has-btn">
       <label class="remark">验证码</label>
-      <input  placeholder="请输入验证码"  type="password"  v-model="checkCode">
+      <input  placeholder="请输入验证码" @focus='dirtyCode=true'   v-model="checkCode"/>
     </div>
-    <button @click='validate' class="btn btn-disabled" :disabled="username==='' || checkCode==''">验证手机号</button>
+    <div class="validator-error" v-if="checkCode.length!==6 && dirtyCode">请输入合法验证码</div>
+  <button @click='validate' class="btn btn-disabled" :disabled="checkCode.length !==6 && username.length !=11 && phoneInValid=='' ">验证手机号</button>
     </div>
 </div>
 <div v-else-if="index == 1" class="reset">
@@ -44,14 +46,19 @@
     </div>
     <div class="user">
       <label class="remark">新密码</label>
-      <input  placeholder="请输入新密码"  type="password"  v-model="password">
+      <input  placeholder="请输入新密码" @focus='dirtyPwd=true'  type="password"  v-model="password">
     </div>
+    <div class="validator-error" v-if="password.length < 6 && dirtyPwd">密码不能小于6位</div>
+
     <div class="user">
       <label class="remark">确认密码</label>
-      <input  placeholder="请确认密码"  type="password" v-model="passwordRep">
+      <input  placeholder="请确认密码" @focus='dirtyPwdRep=true' type="password" v-model="passwordRep">
     </div>
-      <button @click='updatepassword' class="btn" :disabled="mobile===''|| password==='' || password !== passwordRep" >设置密码</button>
-    </div>
+    <div class="validator-error" v-if="passwordRep.length < 6 && dirtyPwdRep">确认密码不能小于6位</div>
+    <div class="validator-error" v-if="passwordRep.length >= 6 && (password != passwordRep) && dirtyPwdRep">两次密码不一致</div>
+
+    <button @click='updatepassword' class="btn" :disabled="selected===''|| password.length <6 || password !== passwordRep" >设置密码</button>
+  </div>
 </div>
 </div>
 
@@ -78,23 +85,55 @@ export default {
       msgcode: "",
       validateResult: null,
       selected: "",
-      options: [{ text: "成都同心用朔技有限公司", value: "uoso" }]
+      options: [],
+      expkey: '',
+      checkCodeName: '获取验证码',
+      enableCheckBtn: false,
+      dirtyPhone: false,
+      phoneInValid: '',
+      dirtyCode: false,
+      passwordRep: '',
+      dirtyPwdRep: false,
+      dirtyPwd: false,
+      password: '',
+      passwordRep: ''
+    };
+  },
+  created(){
+    let that = this;
+    _forgetPasswordService.getcodeexpkey(that.$store.state.parmaCommon).then(function(data){
+          //绑定模型 expkey
+        that.expkey = encodeURIComponent(data.AppendData);
+    });
+
+    document.onkeydown = function(event){
+      var ev = event || window.event || arguments.callee.caller.arguments[0];
+      if (ev && ev.keyCode == 13) {
+        if(that.index == 0){
+          if(that.checkCode.length !==6 && that.username.length != 11 && that.phoneInValid == '') return;
+          that.validate();
+        }else{
+          if(that.selected===''|| that.password.length < 6 || that.password !== passwordRep) return;
+          that.updatepassword();
+        }
+      }
     };
   },
   methods: {
-    onItemClick(index) {
-      console.log("on item click:", index), (this.index = index);
-    },
+    // onItemClick(index) {
+    //   console.log("on item click:", index), (this.index = index);
+    // },
     validate() {
       let that = this;
       if (this.msgcode.length > 5 && this.checkCode.length >= 6) {
         _forgetPasswordService
-          .findpassword_step1(this.username, this.msgcode, this.checkCode)
+          .findpassword_step1(this.$store.state.parmaCommon,this.username, this.msgcode, this.checkCode)
+          // .findpassword_step1(that.expkey,this.username, this.msgcode, this.checkCode)
           .then(data => {
             // 检查验证码是否正确
             if (data.ResultType == 0 && data.AppendData.status == 1) {
               that.validateResult = data.AppendData;
-              let secretCodeArray = this.validateResult.listsecretcode;
+              let secretCodeArray = that.validateResult.listsecretcode;
               that.options = [];
               secretCodeArray.forEach(element => {
                 that.options.push({
@@ -105,6 +144,18 @@ export default {
               // alert("验证通过,请点击重置密码页设置您的新密码");
               // TODO : 跳转
               that.step0 = true;
+              that.index = 1;
+
+              // { "ResultType":0,
+              //   "Message":"",
+              //   "LogMessage":"",
+              //   "AppendData":{
+              //     "status":1,
+              //     "secretId":"QDinAZ00CDnph3TeUzQZZhXN9qC35zAwreYCZMgXWU8v97M2hl9bQ7rtGvaqZ06w",
+              //     "listsecretcode":["bwGIpRDwJMpyNZDmQRGBi9sDK6m+Ki0rMUaEgjxM9EFWfcRhCfg/UWvpaO2AHhMojLNxUSSrdZYq/JBSncGS4tIvjARSfFPz4U2Ejjlvqxw=|15608066283 "]
+              //   }
+              // }
+
             } else {
               that.$vux.toast.show({
                 text: "验证码错误",
@@ -125,31 +176,37 @@ export default {
     },
     getCheckCode() {
       let that = this;
-      _forgetPasswordService.getcodeexpkey().then(datetimekey => {
-        if (
-          datetimekey.ResultType == 0 &&
-          typeof datetimekey.AppendData == "string"
-        ) {
-          let key = datetimekey.AppendData;
-          _forgetPasswordService
-            .getVerifyCode(this.username, key)
-            .then(response => {
-              if (response.ResultType == 0) {
-                this.msgcode = response.AppendData.msg_id;
-                // TODO : 进入验证码三分钟有效期倒计时
-              } else {
-                that.$vux.toast.show({
-                  text: response.Message,
-                  type: 'warn',
-                  position: 'middle'
-                });
-                // console.log("获取验证码失败", response.Message);
-                // alert(response.Message);
-              }
-              // console.log("获取验证码的返回值 : ", response);
+      if(that.enableCheckBtn == false) return;
+      _forgetPasswordService
+        .getVerifyCode(this.username, that.expkey)
+        .then(data => {
+
+            this.msgcode = data.AppendData.msg_id;
+            that.$vux.toast.show({
+              text: "验证码发送成功",
+              type: 'success',
+              position: 'middle',
+              time: 2000
             });
-        }
-      });
+            that.expkey = encodeURIComponent(data.AppendData.expkey);
+            that.msg_id = encodeURIComponent(data.AppendData.msg_id);
+            let number = 60*3;
+            that.dirtyPhone = false;
+            that.enableCheckBtn = false;
+            that.checkCodeName = "还剩<span style='color:#ff5722'>&nbsp;"+ number +"&nbsp;</span>S";
+            let timer = window.setInterval(function growUp() {
+              number -= 1;
+              that.checkCodeName = "还剩<span style='color:#ff5722'>&nbsp;"+ number +"&nbsp;</span>S";
+              if(number === 0){
+                that.checkCodeName = "获取验证码";
+                that.enableCheckBtn = true;
+                window.clearInterval(timer);
+              }
+            }, 1000);
+            // TODO : 进入验证码三分钟有效期倒计时
+         
+          // console.log("获取验证码的返回值 : ", response);
+        });
 
       console.log("手机 = ", this.username);
     },
@@ -175,18 +232,26 @@ export default {
 
         _forgetPasswordService
           .findpassword_step2(
+            this.$store.state.parmaCommon,
             secretId,
             this.selected,
             this.password,
             this.passwordRep
           )
+          // .findpassword_step2(
+          //   that.expkey,
+          //   secretId,
+          //   this.selected,
+          //   this.password,
+          //   this.passwordRep
+          // )
           .then(result => {
             if (result.ResultType == 0) {
               // console.log("密码修改成功 = ", result);
               // alert("密码修改成功");
               // TODO : 跳转到成功页面
               that.$vux.toast.show({
-                text: "密码修改成功",
+                text: "重置密码成功",
                 type: 'warn',
                 position: 'middle'
               });
@@ -202,7 +267,19 @@ export default {
         });
         // alert("获取失败");
       }
-    }
+    },
+    judgePhone(){
+      if(/^((13[0-9])|(14[5|7])|(15([0-9]))|(17([0-9]))|(18[0-9]))\d{8}$/.test(this.username)){
+        this.phoneInValid = '';
+        this.enableCheckBtn = true;
+      }else{
+        this.enableCheckBtn = false;
+        if(this.username.length == 0) return this.phoneInValid = '手机号必填';
+        this.phoneInValid = '请输入合法的手机号码';
+      }
+      console.log(this.enableCheckBtn)
+      // this.enableCheckBtn = true;
+    },
   }
 };
 </script>
@@ -269,8 +346,9 @@ body[data-path=forgetPassword] {
       }
       border-bottom: 1px solid #d4dce1;
       .px2px(font-size, 24);
-      .px2rem(padding-left, 84);
+      // .px2rem(padding-left, 84);
       .px2rem(margin-bottom, 40);
+      padding-left: 4.5em;
       color: #3c9;
       position: relative;
       .remark {
@@ -293,22 +371,32 @@ body[data-path=forgetPassword] {
         border: 1px solid #3c9;
         display: inline-block;
         color: #000;
+        &[disabled]{
+          background: #ddd;
+          color: #fff;
+          border-color: #ddd;
+        }
       }
-      input {
+      input, select {
         .px2rem(padding-bottom,0);
-        .px2rem(margin-left,30);
         .px2rem(height, 70);
-        // height: 3.5rem;
         border: none;
         width: 100%;
         .px2px(font-size, 26);
-        // font-size: 1.3rem;
         display: block;
 
         &:focus {
           outline: none;
         }
       }
+
+    }
+
+    .validator-error{
+      position: relative;
+      .px2rem(top, -20);
+      color: red;
+      left: 4.5em;
     }
 
     // .login{

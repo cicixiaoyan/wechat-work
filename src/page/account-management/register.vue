@@ -8,7 +8,7 @@
     <div class="login-form">
       <div class="user">
         <span class="iconfont icon-yonghuming"></span>
-        <input type="number"  @input="judgePhone" @blur="judgePhone" @focus='dirtyPhone==true' placeholder="请输入手机号" maxlength="11" v-model="username">
+        <input type="number"  @input="judgePhone" @blur="judgePhone" @focus='dirtyPhone=true' placeholder="请输入手机号" maxlength="11" v-model="username">
         <div class="validator-error" v-if="!enableCheckBtn && dirtyPhone">{{phoneInValid}}</div>
       </div>
 
@@ -80,15 +80,17 @@ export default {
   },
   methods: {
     judgePhone(){
-      if(/^((13[0-9])|(14[5|7])|(15([0-9]))|(17([0-9]))|(18[0-9]))\\d{8}$/.test(this.username)){
+      if(/^((13[0-9])|(14[5|7])|(15([0-9]))|(17([0-9]))|(18[0-9]))\d{8}$/.test(this.username)){
         // 后台验证是否为已注册
         // this.phoneInValid = '改手机号已存在';
         this.enableCheckBtn = true;
+        this.phoneInValid = '';
       }else{
+        this.enableCheckBtn = false;
         if(this.username.length == 0) return this.phoneInValid = '手机号必填';
         this.phoneInValid = '请输入合法的手机号码';
       }
-      this.enableCheckBtn = true;
+      
     },
 
     register () {
@@ -122,7 +124,7 @@ export default {
     },
     getCheckCode () {
       let that = this;
-      if(that.enableCheckBtn = false) return;
+      if(that.enableCheckBtn == false) return;
       _userServices._sendCodeRegister({expkey:this.expkey,tel:this.username}).then(function(data){
       //绑定模型 expkey 、msg_id  只要失败就提示 Message
         that.$vux.toast.show({
@@ -134,6 +136,7 @@ export default {
         that.expkey = data.AppendData.expkey;
         that.msg_id = data.AppendData.msg_id;
         let number = 60;
+        that.dirtyPhone = false;
         that.enableCheckBtn = false;
         that.checkCodeName = "还剩<span style='color:#ff5722'>&nbsp;"+ number +"&nbsp;</span>S";
         let timer = window.setInterval(function growUp() {

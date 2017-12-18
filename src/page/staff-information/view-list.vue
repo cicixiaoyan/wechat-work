@@ -16,8 +16,9 @@
             <div slot="content">
             <label class="item">
               <div class="right-ctx">
-                <h4>{{item.PhName}}</h4>
+                <h4>{{item.PhName}}<span>[{{item.age}}岁]</span>&emsp;{{item.PhSex}}</h4>
                 <p>[{{item.PhCardId}}]</p>
+                <p>{{item.IsLeave == 0 ? '在职' : '离职'}}</p>
               </div>
               <span class="iconfont icon-accessory" @click="$refs.swipeoutItem[index].open('right')"></span>
             </label>
@@ -42,29 +43,7 @@ export default {
   data () {
     return {
       noDataText: '',
-      list: [
-        {
-          PhId: '1',
-          ULid: '122',
-          PhName: '张三',
-          PhCardId: '511322198910101010',
-          PhStatus: '0'
-        },
-        {
-          PhId: '2',
-          ULid: '122',
-          PhName: '张三',
-          PhCardId: '511322198910101010',
-          PhStatus: '0'
-        },
-        {
-          PhId: '3',
-          ULid: '122',
-          PhName: '张三',
-          PhCardId: '511322198910101010',
-          PhStatus: '0'
-        }
-      ],
+      list: [],
       page: 0,
       size: 20,
       loadmore: true,

@@ -13,7 +13,7 @@
       </div>
       <div class="user">
         <span class="iconfont icon-mima"></span>
-        <input  placeholder="请输入登录" maxlength='6' @input type="password"  v-model="password">
+        <input  placeholder="请输入登录" minlength='20' @input type="password"  v-model="password">
       </div>
       <div class="remenber-password">
         <div >
@@ -22,7 +22,7 @@
             <span class="iconfont icon-circle" v-if="remember"></span>
             <input  type="checkbox"  v-model="remember">记住密码
           </label>| -->
-          <!-- <a @click='findPwd'>忘记密码?</a> -->
+          <a @click='findPwd'>忘记密码?</a>
           </div>
       </div>
       <button @click='login' class="login" :disabled="mobile==='' || phoneInValid != '' || password===''" >登陆</button>
@@ -83,7 +83,6 @@ export default {
 
           _userServices._getUserMsg().then(function(data1){
             that.showload = false;
-            window.localStorage.setItem('ULName', data1.ULName);
              //已审核通过 转到 人员信息页面
             if(data1.ULAudtiStatus == 3){
               that.$router.push({name: 'staff-information-list'});
@@ -153,7 +152,9 @@ export default {
   body[data-path=login]{
     background: #fff;
 
-  .logo{
+
+  }
+    .logo{
     .px2rem(width, 200);
     .px2rem(height, 200);
     .px2rem(border-radius, 40);
@@ -242,7 +243,6 @@ export default {
         vertical-align: middle;
       }
     }
-  }
   }
 
 

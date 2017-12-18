@@ -1,6 +1,6 @@
 <template>
   <div class="myapp">
-    <x-header>提交机构信息</x-header>
+    <x-header :left-options="{showBack: false}">提交机构信息</x-header>
     <div class="wait" v-if="read"><span class="iconfont icon-shenhezhong"></span>资料审核中，请稍后再来。。。</div>
     <div class="wait" v-if="!read"><span class="iconfont icon-fail"></span>审核失败！{{item.Description}}</div>
     
@@ -49,7 +49,7 @@
 
 
       <button v-if='!read' @click='submit' :disabled="item.uoname == '' || item.ubusinesstype == '' || item.businessnumber == '' ||
-            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0 || !idcValid || !telValid|| item.ubusinessaddress" 
+            item.areid == '' || !idcValid || !telValid || item.ubusinessaddress == ''" 
       class="round-big-btn">提交审核</button>
 
       <div v-transfer-dom>
@@ -73,6 +73,7 @@ import uploadImg from '../../components/uploadImg';
 // import {_getlistbyparentid, _gettbsysbasicdatabycode} from '../../service/getdata';
 import {employmentServices} from '../../service/EmploymentRegister';
 import {_userServices} from '../../service/userServices';
+import {IdentityCodeValid} from '../../utils/idc-valid';
 export default {
   name: "submit-information-add",
   directives: {
@@ -142,30 +143,7 @@ export default {
   computed: {
   },
   created(){
-    let that = this;
-    _userServices._getUserMsg().then(function(data1){
-      that.read = that.$route.params.read=="true" ? true :false;
-      if(data1.ULAudtiStatus == 1){
-        if(that.read) that.$router.push({name: 'submit-information-view', params: { 'read': false }});
-      }else{
-        if(!that.read)  that.$router.push({name: 'submit-information-view', params: { 'read': true }});
-      }
-    }).catch(function(err){
-      console.log(err)
-    });
-
-    console.log(this.$route.params.read);
-    console.log(that.read);
-    employmentServices._getorganizeinfo().then((data) => {
-      that.item = data.AppendData;
-      that.cardidimg = imgIp+that.item.cardidimg[0]
-      that.licenceimg = imgIp+that.item.licenceimg[0];
-      that.licenceimg1 = !!that.item.licenceimg[1]?imgIp+that.item.licenceimg[1]:'';
-      that.permitimg = !!that.item.permitimg[0]?imgIp+that.item.permitimg[0]:'';
-      that.permitimg1 = !!that.item.permitimg[1]?imgIp+that.item.permitimg[1]:'';
-    }).catch(err => console.log(err))
-    this.getareas();
-    this.gettbsysbasicdatabycode();
+    this.start()
   },
   beforeRouteUpdate (to, from, next) {
     next()
@@ -186,7 +164,8 @@ export default {
               type: 'success',
               position: 'middle'
             });
-            that.$router.push({ name: "submit-information-view", params: {read: true}});
+            // that.$router.push({ name: "submit-information-view", params: {read: true}});
+            that.start();
           }
         })
         .catch(function(err) {
@@ -324,8 +303,8 @@ export default {
       })
     },
     getIdcValid(value){
-      var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/
-      if((this.item.ucardid.length == 15 || this.item.ucardid.length==18) && reg.test(this.item.ucardid)){
+      // var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/
+      if((this.item.ucardid.length == 15 || this.item.ucardid.length==18) && IdentityCodeValid(this.item.ucardid)){
         this.idcValid = true;
       }else{
         if(this.item.ucardid.length !== 0) this.idcValid = false;
@@ -338,6 +317,34 @@ export default {
       }else{
         if(this.item.utel.length !== 0) this.telValid = false;
       }
+    },
+    start(){
+      let that = this;
+      _userServices._getUserMsg().then(function(data1){
+        // that.read = that.$route.params.read=="true" ? true :false;
+        if(data1.ULAudtiStatus == 1){
+          if(that.read) that.$router.push({name: 'submit-information-view', params: { 'read': false }});
+          that.read = false;
+        }else{
+          if(!that.read)  that.$router.push({name: 'submit-information-view', params: { 'read': true }});
+          that.read = true;
+        }
+      }).catch(function(err){
+        console.log(err)
+      });
+
+      // console.log(this.$route.params.read);
+      // console.log(that.read);
+      employmentServices._getorganizeinfo().then((data) => {
+        that.item = data.AppendData;
+        that.cardidimg = imgIp+that.item.cardidimg[0]
+        that.licenceimg = imgIp+that.item.licenceimg[0];
+        that.licenceimg1 = !!that.item.licenceimg[1]?imgIp+that.item.licenceimg[1]:'';
+        that.permitimg = !!that.item.permitimg[0]?imgIp+that.item.permitimg[0]:'';
+        that.permitimg1 = !!that.item.permitimg[1]?imgIp+that.item.permitimg[1]:'';
+      }).catch(err => console.log(err))
+      this.getareas();
+      this.gettbsysbasicdatabycode();
     }
   }
 };

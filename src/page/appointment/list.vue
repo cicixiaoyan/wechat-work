@@ -8,9 +8,9 @@
           ref="my_scroller">
       <div class="list">
         <swipeout>
-          <swipeout-item ref="swipeoutItem"   transition-mode="follow" v-for="(item, index) in list" :key="item.PhAID">
-            <div slot="right-menu" v-if='item.PhAStatus=!3'>
-              <swipeout-button  @click.native.prevent="deleteItem(index)" type="warn">删除</swipeout-button>
+          <swipeout-item ref="swipeoutItem"   transition-mode="follow" v-for="(item, index) in list" :key="item.Id">
+            <div slot="right-menu"  >
+              <swipeout-button v-if='item.PhAStatus === 1 || item.PhAStatus === 2' @click.native.prevent="deleteItem(index)" type="warn">删除</swipeout-button>
             </div>
             <div slot="content">
               <div class="item"  @click='view(item.Id,item.originalData)'>
@@ -19,7 +19,7 @@
                   {{item.status}}
                 </div>
                 <div class="right-ctx">
-                  <h4>{{item.time}}</h4>
+                  <h4>{{item.time}}&emsp;{{item.ActualPPNID !== item.PPNID ? '时间被更改':''}}</h4>
                   <p>[{{item.number}}]&emsp;预约人数</p>
                   <p>{{item.originalData.PhaOrName}}</p>
                 </div>
@@ -29,7 +29,7 @@
         </swipeout>
       </div>
       <div v-if='nodata' class="nodata" @click="goAppoinment">
-        <img src="../../assets/vux_logo.png" alt="无数据">
+        <img src="../../assets/nodata.png" alt="无数据">
         亲，您目前还没有任何预约记录哦！点击预约
       </div>
 
@@ -100,7 +100,7 @@ export default {
       setTimeout(() => {
         that.loadmore ? done() : done(true);
       }, 1500)
-      console.log("加载更多数据");
+      // console.log("加载更多数据");
     },
     loadData(pageindex = 1, pagesize = 10) {
       // this.maxPageIndex = pageindex;
@@ -113,7 +113,7 @@ export default {
             that.nodata = false;
             that.loadmore = true;
             that.isLoading = false;
-            console.log(data.AppendData);
+            // console.log(data.AppendData);
           }else{
             that.loadmore = false;
             if(that.page == 1){
@@ -128,24 +128,18 @@ export default {
       }).catch(err => console.log(err));
     },
     deleteItem(index){
-      let id = this.list[index].PhAID;
+      let id = this.list[index].Id;
       let that = this;
       _appointmentServce.deleteAppointment(id)
       .then(data => {
-        if(data.PerrationResultType == 0){
-          that.$vux.toast.show({
-            text: "删除预约成功",
-            type: 'success',
-            position: 'middle'
-          });
-          that.list.splice(index, 1);
-        }else{
-          that.$vux.toast.show({
-            text: data.Message,
-            type: 'warn',
-            position: 'middle'
-          });
-        }
+        that.list.splice(index, 1);
+
+        that.$vux.toast.show({
+          text: "删除预约成功",
+          type: 'success',
+          position: 'middle'
+        });
+        
       })
     },
     appendToList(AppendData) {
@@ -156,7 +150,8 @@ export default {
           time: item.PhADate + " " + ["全天", "上午", "下午"][item.PPNType],
           number: item.PhCount,
           status: ["", "未通过", "待审核", "已通过"][item.PhAStatus],
-          originalData: item
+          originalData: item,
+          PhAStatus: item.PhAStatus
         });
       });
     },
@@ -172,6 +167,9 @@ export default {
   .nodata{
     text-align: center;
     color: #3c9;
+    padding: 20px;
+    margin-top: 50%;
+    transform: translateY(-50%);
     img{
       width: 100%;
     }

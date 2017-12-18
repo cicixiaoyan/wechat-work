@@ -1,6 +1,6 @@
 <template>
   <div class="myapp">
-    <x-header>提交机构信息</x-header>
+    <x-header :left-options="{showBack: false}">提交机构信息</x-header>
     <div class="add-form">
       <group>
         <div class="mid-title"><span>必填项</span></div>
@@ -69,6 +69,7 @@ import { baseurl } from '../../config/axois';
 import uploadImg from '../../components/uploadImg';
 // import {_getlistbyparentid, _gettbsysbasicdatabycode} from '../../service/getdata';
 import {employmentServices} from '../../service/EmploymentRegister';
+import {IdentityCodeValid} from '../../utils/idc-valid';
 export default {
   name: "submit-information-add",
   directives: {
@@ -250,8 +251,8 @@ export default {
       })
     },
     getIdcValid(value){
-      var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/
-      if((this.item.ucardid.length == 15 || this.item.ucardid.length==18) && reg.test(this.item.ucardid)){
+      // var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/
+      if((this.item.ucardid.length == 15 || this.item.ucardid.length==18) && IdentityCodeValid(this.item.ucardid)){
         this.idcValid = true;
       }else{
         if(this.item.ucardid.length !== 0) this.idcValid = false;

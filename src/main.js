@@ -8,6 +8,7 @@ import App from './App';
 import store from './store';
 import routers from './router/routers';
 import { ToastPlugin, ConfirmPlugin, AjaxPlugin, ConfigPlugin } from 'vux';
+// import {baseIp} from './config/axois';
 
 Vue.use(VueRouter);
 Vue.use(ToastPlugin);
@@ -49,8 +50,17 @@ methods.forEach(key => {
 })
 
 router.beforeEach(function (to, from, next) {
+  
+  // var ua = window.navigator.userAgent.toLowerCase(); 
+  // if (ua.match(/MicroMessenger/i) == 'micromessenger') { 
+  //   // 在微信中
+  // } else {     
+  //   // 不在微信中
+  //   window.location.href= window.location.host +'/#/app/redirect'
+  // }
+
   store.commit('updateLoadingStatus', {isLoading: true})
-  console.log(to, from)
+  // console.log(to, from)
   var body=document.getElementsByTagName("body")[0];
   body.setAttribute("data-path", to.name);
   const toIndex = history.getItem(to.path)

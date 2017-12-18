@@ -46,9 +46,9 @@ export default {
     _userServices._getUserMsg().then(function(data){
       that.item = data;
       employmentServices._gettbsysbasicdatabycode().then((data1) => {
-        console.log(data1)
+        // console.log(data1)
         data1.AppendData.forEach(function(value,index, arr) {
-          console.log(value)
+          // console.log(value)
           if(value.BDID == data.ULType) return that.type = value.Name;
         });
       }).catch(err1 => console.log(err1))
@@ -62,8 +62,12 @@ export default {
   },
   methods: {
     quit(){
-      window.localStorage.clear();
-      this.$router.push({name: 'login'});
+      let that = this;
+      _userServices._logout().then(function(data){
+        window.localStorage.clear();
+        that.$router.push({name: 'login'});
+      }).catch(err => console.log(err))
+
     },
   }
 };

@@ -21,7 +21,10 @@ var _getCodeExpkey=(params={})=>getInfo(baseurl+'/users/getcodeexpkey',params, "
 */
 var _sendCodeRegister=(params={})=>getInfo(baseurl+'/users/sendcode',params, "post", false); 
 
-
+/*
+**退出登录
+*/
+var _logout=() => getInfo(baseurl+'/users/logout', {}, "post", true); 
 
 
 export var _userServices= {
@@ -29,6 +32,7 @@ export var _userServices= {
     _userRegister,//用户注册
      _getUserMsg,//获取用户信息（系统业务）
     _getCodeExpkey,//获取验证码时间戳
-    _sendCodeRegister//发送注册验证码
+    _sendCodeRegister,//发送注册验证码
+    _logout
 }
   
