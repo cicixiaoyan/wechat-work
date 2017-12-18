@@ -13,7 +13,7 @@
       </div>
       <div class="user">
         <span class="iconfont icon-mima"></span>
-        <input  placeholder="请输入登录" minlength='20' @input type="password"  v-model="password">
+        <input  placeholder="请输入密码" minlength='20' @input type="password"  v-model="password">
       </div>
       <div class="remenber-password">
         <div >

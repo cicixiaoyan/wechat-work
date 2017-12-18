@@ -6,7 +6,7 @@
         <span slot="icon" class="iconfont icon-tijianyuyue1"></span>
         <span slot="label">体检预约</span>
       </tabbar-item>
-      <tabbar-item show-dot :link="{name: 'appointment-list' }">
+      <tabbar-item :link="{name: 'appointment-list' }">
         <span slot="icon" class="iconfont icon-shenhejilu"></span>
         <span slot="label" link="../page/appointment/add">审核记录</span>
       </tabbar-item>

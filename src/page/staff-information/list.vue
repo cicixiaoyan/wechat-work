@@ -27,7 +27,7 @@
                 <p>{{item.IsLeave == 0 ? '在职' : '离职'}}&emsp;{{item.PhStatus == 0? '未预约':'已预约'}}</p>
                 <!-- PhStatus:体检人员状态 0:未提交过预约  1:预约未审核 -->
               </div>
-              <span class="iconfont icon-accessory" @click="$refs.swipeoutItem[index].open('right')"></span>
+              <span class="iconfont icon-dot" @click="$refs.swipeoutItem[index].open('right')"></span>
             </label>
             </div>
           </swipeout-item>
@@ -161,7 +161,7 @@ export default {
       showpop: false,
       showchecktime: false,
       checkedNumber: 0,
-      totalNumber: 3,
+      totalNumber: 0,
       checkValue: [],
       checkAllow: false,
       list: [],
@@ -210,6 +210,7 @@ export default {
       // this.$router.push({name: 'appointment-view', params: { 'id': id }});
     },
     submit() {
+      if(this.checkedNumber === 0) return;
       let that = this;
       let phids = "";
       this.list.forEach(function(item, index, array) {
@@ -332,6 +333,7 @@ export default {
         .then(data => {
           if (data.AppendData.length != 0) {
             that.list = data.AppendData;
+            that.totalNumber = that.list.length;
             that.nodata = false;
           } else {
             that.nodata = true;

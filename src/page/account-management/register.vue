@@ -133,9 +133,9 @@ export default {
           position: 'middle',
           time: 2000
         });
-        that.expkey = data.AppendData.expkey;
-        that.msg_id = data.AppendData.msg_id;
-        let number = 60;
+        that.expkey = encodeURIComponent(data.AppendData.expkey);
+        that.msg_id = encodeURIComponent(data.AppendData.msg_id);
+        let number = 60*3;
         that.dirtyPhone = false;
         that.enableCheckBtn = false;
         that.checkCodeName = "还剩<span style='color:#ff5722'>&nbsp;"+ number +"&nbsp;</span>S";

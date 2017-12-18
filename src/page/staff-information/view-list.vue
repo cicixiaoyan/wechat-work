@@ -18,7 +18,7 @@
               <div class="right-ctx">
                 <h4>{{item.PhName}}<span>[{{item.age}}岁]</span>&emsp;{{item.PhSex}}</h4>
                 <p>[{{item.PhCardId}}]</p>
-                <p>{{item.IsLeave == 0 ? '在职' : '离职'}}</p>
+                <!-- <p>{{item.IsLeave == 0 ? '在职' : '离职'}}</p> -->
               </div>
               <span class="iconfont icon-accessory" @click="$refs.swipeoutItem[index].open('right')"></span>
             </label>

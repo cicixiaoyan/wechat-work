@@ -24,7 +24,7 @@
       <popup v-model="showOr">
         <popup-header  title="选择机构" right-text='完成' @on-click-right='changeOr'></popup-header>
         <div class="pop-content">
-          <checklist  :options="orinfoList" :max="1" :value="PhAOrCode"></checklist>
+          <checklist  :options="orinfoList" :max="1" @on-change='changePhAOrCode' :value="PhAOrCode"></checklist>
         </div>
       </popup>
     </div>
@@ -120,17 +120,20 @@ export default {
           });
           that.orinfoList = [...arr];
           that.PhAOrCode = [arr[0].key, arr[0].value];
-           console.log(that.PhAOrCode)
+          //  console.log(that.PhAOrCode)
           // console.log(list[0])
           that.changeOr();
         }
       })
       .catch((err) => {console.log(err);})
     },
+    changePhAOrCode(val,label){
+      this.PhAOrCode[0] = val[0];
+      this.PhAOrCode[1] = label[0]
+    },
     changeOr(){
       let that = this;
       let val = this.PhAOrCode;
-      console.log(this.PhAOrCode)
       that.showOr = false;
 
       if(val.length !== 0){

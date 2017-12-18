@@ -109,6 +109,7 @@ export default {
       this.checkedNumber = number;
     },
     submit() {
+      if(this.checkedNumber === 0) return;
       let that = this;
       let phids = '';
       this.list.forEach(function (item, index, array) {
