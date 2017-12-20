@@ -1,14 +1,15 @@
 <template>
   <div class="myapp">
     <x-header :left-options="{showBack: false}">提交机构信息</x-header>
+    <scroll class="scroll-normal" :on-refresh="onRefresh" refreshLayerColor='#fff' loadingLayerColor='#fff'>
     <div class="add-form">
       <group>
         <div class="mid-title"><span>必填项</span></div>
         <x-input title="机构名称" required :min="2"  :max="50" placeholder="机构名称" v-model="item.uoname"></x-input>
         <selector title="机构类型" required  v-model="item.ubusinesstype"  :options="tbsysbasicdatabycode" placeholder="请选择"></selector>
         <x-input title="执照代码" required :max="30" placeholder="营业执照统一社会信用代码" v-model="item.businessnumber"></x-input>
-        <x-input title="所属区域" required placeholder="所属区域"  @click.native="showArea=true"  v-model="item.arename"></x-input>
-        <!-- <cell title="所属区域" text-left :value="item.arename" @click.native="showArea=true"></cell> -->
+        <!-- <x-input title="所属区域"  required placeholder="所属区域"  @click.native="showArea=true"  v-model="item.arename"></x-input> -->
+        <cell title="所属区域" is-link value-align='left' placeholder="所属区域" :value="item.arename||'请选择'" @click.native="showArea=true"></cell>
         <x-input title="经营地址" required :max="200" placeholder="经营地址" v-model="item.ubusinessaddress"></x-input>
         <div class="photo-item" style="text-align:right;">
           <span>身份证正面照<br><span style="font-size:small;color:red;">(必须原件)</span></span>
@@ -51,25 +52,31 @@
 
       <div v-transfer-dom>
         <popup v-model="showArea">
-          <popup-header :left-text="haschidren?'返回上一级':''" @on-click-left="haschidren = false" right-text="" title="区域选择"></popup-header>
+          <popup-header @on-click-left='showArea=false' left-text="取消" right-text="" title="区域选择"></popup-header>
           <div class="pop-content">
-            <checklist v-if="!haschidren"   :options="objectList" :max="1" :value="objectListValue" @on-change="changeArea"></checklist>
-            <checklist v-if="haschidren"  :options="objectList1" :max="1" :value="objectListValue1" @on-change="changeArea1"></checklist>
+            <checklist  :options="objectList" :max="1" :value="objectListValue" @on-change="changeArea"></checklist>
           </div>
         </popup>
       </div>
+
+      <div v-transfer-dom>
+        <loading :show="showload" text="提交资料中"></loading>
+      </div>
     </div>
+    </scroll>
   </div>
 </template>
 
 <script>
-import { XHeader, Group, Cell, XInput, Selector, Picker,Flexbox, Checklist,
+import { XHeader, Group, Cell, XInput, Selector, Picker,Flexbox, Checklist,Loading,
  FlexboxItem,  PopupHeader, Popup, TransferDom } from 'vux';
+import scroll from "../../components/scroll";
 import { baseurl } from '../../config/axois';
 import uploadImg from '../../components/uploadImg';
 // import {_getlistbyparentid, _gettbsysbasicdatabycode} from '../../service/getdata';
 import {employmentServices} from '../../service/EmploymentRegister';
 import {IdentityCodeValid} from '../../utils/idc-valid';
+import {_userServices} from '../../service/userServices';
 export default {
   name: "submit-information-add",
   directives: {
@@ -87,7 +94,9 @@ export default {
     Popup,
     Flexbox,
     FlexboxItem,
-    Checklist
+    Checklist,
+    Loading,
+    scroll
   },
   data() {
     return {
@@ -111,7 +120,8 @@ export default {
         permitimg: '',
         ulaudtistatus:'',
         ulstatus:'',
-        description:''
+        description:'',
+        showload: false
       },
       cardidimg:[],
       licenceimg:[],
@@ -123,9 +133,6 @@ export default {
       tbsysbasicdatabycode: [],
       objectListValue: [],
       objectList: [],
-      haschidren: false,
-      objectListValue1: [],
-      objectList1: [],
       idcValid: true,
       telValid: true
       // gettbsysbasicdatabycode: []
@@ -134,18 +141,16 @@ export default {
   computed: {
   },
   created(){
-    this.getareas();
-    this.gettbsysbasicdatabycode();
+    this.start();
   },
   methods: {
     submit() {
+      this.showload = true;
       let that = this;
-      this.item.cardidimg =  encodeURIComponent(this.cardidimg);
-      this.item.licenceimg = encodeURIComponent(this.licenceimg+"|"+this.licenceimg1);
-      this.item.permitimg = encodeURIComponent(this.permitimg+"|"+this.permitimg1);
       employmentServices
         ._editorganizeinfo(this.item)
         .then(function(data) {
+          that.showload = false;
           if (data.ResultType == 0) {
             that.$vux.toast.show({
               text: "提交信息成功",
@@ -156,99 +161,72 @@ export default {
           }
         })
         .catch(function(err) {
+          that.showload = false;
           console.log(err, "err");
         });
     },
+    onRefresh(done){
+      this.start();
+      setTimeout(() => {
+        done(); //必须有
+      }, 1500);
+    },
     cardidimgChange(file, name){
       this.cardidimg = file;
+      this.item.cardidimg =  encodeURIComponent(file);
     },
     licenceimgChange(file, name){
       this.licenceimg = file;
+      if(this.licenceimg1.length > 10) this.item.licenceimg = encodeURIComponent(file+"|"+this.licenceimg1);
+      else this.item.licenceimg = encodeURIComponent(file)
     },
     licenceimgChange1(file, name){
       this.licenceimg1 = file;
+      this.item.licenceimg = encodeURIComponent(this.licenceimg+"|"+file);
     },
     permitimgChange(file, name){
       this.permitimg = file;
+      if(this.permitimg1.length > 10) this.item.permitimg = encodeURIComponent(file+"|"+this.permitimg1);
+      else this.item.permitimg = encodeURIComponent(file)
     },
     permitimgChange1(file, name){
       this.permitimg1 = file;
+      this.item.permitimg = encodeURIComponent(this.permitimg+"|"+file);
     },
     Optionalshow() {
       this.showOptional = !this.showOptional;
     },
-    changeAreid(){
-
-    },
-    set(){
-      this.showArea = false;
-    },
-    changeArea(val, label){
-      let that = this;
-      if(val.length !== 0){
-        let values =  val[0].split(",");
-        let parma = {"areid": values[0]}
-        employmentServices._getlistbyparentid(parma)
-        .then(function(data){
-          let list = data.AppendData;
-          if(list.length == 0){
-            that.showArea = false;
-            that.haschidren = false;
-            that.item.areid = values[1];
-            that.item.arename = label[0];
-          }else{
-            that.haschidren = true;
-            that.showArea = true;
-            list.forEach(function(value, index, array1){
-              list[index].key = [value.AreID, value.AreCode].join(",");
-              list[index].value = value.AreName;
-            });
-            that.objectList1 = list;
-          }
-        })
-        .catch(function(){
-
-        })
-      }
-
-    },
-    changeArea1(value, label){
+    changeArea(value, label){
       if(value.length != 0){
-        let values =  value[0].split(",");
-        this.item.areid = values[1];
+        this.item.areid = value[0];
         this.item.arename = label[0];
         this.showArea = false;
-        this.haschidren = true;
       }
     },
+    
     gettbsysbasicdatabycode() {
       var that = this;
       return employmentServices._gettbsysbasicdatabycode().then(function(data){
-        if(data.ResultType === 0){
-          let list = data.AppendData;
-          list.forEach(function(value, index, array1){
-            list[index].key = value.BDID;
-            list[index].value = value.Value;
-          });
-          that.tbsysbasicdatabycode = list;
-        }else{
-
-        }
-      })
+        let list = data.AppendData;
+        list.forEach(function(value, index, array1){
+          list[index].key = value.BDID;
+          list[index].value = value.Value;
+        });
+        that.tbsysbasicdatabycode = list;
+      }).catch(err => console.log(err))
     },
     getareas(){
       var that = this;
-      return employmentServices._getareas().then(function(data){
-        if(data.ResultType === 0){
-          let list = data.AppendData;
-          list.forEach(function(value, index, array1){
-            list[index].key = [value.AreID, value.AreCode].toString();
-            list[index].value = value.AreName;
-          });
-          that.objectList = list;
-        }else{
-        }
-      })
+      let params = {"areid": window.localStorage.getItem('areId')};
+      return employmentServices._getlistbyareidone(params).then(function(data){
+        let list = data.AppendData;
+        list.forEach(function(value, index, array1){
+          list[index].key = value.AreCode;
+          list[index].value = value.AreName;
+        });
+        that.objectList = list;
+  
+      }).catch(err => console.log(err))
     },
     getIdcValid(value){
       // var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/
@@ -265,6 +243,25 @@ export default {
       }else{
         if(this.item.utel.length !== 0) this.telValid = false;
       }
+    },
+    start(){
+      this.showload = false;
+      let that = this;
+      _userServices._getUserMsg().then(function(data1){
+        if(data1.ULAudtiStatus == 1){
+          if(that.read) that.$router.push({name: 'submit-information-view', params: { 'read': false }});
+        }else if(data1.ULAudtiStatus == 2){
+          if(!that.read)  that.$router.push({name: 'submit-information-view', params: { 'read': true }});
+        }else if(data1.ULAudtiStatus == 3){
+          that.$router.push({name: 'staff-information-list'});
+        }
+      }).catch(function(err){
+        console.log(err)
+      });
+
+      this.getareas();
+      this.gettbsysbasicdatabycode();
+
     }
   }
 };
@@ -274,6 +271,15 @@ export default {
 <style lang="less">
 body[data-path=submit-information-add]{
   background: #3c9;
+  /* cell样式更改 */ 
+  .vux-label{
+    color: #878f98;
+    width: 5em;
+  }
+  .weui-cell__ft{
+    color: #333;
+  }
+
   .myapp {
     .valid-err{
       text-align: center;

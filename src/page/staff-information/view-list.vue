@@ -105,7 +105,7 @@ export default {
             that.nodata = false;
             this.loadmore = true;
             this.isLoading = false;
-            console.log(data.AppendData);
+            // console.log(data.AppendData);
           }else{
             that.loadmore = false;
             if(that.page == 1){

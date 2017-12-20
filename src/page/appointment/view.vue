@@ -3,29 +3,29 @@
     <x-header>预约详情</x-header>
     <div class="result">
       <div class="success" v-if="item.PhAStatus == 3"><span class="iconfont icon-checkedon"></span>审核成功</div>
-      <div class="danger" v-if="item.PhAStatus == 2"><span class="iconfont icon-shenhezhong"></span>审核中</div>
-      <div calss="warning" v-if="item.PhAStatus == 1"><span class="iconfont icon-fail"></span>审核失败</div>
+      <div class="warning" v-if="item.PhAStatus == 2"><span class="iconfont icon-shenhezhong"></span>审核中</div>
+      <div class="danger" v-if="item.PhAStatus == 1"><span class="iconfont icon-fail"></span>审核失败</div>
 
     </div>
     <div class="content">
       <group>
         <cell title="体检机构" readonly :is-loading="!item.PhaOrName" :value="item.PhaOrName"></cell>
-        <cell title="成员列表" :value="item.PhCount+'人'" is-link @click.native="viewStaffList"></cell>
-        <cell title="体检日期" readonly :is-loading="!item.PhADate" :value="item.PhADate"></cell>
+        <cell title="体检人员" :value="item.PhCount+'人'" is-link @click.native="viewStaffList"></cell>
+        <cell title="体检日期" readonly :is-loading="!item.PhADate" :value="item.Time"></cell>
         <cell title="申请日期" readonly :is-loading="!item.CreateDate" :value="item.CreateDate"></cell>
 
         <!-- :is-loading="!item.Description" -->
         <cell :title="stateTitle" readonly  :value="item.PhABackOption" placeholder="无"></cell>
-        <div v-if="item.PhAStatus == 3" class="result-tip danger"><span class="iconfont icon-fail"></span>
-          预约成功，请通知相关人员凭身份证按时到【{{item.PhaOrName}}】进行体检
-          <div>
-            --体检机构电话：{{phinfo.OrTel}}<br>
+        <div  class="result-tip " :class='{"success":(item.PhAStatus != 1),"danger":(item.PhAStatus == 1) }'>
+          <span class="iconfont icon-fail"></span>
+          <div v-if="item.PhAStatus == 3">预约成功，请通知相关人员凭身份证按时到【{{item.PhaOrName}}】进行体检</div>
+          <div v-if="item.PhAStatus == 1">预约失败了，可以删除这条申请，重新提交申请</div>
+          <div v-if='item.PhAStatus != 1'>
+            --体检机构电话：<a :href="'tel:' + phinfo.OrTel ">{{phinfo.OrTel}}</a><br>
             --体检机构地址：{{phinfo.OrAddress}}
-
           </div>
         </div>
-        <div v-if="item.PhAStatus == 1" class="result-tip danger"><span class="iconfont icon-fail"></span>
-          预约失败了，可以删除这条申请，重新提交申请</div>
+          
       </group>
     </div>
   </div>
@@ -52,7 +52,10 @@ export default {
     let that = this;
     _appointmentServce.getmodeltbphysicalappointment(id).then(data => {
       if (data.ResultType == 0) {
-        this.item = data.AppendData[0];
+        that.item = data.AppendData[0];
+        let time = new Date(that.item.PhADate.replace(/-/g, '/'));
+        let timeArr = time.getFullYear()+'-'+(time.getMonth()+1)+'-'+time.getDate();
+        that.item.Time = timeArr+' '+["全天", "上午", "下午"][that.item.PPNType];
         // 获取体检机构信息
         _appointmentServce.getorganizebycode(this.item.PhAAreaID).then(data => {
           that.phinfo = data.AppendData;
@@ -79,8 +82,8 @@ export default {
         PhaOrName: "",
         PhCount: 0,
         Listparma: "",
-        PhADate: "",
-        Description: ""
+        Time: "",
+        Description: "",
       },
       phinfo:{}
     };
@@ -114,6 +117,10 @@ export default {
     .px2px(font-size, 40);
     .px2rem(left, 10);
     .px2rem(top, 8);
+  }
+
+  a{
+    color: inherit;
   }
 }
 </style>

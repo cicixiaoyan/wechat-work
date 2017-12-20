@@ -19,8 +19,8 @@
                   {{item.status}}
                 </div>
                 <div class="right-ctx">
-                  <h4>{{item.time}}&emsp;{{item.ActualPPNID !== item.PPNID ? '时间被更改':''}}</h4>
-                  <p>[{{item.number}}]&emsp;预约人数</p>
+                  <h4>{{item.time}}</h4>
+                  <p>[{{item.number}}]&emsp;预约人数&emsp;<span style="font-size: small;color: chocolate;">{{item.ActualPPNID !== item.PPNID ? '[时间被更改]':''}}</span></p>
                   <p>{{item.originalData.PhaOrName}}</p>
                 </div>
               </div>
@@ -151,7 +151,9 @@ export default {
           number: item.PhCount,
           status: ["", "未通过", "待审核", "已通过"][item.PhAStatus],
           originalData: item,
-          PhAStatus: item.PhAStatus
+          PhAStatus: item.PhAStatus,
+          ActualPPNID: item.ActualPPNID,
+          PPNID: item.PPNID
         });
       });
     },

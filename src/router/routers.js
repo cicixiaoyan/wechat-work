@@ -101,17 +101,17 @@ export default [
         }
       },
       {
-        path: '/app/submit-information/add',
-        name: 'submit-information-add',
-        component: function (resolve) {
-          require(['../page/submit-information/add'], resolve);
-        }
-      },
-      {
         path: '/app/submit-information/view/:read',
         name: 'submit-information-view',
         component: function (resolve) {
           require(['../page/submit-information/view'], resolve);
+        }
+      },
+      {
+        path: '/app/submit-information/add',
+        name: 'submit-information-add',
+        component: function (resolve) {
+          require(['../page/submit-information/add'], resolve);
         }
       },
       {

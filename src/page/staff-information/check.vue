@@ -20,11 +20,11 @@
         </label>
       </div>
       <div v-if='nodata' class="nodata">
-        <img src="../../assets/vux_logo.png" alt="无数据">
+        <img src="../../assets/nodata.png" alt="无数据">
         亲，您目前还没有员工可以预约！
       </div>
     </scroll>
-    <flexbox  align='stretch'  :gutter="0" class="fix-bottom">
+    <flexbox v-if='!nodata'  align='stretch'  :gutter="0" class="fix-bottom">
       <flexbox-item @click.native='checkall'>
         <label>
           <span v-show='!checkAll' class="iconfont icon-checknormal gray"></span>
@@ -83,14 +83,11 @@ export default {
       checkAllow: false,
       list: [],
       isLoading: false,
-      nodata: false,
+      nodata: true,
       noDataText: '',
     };
   },
   methods: {
-    view(id) {
-      this.$router.push({name: 'staff-information-edit', params: { 'id': id, 'read': true }});
-    },
     change (index) {
       this.list[index].checked = !this.list[index].checked;
       let dec = this.list[index].checked ? 1 : -1;
@@ -145,6 +142,7 @@ export default {
           if(arr.length == 0) {that.nodata = true;}
           else{
             that.totalNumber = arr.length;
+            that.checkAll = (arr.length == that.routeParams.length-1) ? true : false;
             that.nodata = false;
             that.list = arr;
           }
@@ -152,30 +150,7 @@ export default {
           that.nodata = true;
         }
       }).catch(err => console.log(err));
-    },
-    testName(){
-      if(this.addData.phName == "" || this.addData.phName.length > 10){
-        this.nameValid = false;
-      }else{
-        this.nameValid = true;
-      }
-    },
-    testIdc(){
-      var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
-      if(reg.test(this.addData.phcardid)){
-        this.idcValid = true;
-      }else{
-        this.idcValid = false;
-      }
-    },
-    textPhone(){
-      let reg = /^((13[0-9])|(14[5|7])|(15([0-9]))|(17[0-9])|(18[0-9]))\d{8}$/;
-      if(reg.test(this.addData.phTel)){
-        this.phoneValid = true;
-      }else{
-        this.phoneValid = false;
-      }
-    },
+    }
   }
 };
 </script>
@@ -185,6 +160,16 @@ export default {
 body[data-path=staff-information-check]{
   .myapp {
     // position: relative;
+    .nodata{
+      text-align: center;
+      color: #3c9;
+      padding: 20px;
+      margin-top: 50%;
+      transform: translateY(-50%);
+      img{
+        width: 100%;
+      }
+    }
 
     ._v-container.scroll-checkallow >{
       .px2rem(top, 100);

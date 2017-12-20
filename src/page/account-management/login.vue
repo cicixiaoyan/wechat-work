@@ -47,6 +47,17 @@ export default {
     Loading
   },
   created(){
+    try{
+      if(!window.localStorage.getItem('areId')){
+        let reg = new RegExp("(^|&)"+ "areId" +"=([^&]*)(&|$)");
+    　　let r = window.location.search.substr(1).match(reg);
+    　　let areId = unescape(r[2]); 
+        window.localStorage.setItem('areId', areId);
+      }
+    }catch(err){
+      console.log(err)
+    }
+
     let that = this;
     document.onkeydown = function(event){
       var ev = event || window.event || arguments.callee.caller.arguments[0];

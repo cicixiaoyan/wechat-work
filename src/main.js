@@ -50,15 +50,20 @@ methods.forEach(key => {
 })
 
 router.beforeEach(function (to, from, next) {
+  var ua = window.navigator.userAgent.toLowerCase(); 
   
-  // var ua = window.navigator.userAgent.toLowerCase(); 
-  // if (ua.match(/MicroMessenger/i) == 'micromessenger') { 
-  //   // 在微信中
-  // } else {     
-  //   // 不在微信中
-  //   window.location.href= window.location.host +'/#/app/redirect'
-  // }
+  if (ua.match(/MicroMessenger/i) == 'micromessenger') { 
+    // 在微信中
+  } else {     
+    // 不在微信中
+    if(to.name != 'redirect')  next({path: '/app/redirect'});
+    else next();
+  }
 
+  if(from.name == 'login' && !!window.localStorage.getItem('areId') && !!window.location.search){
+    window.location.href =  "/#" + to.fullPath;
+  }
+  
   store.commit('updateLoadingStatus', {isLoading: true})
   // console.log(to, from)
   var body=document.getElementsByTagName("body")[0];

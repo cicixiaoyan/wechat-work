@@ -1,6 +1,10 @@
 <template >
   <div class="myapp">
-    <x-header :left-options="{showBack: false}">成员列表({{totalNumber}})<a slot="left" @click="showchecktime=true">添加</a><a slot="right" @click='appointment'>{{checkAllow?'取消预约':'预约'}}</a></x-header>
+    <x-header :left-options="{showBack: false}">成员列表({{totalNumber}})
+      <a slot="left" @click="showchecktime=true;edit=false;">
+        <i class="iconfont icon-add-people" style="font-size:1.7em;"></i>&emsp;
+      </a>
+      <a slot="right" v-if='!nodata' @click='appointment'>{{checkAllow?'取消预约':'预约'}}</a></x-header>
     <!-- <panel :footer="footer" :list="list" :type="type" @on-img-error="onImgError"></panel> -->
     <scroll :class='{"scroll-checkallow":checkAllow,"scroll-normal":!checkAllow}'
           :on-refresh="onRefresh"
@@ -10,8 +14,8 @@
         <swipeout>
           <swipeout-item ref="swipeoutItem"  transition-mode="follow" v-for="(item, index) in list" :key="item.PhID">
             <div slot="right-menu">
-              <swipeout-button v-if='item.IsLeave==0' @click.native.prevent="deleteItem(index)" type="warn">删除</swipeout-button>
-              <swipeout-button  @click.native.prevent="editAction(index)" type="primary">修改</swipeout-button>
+              <swipeout-button v-if='item.IsLeave==0' @click.native.prevent="deleteItem(index)" type="warn">离职</swipeout-button>
+              <swipeout-button  @click.native.prevent="editAction(index)" type="primary">详情</swipeout-button>
               <swipeout-button v-if='item.IsLeave==1' @click.native.prevent="recoverItem(index)" type="warn">复职</swipeout-button>
             </div>
             <div slot="content">
@@ -34,7 +38,7 @@
         </swipeout>
 
       </div>
-      <div v-if='nodata' class="nodata" @click="goAppoinment">
+      <div v-if='nodata' class="nodata">
         <img src="../../assets/nodata.png" alt="无数据">
         亲，您目前还没有添加任何员工哦！左上角添加
       </div>
@@ -52,8 +56,8 @@
     </flexbox>
 
     <div v-transfer-dom>
-      <popup v-model="showchecktime" position="bottom">
-        <popup-header left-text="" right-text="" title="新增成员"></popup-header>
+      <popup v-model="showchecktime" position="bottom" @on-hide='cancel'>
+        <popup-header left-text="" right-text="" :title="edit?'员工详情':'新增成员'"></popup-header>
         <div class="pop-content">
           <flexbox  class="form-item" :gutter="0">
             <flexbox-item class='form-item-left'>
@@ -96,9 +100,9 @@
           <flexbox class="submit-box1"  :gutter="0">
             <flexbox-item class="light" @click.native='cancel'>取消</flexbox-item>
             <flexbox-item v-if="!edit" class="primary"
-            @click.native='(nameValid && idcValid && phoneValid && addData.phunit.length!=0 && addData.phname.length!=0 && addData.phcardid.length!=0) ? addStaff():""'>完成</flexbox-item>
+            @click.native='(nameValid && idcValid && phoneValid && addData.phunit.length!=0 && addData.phname.length!=0 && addData.phcardid.length!=0) ? addStaff():""'>添加</flexbox-item>
             <flexbox-item v-if="edit" class="primary"
-            @click.native='(nameValid && idcValid && phoneValid && addData.phunit.length!=0 && addData.phname.length!=0 && addData.phcardid.length!=0) ?  editSubmit(): ""'>完成</flexbox-item>
+            @click.native='(nameValid && idcValid && phoneValid && addData.phunit.length!=0 && addData.phname.length!=0 && addData.phcardid.length!=0) ?  editSubmit(): ""'>修改</flexbox-item>
           </flexbox>
         </div>
       </popup>
@@ -245,7 +249,7 @@ export default {
       this.edit = true;
       this.showchecktime = true;
       let data = this.list[index];
-      console.log(data);
+      // console.log(data);
       this.addData.phname = data.PhName;
       this.addData.phcardid = data.PhCardId;
       this.addData.phtel = data.PhTel;
@@ -331,8 +335,19 @@ export default {
       _staffServce
         .getphysicalinfo()
         .then(data => {
+          that.checkedNumber = 0;
           if (data.AppendData.length != 0) {
-            that.list = data.AppendData;
+            that.list = data.AppendData.sort(function(x, y){
+              if(x.IsLeave == y.IsLeave ){
+                if(x.PhStatus == y.PhStatus){
+                  return [x.PhID, y.PhID].sort();
+                } else return x.PhStatus - y.PhStatus;
+              }else if(x.IsLeave == 1 && y.IsLeave == 0){
+                return 1;
+              }else if (x.IsLeave == 0 && y.IsLeave == 1) {
+                return -1
+              }
+            });
             that.totalNumber = that.list.length;
             that.nodata = false;
           } else {
@@ -342,7 +357,7 @@ export default {
         .catch(err => console.log(err));
     },
     testName() {
-      if (this.addData.phname == "" || this.addData.phname.length > 10) {
+      if (this.addData.phname.trim() == "" || this.addData.phname.trim().length > 10) {
         this.nameValid = false;
       } else {
         this.nameValid = true;
@@ -350,7 +365,7 @@ export default {
     },
     testIdc() {
       // var reg = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
-      if (IdentityCodeValid(this.addData.phcardid)) {
+      if (IdentityCodeValid(this.addData.phcardid.trim())) {
         this.idcValid = true;
       } else {
         this.idcValid = false;
@@ -358,7 +373,7 @@ export default {
     },
     textPhone() {
       let reg = /^((13[0-9])|(14[5|7])|(15([0-9]))|(17[0-9])|(18[0-9]))\d{8}$/;
-      if (reg.test(this.addData.phtel)) {
+      if ((this.addData.phtel.trim().length === 0) || reg.test(this.addData.phtel.trim())) {
         this.phoneValid = true;
       } else {
         this.phoneValid = false;
@@ -372,17 +387,18 @@ export default {
 @import "../../style/common.less";
 body[data-path=staff-information-list]{
   .myapp {
-      .nodata{
-    text-align: center;
-    color: #3c9;
-    padding: 20px;
-    margin-top: 50%;
-    transform: translateY(-50%);
-    img{
-      width: 100%;
+    .nodata{
+      text-align: center;
+      color: #3c9;
+      padding: 20px;
+      margin-top: 50%;
+      transform: translateY(-50%);
+      img{
+        width: 100%;
+      }
     }
-  }
     // position: relative;
+    // 修改scroll
     ._v-container.scroll-normal >  {
       .px2rem(top, 100);
       .px2rem(bottom, 70);
@@ -395,6 +411,14 @@ body[data-path=staff-information-list]{
       .px2rem(bottom, 90);
       position: fixed;
       height: auto !important;
+    }
+    // 修改header a
+    .vux-header .vux-header-right a{
+      min-width: 4em;
+      text-align: right;
+    } 
+    .vux-header .vux-header-left a{
+      min-width: 3em;
     }
     .list {
       .px2rem(margin-bottom, 5);
@@ -470,13 +494,19 @@ body[data-path=staff-information-list]{
     input {
       width: 100%;
       border: 1px solid #ddd;
+      .px2px(font-size, 28);
       .px2rem(height, 72);
       .px2rem(padding-left, 10);
       .px2rem(padding-right, 10);
+      box-shadow: none;
+      outline: none;
+      outline-offset: 0;
+
       &:focus {
         outline: none;
+        outline-offset: 0;
         border-color: #3c9;
-        // border-style: solid;
+        box-shadow: none;
         border-width: 1px;
       }
     }

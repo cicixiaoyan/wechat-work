@@ -1,6 +1,6 @@
 <template>
     <div class="firstContainer">
-      <div v-if='showtip' class="uatip">
+      <div v-show='showtip' class="uatip">
         您当前使用非微信浏览器访问!
         <br/>
         <br/>
@@ -26,14 +26,14 @@
     },
     created(){
       // 验证是否在微信环境中   main.js第54行解除注释
-      // var ua = window.navigator.userAgent.toLowerCase(); 
-      // if (ua.match(/MicroMessenger/i) == 'micromessenger') { 
-      //     this.redirect();
-      // } else { 
-      //   this.showtip = true;
-      // }
+      var ua = window.navigator.userAgent.toLowerCase(); 
+      if (ua.match(/MicroMessenger/i) == 'micromessenger') { 
+          this.redirect();
+      } else { 
+        this.showtip = true;
+      }
 
-      this.redirect();
+      // this.redirect();
       
     },
 
@@ -72,7 +72,7 @@
   }
 </script>
 <style lang="less">
-body[data-path=redirect]{
+body{
   .uatip{
     text-align: center;
     font-size: large;

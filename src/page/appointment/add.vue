@@ -2,9 +2,9 @@
   <div>
     <x-header>提交体检预约申请</x-header>
     <group>
+      <cell title="体检人员" value-align="left" @click.native="showPeople=true" :value="pnumber+'人'" is-link ></cell>
       <cell title="体检机构" value-align="left" readonly @click.native="showOr=true" is-link :value="PhaOrName"></cell>
       <cell title="体检日期" placeholder="请选择" value-align="left" is-link @click.native="showpop=true"  :value="ptime"></cell>
-      <cell title="成员列表" value-align="left" :value="pnumber+'人'" is-link :link="{name:'staff-information-check', params: { phids: $route.params.phid }}"></cell>
       <x-textarea title="预约说明" v-model="item.PhADescription" :max="100" placeholder="预约说明" :show-counter="true"  :rows="2"></x-textarea>
     </group>
     <div class="submit-box">
@@ -27,7 +27,18 @@
           <checklist  :options="orinfoList" :max="1" @on-change='changePhAOrCode' :value="PhAOrCode"></checklist>
         </div>
       </popup>
+
+      <popup v-model="showPeople" height='100%'>
+        <popup-header  title="选择人员" right-text=''></popup-header>
+        <div class="pop-content">
+          <checkPeople :phids='item.phid' show='true' :checkedNumber='pnumber'></checkPeople> 
+        </div>
+      </popup>
+
+
     </div>
+
+    
 
   </div>
 </template>
@@ -35,6 +46,7 @@
 <script>
 import { Group, Cell, XHeader,Checklist, XTextarea, XInput, Selector, TransferDom, PopupHeader, Popup, Picker } from 'vux';
 import {_appointmentServce} from '../../service/appointmentServices'
+import checkPeople from '../staff-information/checkPeople'
 export default {
   name: 'appointment-add',
   directives: {
@@ -50,7 +62,8 @@ export default {
     Selector ,
     PopupHeader,
     Popup,
-    Picker
+    Picker,
+    checkPeople
   },
   created(){
     this.fetchData()
@@ -61,6 +74,7 @@ export default {
     return {
       showpop: false,
       showOr: false,
+      showPeople: false,
       PhaOrName: '',
       ptime:'',
       maxNumber: 0,
@@ -83,7 +97,7 @@ export default {
       if(this.maxNumber < this.pnumber){
         return this.$vux.toast.show({
           text: "所选日期最多可提交"+this.maxNumber+'人次预约',
-          type: 'success',
+          type: 'warn',
           position: 'middle'
         });
       }
@@ -119,7 +133,9 @@ export default {
             });
           });
           that.orinfoList = [...arr];
-          that.PhAOrCode = [arr[0].key, arr[0].value];
+          that.PhAOrCode[0] = arr[0].key;
+          that.PhAOrCode[1] = arr[0].value;
+          // that.PhAOrCode = [arr[0].key, arr[0].value];
           //  console.log(that.PhAOrCode)
           // console.log(list[0])
           that.changeOr();
@@ -151,24 +167,26 @@ export default {
             let arr = [];
             list.forEach(function(value, index, array1){
               let length = arr.length;
-              if(length != 0 && value.PPNDate == list[index-1].PPNDate){
-                arr.push({
-                  name : ["全天","上午","下午"][value.PPNType]+"("+value.UsedNumber+"/"+value.Number+")",
-                  value : value.PPNDate+','+["全天","上午","下午"][value.PPNType]+','+(value.Number-value.UsedNumber),
-                  parent : value.PPNDate
-                });
-              }else{
-                arr.push({
-                  name : value.PPNDate,
-                  value : value.PPNDate,
-                  parent : 0
-                });
-                arr.push({
-                  name : ["全天","上午","下午"][value.PPNType]+"("+value.UsedNumber+"/"+value.Number+")",
-                  value :  value.PPNID+","+["全天","上午","下午"][value.PPNType]+','+(value.Number-value.UsedNumber),
-                  parent : value.PPNDate
-                })
-              }
+              if(value.Number !== value.UsedNumber) { // 余0不显示
+                if(length != 0 && value.PPNDate == arr[length-1].parent){
+                  arr.push({
+                    name : ["全天","上午","下午"][value.PPNType]+"(余"+(value.Number-value.UsedNumber)+"/总"+value.Number+")",
+                    value : value.PPNID+','+["全天","上午","下午"][value.PPNType]+','+(value.Number-value.UsedNumber),
+                    parent : value.PPNDate
+                  });
+                }else{
+                  arr.push({
+                    name : value.PPNDate,
+                    value : value.PPNDate,
+                    parent : 0
+                  });
+                  arr.push({
+                    name : ["全天","上午","下午"][value.PPNType]+"(余"+(value.Number-value.UsedNumber)+"/总"+value.Number+")",
+                    value :  value.PPNID+","+["全天","上午","下午"][value.PPNType]+','+(value.Number-value.UsedNumber),
+                    parent : value.PPNDate
+                  })
+                }
+              };
             });
             that.timedatas = arr;
           }

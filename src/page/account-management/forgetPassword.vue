@@ -208,7 +208,7 @@ export default {
           // console.log("获取验证码的返回值 : ", response);
         });
 
-      console.log("手机 = ", this.username);
+      // console.log("手机 = ", this.username);
     },
     updatepassword() {
       let that = this;
@@ -277,7 +277,7 @@ export default {
         if(this.username.length == 0) return this.phoneInValid = '手机号必填';
         this.phoneInValid = '请输入合法的手机号码';
       }
-      console.log(this.enableCheckBtn)
+      // console.log(this.enableCheckBtn)
       // this.enableCheckBtn = true;
     },
   }
