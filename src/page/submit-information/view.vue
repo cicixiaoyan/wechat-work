@@ -9,7 +9,8 @@
       <group>
         <div class="mid-title"><span>必填项</span></div>
         <x-input title="机构名称" :readonly='read' required :min="2"  :max="50" placeholder="机构名称" v-model="item.uoname"></x-input>
-        <selector title="机构类型" direction="left" v-if="!read" required  v-model="item.ubusinesstype"  :options="tbsysbasicdatabycode" placeholder="请选择"></selector>
+        <!-- <selector title="机构类型" direction="left" v-if="!read" required  v-model="item.ubusinesstype"  :options="tbsysbasicdatabycode" placeholder="请选择"></selector> -->
+        <selector title="机构类型" direction="left" v-if="!read" required ref='ubusinesstype'  v-model="item.ubusinesstype" :value-map="['BDID','Value']" :options="tbsysbasicdatabycode" placeholder="请选择"></selector>
         <x-input title="机构类型" readonly v-if="read"  v-model="item.ubusinesstypename"></x-input>
         <x-input title="执照代码" :readonly='read' required :max="30" placeholder="营业执照统一社会信用代码" v-model="item.businessnumber"></x-input>
         <!-- <x-input title="所属区域" readonly :disabled="read" required placeholder="所属区域"  @click.native="!read?showArea=true:''"  v-model="item.arename"></x-input> -->
@@ -55,9 +56,10 @@
 
       <div v-transfer-dom>
         <popup v-model="showArea">
-          <popup-header @on-click-left='showArea=false' left-text="取消"  right-text="" title="区域选择"></popup-header>
+          <popup-header :left-text="haschidren?'返回上一级':''" @on-click-left="haschidren = false" right-text="" title="区域选择"></popup-header>
           <div class="pop-content">
-            <checklist  :options="objectList" :max="1" :value="objectListValue" @on-change="changeArea"></checklist>
+            <checklist v-show="!haschidren"   :options="objectList" :max="1" :value="objectListValue" @on-change="changeArea"></checklist>
+            <checklist v-if="haschidren"  :options="objectList1" :max="1" :value="objectListValue1" @on-change="changeArea1"></checklist>
           </div>
         </popup>
       </div>
@@ -140,10 +142,15 @@ export default {
       tbsysbasicdatabycode: [],
       objectListValue: [],
       objectList: [],
+      haschidren: false,
+      objectListValue1: [],
+      objectList1: [],
+
       // 验证类
       idcValid: true,
       telValid: true,
-      showload: false
+      showload: false,
+      areid: ''
     };
   },
   created(){
@@ -160,6 +167,9 @@ export default {
       if(this.item.licenceimg.length < 50) this.item.licenceimg = "";
       if(this.item.permitimg.length < 50) this.item.permitimg = "";
       // console.log("0: "+this.item.cardidimg.length, "1: "+ this.item.licenceimg.length, "2: "+ this.item.permitimg.length)
+      if (that.$refs['ubusinesstype'].getFullValue().length != 0)
+        that.item.ubusinesstypename = that.$refs['ubusinesstype'].getFullValue()[0].Name;
+        
       employmentServices
         ._editorganizeinfo(this.item)
         .then(function(data) {
@@ -241,35 +251,86 @@ export default {
     Optionalshow() {
       this.showOptional = !this.showOptional;
     },
-    changeArea(value, label){
+    changeArea(val, label){
+      let that = this;
+      if(val.length !== 0){
+        if(that.areid != ''){
+            that.showArea = false;
+            that.haschidren = false;
+            that.item.areid = val[0];
+            that.item.arename = label[0];
+        }else{
+          let values =  val[0].split(",");
+          let parma = {"areid": values[0]}
+          employmentServices._getlistbyparentid(parma)
+          .then(function(data){
+            let list = data.AppendData;
+            if(list.length == 0){
+              that.showArea = false;
+              that.haschidren = false;
+              that.item.areid = values[1];
+              that.item.arename = label[0];
+            }else{
+              that.haschidren = true;
+              that.showArea = true;
+              list.forEach(function(value, index, array1){
+                list[index].key = [value.AreID, value.AreCode].join(",");
+                list[index].value = value.AreName;
+              });
+              that.objectList1 = list;
+            }
+          })
+          .catch(function(){
+
+          })
+        }
+
+      }
+
+    },
+    changeArea1(value, label){
       if(value.length != 0){
-        this.item.areid = value[0];
+        let values =  value[0].split(",");
+        this.item.areid = values[1];
         this.item.arename = label[0];
         this.showArea = false;
+        this.haschidren = true;
       }
     },
     gettbsysbasicdatabycode() {
       var that = this;
       return employmentServices._gettbsysbasicdatabycode().then(function(data){
         let list = data.AppendData;
-        list.forEach(function(value, index, array1){
-          list[index].key = value.BDID;
-          list[index].value = value.Value;
-        });
         that.tbsysbasicdatabycode = list;
       }).catch(err => console.log(err))
     },
     getareas(){
       var that = this;
-      let params = {"areid": window.localStorage.getItem('areId')};
-      return employmentServices._getlistbyareidone(params).then(function(data){
-        let list = data.AppendData;
-        list.forEach(function(value, index, array1){
-          list[index].key = value.AreCode;
-          list[index].value = value.AreName;
-        });
-        that.objectList = list;
-      }).catch(err => console.log(err))
+      if(that.areid != ''){ // 存在areaId 
+        let params = {"areid": that.areid};
+        return employmentServices._getlistbyareidone(params).then(function(data){
+          let list = data.AppendData;
+          list.forEach(function(value, index, array1){
+            list[index].key = value.AreCode
+            list[index].value = value.AreName;
+          });
+          that.objectList = list;
+          that.objectListValue[0] = that.item.areid;
+          that.objectListValue[1] = that.item.arename;
+        }).catch(err => console.log(err));
+
+      }else{ // 不存在areaId 
+        return employmentServices._getareas().then(function(data){
+          let list = data.AppendData;
+          list.forEach(function(value, index, array1){
+            list[index].key = [value.AreID, value.AreCode].toString();
+            list[index].value = value.AreName;
+          });
+          that.objectList = list;
+
+        }).catch(err => console.log(err));
+
+      }
     },
     getIdcValid(value){
       // var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/
@@ -288,6 +349,7 @@ export default {
       }
     },
     start(){
+      if(!!window.localStorage.getItem('areId')) this.areid = window.localStorage.getItem('areId');
       let that = this;
       this.showload = false;
       _userServices._getUserMsg().then(function(data1){
@@ -314,8 +376,10 @@ export default {
         that.licenceimg1 = !!that.item.licenceimg[1]?imgIp+that.item.licenceimg[1]:'';
         that.permitimg = !!that.item.permitimg[0]?imgIp+that.item.permitimg[0]:'';
         that.permitimg1 = !!that.item.permitimg[1]?imgIp+that.item.permitimg[1]:'';
-        that.objectListValue[0] = that.item.areid;
-        that.objectListValue[1] = that.item.arename;
+        if(that.areid != ''){
+          that.objectListValue[0] = that.item.areid;
+          that.objectListValue[1] = that.item.arename;
+        }
       }).catch(err => console.log(err))
       this.getareas();
       this.gettbsysbasicdatabycode();

@@ -2,9 +2,9 @@
   <div>
     <x-header>提交体检预约申请</x-header>
     <group>
-      <cell title="体检人员" value-align="left" @click.native="showPeople=true" :value="pnumber+'人'" is-link ></cell>
       <cell title="体检机构" value-align="left" readonly @click.native="showOr=true" is-link :value="PhaOrName"></cell>
-      <cell title="体检日期" placeholder="请选择" value-align="left" is-link @click.native="showpop=true"  :value="ptime"></cell>
+      <cell title="体检日期" placeholder="请选择" value-align="left" is-link @click.native="showTime"  :value="ptime"></cell>
+      <cell title="体检人员" value-align="left" @click.native="showPeople=true" :value="pnumber+'人'" is-link ></cell>
       <x-textarea title="预约说明" v-model="item.PhADescription" :max="100" placeholder="预约说明" :show-counter="true"  :rows="2"></x-textarea>
     </group>
     <div class="submit-box">
@@ -29,9 +29,9 @@
       </popup>
 
       <popup v-model="showPeople" height='100%'>
-        <popup-header  title="选择人员" right-text=''></popup-header>
+        <popup-header left-text='取消' style="border-bottom: 4px solid #3c9;" @on-click-left='showPeople=false' title="选择人员" right-text=''></popup-header>
         <div class="pop-content">
-          <checkPeople :phids='item.phid' show='true' :checkedNumber='pnumber'></checkPeople> 
+          <checkPeople v-if='showPeople' ref='checkpeople' @onChange='getPhid' :phids='item.phid'  :checkedNumber='pnumber'></checkPeople> 
         </div>
       </popup>
 
@@ -92,6 +92,12 @@ export default {
     };
   },
   methods: {
+    getPhid(val, length){
+      // console.log(val,this.item.phid);
+      this.item.phid = val;
+      this.pnumber = length
+      this.showPeople = false;
+    },
     submit(){
       let that = this;
       if(this.maxNumber < this.pnumber){
@@ -124,20 +130,21 @@ export default {
       let that = this;
       _appointmentServce.gettbsysorganize().then((data) => {
         if(data.AppendData.length != 0){
-          let list = data.AppendData;
-          let arr = [];
+          let list = data.AppendData,
+              arr = [],
+              defaultVal = { "key": "", "value": "" };
+
           list.forEach(function(value, index, array1){
+            if(value.OrId == data.Message) defaultVal = { "key": value.OrCode, "value": value.OrName };
             arr.push({
-              key: value.OrCode,
-              value: value.OrName
+              "key": value.OrCode,
+              "value": value.OrName
             });
           });
+          
           that.orinfoList = [...arr];
-          that.PhAOrCode[0] = arr[0].key;
-          that.PhAOrCode[1] = arr[0].value;
-          // that.PhAOrCode = [arr[0].key, arr[0].value];
-          //  console.log(that.PhAOrCode)
-          // console.log(list[0])
+          that.PhAOrCode[0] = defaultVal.key;
+          that.PhAOrCode[1] = defaultVal.value;
           that.changeOr();
         }
       })
@@ -149,6 +156,7 @@ export default {
     },
     changeOr(){
       let that = this;
+      that.timedatas = [];
       let val = this.PhAOrCode;
       that.showOr = false;
 
@@ -188,7 +196,7 @@ export default {
                 }
               };
             });
-            that.timedatas = arr;
+            that.timedatas = [...arr];
           }
         })
         .catch((err) => { console.log(err) })
@@ -199,6 +207,19 @@ export default {
       this.gettbsysorganize();
       this.item.phid = this.$route.params.phid;
       this.pnumber = this.item.phid.length == 0?0:this.item.phid.split(',').length-1;
+    },
+    showTime(){
+      if(this.timedatas.length === 0){
+        this.$vux.toast.show({
+          text: "当前体检机构预约名额已满，请切换体检机构或明日再来预约",
+          width: '12em',
+          type: 'warn',
+          position: 'middle',
+          time: '3000'
+        });
+      }else{
+        this.showpop=true
+      }
     }
   },
   watch:{

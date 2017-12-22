@@ -47,16 +47,27 @@ export default {
     Loading
   },
   created(){
-    try{
-      if(!window.localStorage.getItem('areId')){
-        let reg = new RegExp("(^|&)"+ "areId" +"=([^&]*)(&|$)");
-    　　let r = window.location.search.substr(1).match(reg);
-    　　let areId = unescape(r[2]); 
-        window.localStorage.setItem('areId', areId);
+    if(window.location.search == ''){
+      let areid = window.localStorage.getItem("areId");
+      window.localStorage.clear(); // 清空本地和session
+      window.sessionStorage.clear();
+      if(areid != null)
+        window.localStorage.setItem('areId', areid);
+    }else{
+      try{
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+        if(!window.localStorage.getItem('areId')){
+          let reg = new RegExp("(^|&)"+ "areId" +"=([^&]*)(&|$)");
+      　　let r = window.location.search.substr(1).match(reg);
+      　　let areId = unescape(r[2]); 
+          window.localStorage.setItem('areId', areId);
+        }
+      }catch(err){
+        console.log(err)
       }
-    }catch(err){
-      console.log(err)
     }
+
 
     let that = this;
     document.onkeydown = function(event){
@@ -96,18 +107,18 @@ export default {
             that.showload = false;
              //已审核通过 转到 人员信息页面
             if(data1.ULAudtiStatus == 3){
-              that.$router.push({name: 'staff-information-list'});
+              that.$router.replace({name: 'staff-information-list'});
             }
             else if(data1.ULAudtiStatus == 1 || data1.ULAudtiStatus == 2){
               if(data1.ULAudtiStatus == 1){
-                that.$router.push({name: 'submit-information-view', params: { 'read': false }});
+                that.$router.replace({name: 'submit-information-view', params: { 'read': false }});
               }else{
-                that.$router.push({name: 'submit-information-view', params: { 'read': true }});
+                that.$router.replace({name: 'submit-information-view', params: { 'read': true }});
               }
 
             }
             else{
-              that.$router.push({name: 'submit-information-add'});
+              that.$router.replace({name: 'submit-information-add'});
             }
 
 
@@ -198,10 +209,9 @@ export default {
       position: relative;
       .iconfont{
         .px2px(font-size, 60);
-        // font-size: 3rem;
         position: absolute;
         left: 0;
-        .px2px(top, -16);
+        .px2rem(line-height, 70);
       }
       input{
         .px2rem(padding-bottom, 10);

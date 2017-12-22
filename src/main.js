@@ -51,7 +51,9 @@ methods.forEach(key => {
 
 router.beforeEach(function (to, from, next) {
   var ua = window.navigator.userAgent.toLowerCase(); 
-  
+  /* 
+  ** 判断是否在微信中
+  */
   if (ua.match(/MicroMessenger/i) == 'micromessenger') { 
     // 在微信中
   } else {     
@@ -60,17 +62,30 @@ router.beforeEach(function (to, from, next) {
     else next();
   }
 
+  /* 
+  ** 清除location.search   '?areId=7'
+  */
+
   if(from.name == 'login' && !!window.localStorage.getItem('areId') && !!window.location.search){
     window.location.href =  "/#" + to.fullPath;
   }
-  
+
   store.commit('updateLoadingStatus', {isLoading: true})
-  // console.log(to, from)
+
+  /* 
+  ** 给每个页面添加pro,以便设置样式
+  */
+
   var body=document.getElementsByTagName("body")[0];
   body.setAttribute("data-path", to.name);
+
+  /* 
+  ** 清除浏览器判断
+  */
+
   const toIndex = history.getItem(to.path)
   const fromIndex = history.getItem(from.path)
-
+  // console.log(toIndex, fromIndex)
   if (toIndex) {
     if (!fromIndex || parseInt(toIndex, 10) > parseInt(fromIndex, 10) || (toIndex === '0' && fromIndex === '0')) {
       store.commit('updateDirection', {direction: 'forward'})

@@ -110,9 +110,11 @@ export default {
         if (data.ResultType == 0) {
           if(data.AppendData.length !== 0){
             that.appendToList(data.AppendData);
+            
             that.nodata = false;
-            that.loadmore = true;
+            that.loadmore = data.AppendData.length === pagesize ? true : false;
             that.isLoading = false;
+            that.noDataText = '---- 我是底线 ----';
             // console.log(data.AppendData);
           }else{
             that.loadmore = false;
@@ -137,7 +139,8 @@ export default {
         that.$vux.toast.show({
           text: "删除预约成功",
           type: 'success',
-          position: 'middle'
+          position: 'middle',
+          width: '10em'
         });
         
       })

@@ -38,7 +38,7 @@
         </swipeout>
 
       </div>
-      <div v-if='nodata' class="nodata">
+      <div v-if='nodata' class="nodata" @click='showchecktime=true;edit=false;'>
         <img src="../../assets/nodata.png" alt="无数据">
         亲，您目前还没有添加任何员工哦！左上角添加
       </div>
@@ -162,18 +162,14 @@ export default {
     return {
       edit: false,
       checkAll: false,
-      showpop: false,
       showchecktime: false,
       checkedNumber: 0,
+      checkAllowNumber: 0, //允许选择人数
       totalNumber: 0,
-      checkValue: [],
       checkAllow: false,
       list: [],
-      isLoading: false,
       nodata: false,
       noDataText: "",
-      page: 0,
-      size: 10,
       addData: {
         phname: "",
         phcardid: "",
@@ -186,16 +182,11 @@ export default {
     };
   },
   methods: {
-    view(id) {
-      this.$router.push({
-        name: "staff-information-edit",
-        params: { id: id, read: true }
-      });
-    },
     change(index) {
       this.list[index].checked = !this.list[index].checked;
       let dec = this.list[index].checked ? 1 : -1;
       this.checkedNumber = this.checkedNumber + dec;
+      this.checkAll = (this.checkAllowNumber == this.checkedNumber) ? true : false;
     },
     checkall() {
       let that = this;
@@ -210,6 +201,14 @@ export default {
       this.checkedNumber = number;
     },
     appointment() {
+      if(!this.checkAllow && this.checkAllowNumber === 0) {
+        return this.$vux.toast.show({
+            text: '您当前无可预约员工！',
+            type: "warn",
+            position: "middle",
+            width: '10em'
+          });
+      }
       this.checkAllow = !this.checkAllow;
       // this.$router.push({name: 'appointment-view', params: { 'id': id }});
     },
@@ -239,6 +238,7 @@ export default {
             this.addData.phname = "";
             this.addData.phcardid = "";
             this.addData.phtel = "";
+            this.addData.phunit = window.localStorage.getItem('UoName');
             this.loadData();
             this.showchecktime = false;
           }
@@ -284,6 +284,10 @@ export default {
       this.addData.phtel = "";
       this.showchecktime = false;
       this.addData.phid = null;
+      this.addData.phunit = window.localStorage.getItem('UoName');
+      this.nameValid = true;
+      this.idcValid = true;
+      this.phoneValid = true;
     },
     deleteItem(index) {
       let PhID = this.list[index].PhID;
@@ -293,8 +297,9 @@ export default {
         .deleteAppointment(PhID)
         .then(data => {
           that.list[index].IsLeave = 1;
+          if(that.list[index].PhStatus == 0) that.checkAllowNumber--;
           that.$vux.toast.show({
-            text: "删除成功",
+            text: data.Message,
             type: "success",
             position: "middle"
           });
@@ -311,8 +316,9 @@ export default {
         .recoverphysicalinfo(PhID)
         .then(data => {
           that.list[index].IsLeave = 0;
+          if(that.list[index].PhStatus == 0) that.checkAllowNumber++;
           that.$vux.toast.show({
-            text: "复职成功",
+            text: data.Message,
             type: "success",
             position: "middle"
           });
@@ -322,9 +328,8 @@ export default {
         });
     },
     onRefresh(done) {
-      this.page = 1;
       this.list = [];
-      this.loadmore = true;
+      this.checkAll = false;
       this.loadData();
       setTimeout(() => {
         done(); //必须有
@@ -337,6 +342,7 @@ export default {
         .then(data => {
           that.checkedNumber = 0;
           if (data.AppendData.length != 0) {
+            // 排序
             that.list = data.AppendData.sort(function(x, y){
               if(x.IsLeave == y.IsLeave ){
                 if(x.PhStatus == y.PhStatus){
@@ -348,7 +354,16 @@ export default {
                 return -1
               }
             });
+
+            that.checkAllowNumber = 0;
+            that.list.forEach(function(item, index) {
+              if (item.PhStatus == 0 && item.IsLeave == 0) {
+                that.checkAllowNumber++;
+              }
+            });
+            
             that.totalNumber = that.list.length;
+            
             that.nodata = false;
           } else {
             that.nodata = true;

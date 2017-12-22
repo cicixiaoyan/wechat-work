@@ -1,6 +1,6 @@
 <template>
   <div>
-    <x-header>员工列表</x-header>
+    <x-header>体检人员列表</x-header>
     <!-- :on-infinite="onInfinite" -->
     <scroll style="top: 44px;"
           :on-refresh="onRefresh"

@@ -46,9 +46,7 @@ export default {
     _userServices._getUserMsg().then(function(data){
       that.item = data;
       employmentServices._gettbsysbasicdatabycode().then((data1) => {
-        // console.log(data1)
         data1.AppendData.forEach(function(value,index, arr) {
-          // console.log(value)
           if(value.BDID == data.ULType) return that.type = value.Name;
         });
       }).catch(err1 => console.log(err1))
@@ -63,9 +61,15 @@ export default {
   methods: {
     quit(){
       let that = this;
+      let areid = window.localStorage.getItem("areId");
       _userServices._logout().then(function(data){
-        window.localStorage.clear();
-        that.$router.push({name: 'login'});
+        window.localStorage.clear(); // 清空本地和session
+        window.sessionStorage.clear();
+        
+        if(areid != null)
+          window.localStorage.setItem('areId', areid);
+
+        that.$router.replace({name: 'login'});
       }).catch(err => console.log(err))
 
     },

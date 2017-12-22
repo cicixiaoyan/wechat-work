@@ -202,7 +202,7 @@ export default {
           .px2px(font-size, 60);
           position: absolute;
           left: 0;
-          .px2px(top, -16);
+          .px2rem(line-height, 70);
         }
 
         .CheckCodeBtn{

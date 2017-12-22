@@ -2,15 +2,15 @@
   <div id="app" class="app">
     <router-view :class="{'has-bottom-tabbar':!showTabbar}" class="router-view"></router-view>
     <tabbar  v-show="showTabbar"  slot="bottom" style="position:fixed;">
-      <tabbar-item  :link="{name: 'staff-information-list' }">
+      <tabbar-item :selected='$route.name=="staff-information-list"' :link="{name: 'staff-information-list', replace: true }">
         <span slot="icon" class="iconfont icon-tijianyuyue1"></span>
         <span slot="label">体检预约</span>
       </tabbar-item>
-      <tabbar-item :link="{name: 'appointment-list' }">
+      <tabbar-item :selected='$route.name=="appointment-list"' :link="{name: 'appointment-list', replace: true }">
         <span slot="icon" class="iconfont icon-shenhejilu"></span>
-        <span slot="label" link="../page/appointment/add">审核记录</span>
+        <span slot="label" link="../page/appointment/add">预约记录</span>
       </tabbar-item>
-      <tabbar-item :link="{name: 'personal-center' }">
+      <tabbar-item :selected='$route.name=="personal-center"' :link="{name: 'personal-center', replace: true }">
         <span slot="icon" class="iconfont icon-gerenxinxi"></span>
         <span slot="label" >个人中心</span>
       </tabbar-item>
@@ -70,6 +70,11 @@ html{
 body {
   background-color: #f2f5f7;
   color: #333;
+
+  .weui-toast.weui-toast_forbidden .weui-toast__content{
+    .px2rem(padding-left, 10);
+    .px2rem(padding-right, 10);
+  }
 }
 .round-big-btn{
   .px2rem(border-radius, 60);
@@ -125,14 +130,18 @@ body {
 
   .weui-tabbar__item{
     .px2rem(height, 100);
+    .px2px(min-height, 88);
+    // .px2rem(line-height, 48);
   }
 
   .weui-tabbar__icon .iconfont{
     .px2px(font-size, 40);
+    // .px2rem(line-height, 57);
   }
 
   .weui-tabbar__label > span{
     .px2px(font-size, 24);
+    // .px2rem(line-height, 37);
   }
 
 
@@ -140,6 +149,7 @@ body {
     .px2px(padding, 30);
     // padding: 0.4167rem 0.277rem;
   }
+
   .vux-header{
     width: 100%;
     position: fixed;
@@ -147,7 +157,15 @@ body {
     top: 0px;
     z-index: 100;
     .px2rem(height, 100);
+
+    .vux-header-title{
+      height: 100%;
+      .px2rem(line-height, 94);
+      .px2px(font-size, 36);
+      
+    }
   }
+
   .list{
     position: relative;
     .item{
@@ -218,14 +236,30 @@ body {
     }
   }
 
-  .vux-header .vux-header-left, .vux-header .vux-header-right{
-    // top: 14px;
-    .px2rem(top, 26);
+  .vux-header .vux-header-left,
+  .vux-header .vux-header-right {
     display: block;
-    // font-size: 14px;
     .px2px(font-size, 32);
-    .px2px(line-height, 40);
-    // line-height: 21px;
+    .px2rem(line-height, 100);
+    top: 0;
+  }
+
+  .vux-header .vux-header-left .left-arrow{
+    position: absolute;
+    // .px2rem(width, 60);
+    // .px2rem(height, 60);
+    // .px2rem(top, 23);
+    width: auto;
+    height: auto;
+    top: 0;
+    .px2rem(left, -10);
+    .px2rem(line-height, 100);
+    &::before{
+      .px2rem(width, 24);
+      .px2rem(height, 24);
+
+      .px2rem(top, 36);
+    }
   }
 }
 </style>
