@@ -53,11 +53,11 @@
       },
       // 默认情况下可能会导致选择框弹出慢的问题，请针对具体化图片类型即可解决
       accept: {
-        default: 'image/*,video/*;',
+        default: 'image/*',
         type: String
       },
       capture: {
-        default: true,
+        default: false,
         type: Boolean
       },
       id: {
@@ -77,7 +77,7 @@
         type: String
       },
       bottomText: {
-        default: '点击添加图片',
+        default: '点击修改图片',
         type: String
       },
       placeholder: {
@@ -170,7 +170,7 @@
         let iconMap = {
           img: 'icon-add',
           clip: 'icon-tailor',
-          img2: 'icon-addition_fill'
+          img2: 'icon-add'
         };
         return this.customerIcon || iconMap[this.ICON]
       }
@@ -219,33 +219,77 @@
         }
       },
       handleFileChange (e) {
-        if (typeof e.target === 'undefined') this.file = e[0];
-        else this.file = e.target.files[0];
-        this.errText = '';
-        let size = Math.floor(this.file.size / 1024);
-        if (size > this.maxSize) {
-          this.errText = `文件大小不能超过${this.sizeHumanRead}`;
-          return false
-        }
-        // 双向绑定
-        this.$emit('input', this.file);
-        // 文件选择回调 && 两种绑定方式
-        this.onChange && this.onChange(this.file, this.file.name);
-        this.$emit('onChange', this.file, this.file.name);
-        this.imgPreview(this.file);
-        this.fileName = this.file.name;
-        this.resetInput();
-      },
-      imgPreview (file) {
         let self = this;
-        if (!file || !window.FileReader) return;
-        if (/^image/.test(file.type)) {
-          let reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onloadend = function () {
-            self.dataUrl = this.result;
+        let file;
+        if (typeof e.target === 'undefined') file = e[0];
+        else file = e.target.files[0];
+
+        // this.errText = '';
+        // let size = Math.floor(this.file.size / 1024);
+        // if (size > this.maxSize) {
+        //   this.errText = `文件大小不能超过${this.sizeHumanRead}`;
+        //   return false
+        // }
+        var reader = new FileReader()
+        reader.onloadend = () => {
+          var image = new Image()
+          image.src = reader.result
+          image.onload = () => {
+            var canvas = document.createElement('canvas')
+            // 返回一个用于在画布上绘图的环境, '2d' 指定了您想要在画布上绘制的类型
+            var ctx = canvas.getContext('2d')
+            // 如果高度超标 // 参数，最大高度
+            var MAX_HEIGHT = 1600;
+            if(image.height > MAX_HEIGHT) {
+                // 宽度等比例缩放 *=
+                image.width *= MAX_HEIGHT / image.height;
+                image.height = MAX_HEIGHT;
+            }
+            // 获取 canvas的 2d 环境对象,
+            // 可以理解Context是管理员，canvas是房子
+            // canvas清屏
+            console.log('canvas.width:', canvas.width);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 重置canvas宽高
+            canvas.width = image.width;
+            canvas.height = image.height;
+            // 将图像绘制到canvas上
+            ctx.drawImage(image, 0, 0, image.width, image.height);
+            // !!! 注意，image 没有加入到 dom之中
+            console.log(file.type);
+            // console.log(canvas.toDataURL('image/jpeg',0.5));
+            //----------//
+            var maxSize = 2*1024; // 2M
+            var fileSize = file.size/1024; // 图片大小
+            console.log(fileSize, maxSize)
+            if(fileSize > maxSize) { // 如果图片大小大于2m，进行压缩
+                console.log(maxSize,fileSize, maxSize/fileSize );
+                let dataURL = canvas.toDataURL(file.type, maxSize/fileSize);
+                self.file = dataURL;
+                // self.file = dataURL.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+                self.dataUrl = dataURL;
+                // document.getElementById('previewImage').src = uploadSrc;
+                // uploadFile = convertBase64UrlToFile(uploadSrc, file.name.split('.')[0]); // 转成file文件
+            } else {
+                let dataURL = canvas.toDataURL(file.type, 0.5);
+                self.file = dataURL;
+                // self.file = dataURL.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+                self.dataUrl = dataURL;
+            }
+
+                
+            // 双向绑定
+            self.$emit('input', self.file);
+            // 文件选择回调 && 两种绑定方式
+            self.onChange && self.onChange(self.file, file.name);
+            self.$emit('onChange', self.file, file.name);
+            // this.imgPreview(this.file);
+            self.fileName = file.name;
+            self.resetInput();
+
           }
         }
+        reader.readAsDataURL(file)
       },
       resetInput () {
         let input = document.getElementById(this.inputId);
@@ -308,16 +352,19 @@ transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
   height: 100px;
 
   .img-inputer__placeholder {
-    font-size: 12px;
+    .px2px(font-size, 24);
+    // font-size: 12px;
     top: 65%;
   }
   .img-inputer__icon {
-    font-size: 28px !important;
+
+    font-size: 1.5em !important;
     top: 38%;
   }
 }
 
 &--large {
+
   width: 460px;
   height: 250px;
 }
@@ -349,7 +396,7 @@ transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
 
 &__icon {
   position: absolute;
-  font-size: 34px !important;
+  font-size: 1.5em !important;
   left: 50%;
   top: 40%;
   color: #757575;

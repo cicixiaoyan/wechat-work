@@ -9,9 +9,6 @@ const store = new Vuex.Store({
 		isLogin : false,
 		// 保存登录信息
 		userInfo : {
-			// 'username' : '',
-			// 'photo' : '',
-			// 'uid' : '',
 			'AccessToken' : '',
 			'RefreshToken' : ''
 		},
@@ -20,6 +17,8 @@ const store = new Vuex.Store({
 		isLoading: false,
 		direction: 'forward',
 		demoScrollTop: 0,
+		parmaCommon: 'h27EdZlBIm9R1ysOrDo1boC2KLlyuCRKNC8E7nO%2bcIo%3d'
+		// parmaCommon: 'h27EdZlBIm9R1ysOrDo1boC2KLlyuCRKNC8E7nO+cIo='
 	},
 	actions: {
 		isLogin({commit}) {
@@ -67,20 +66,29 @@ const store = new Vuex.Store({
 		},
 		updateDirection (state, payload) {
 			state.direction = payload.direction
+		},
+		updateUserInfoAccesstoken (state, val) {
+			state.userInfo.AccessToken = val;
+		},
+		updateUserInfoRefreshToken(state, val) {
+			state.userInfo.RefreshToken = val;
 		}
 	},
 	getters: {
+		gerParmaCommon(state) {
+			return state.parmaCommon;
+		},
 		getLoginState (state) {
 			return state.isLogin;
 		},
 		getUserInfo (state) {
 			return state.userInfo;
 		},
-		getUserInfoAccesstoken(state, getters) {
-			return getters.getUserInfo.AccessToken;
+		getUserInfoAccesstoken(state) {
+			return state.userInfo.AccessToken;
 		},
-		getUserInfoRefreshToken(state, getters) {
-			return getters.getUserInfo.RefreshToken;
+		getUserInfoRefreshToken(state) {
+			return state.userInfo.RefreshToken;
 		},
 		getNotMessageCount (state) {
 			return state.message_count;

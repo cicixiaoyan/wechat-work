@@ -1,19 +1,19 @@
 <template>
   <div>
-    <x-header>用户登陆</x-header>
+    <x-header :left-options="{showBack: false}">用户登陆 <a slot="right" @click='register'>注册</a></x-header>
     <div class="text-center">
       <img src="../../assets/logo.png" class="logo" title="logo"/>
       <div class="title">成都市从业人员体检预约平台</div>
     </div>
     <div class="login-form">
       <div class="user">
-        <span class="iconfont icon-mobilephone"></span>
+        <span class="iconfont icon-gerenxinxi"></span>
         <input type="text" @input="judgePhone" @blur="judgePhone" maxlength="20" placeholder="请输入手机号/用户名" v-model="mobile">
         <div class="validator-error" v-if="phoneInValid != ''">{{phoneInValid}}</div>
       </div>
       <div class="user">
-        <span class="iconfont icon-mobilephone"></span>
-        <input  placeholder="请输入登录" maxlength='6' @input type="password"  v-model="password">
+        <span class="iconfont icon-mima"></span>
+        <input  placeholder="请输入密码" minlength='20' @input type="password"  v-model="password">
       </div>
       <div class="remenber-password">
         <div >
@@ -25,8 +25,7 @@
           <a @click='findPwd'>忘记密码?</a>
           </div>
       </div>
-
-      <button @click='login' class="login" :disabled="mobile===''|| password===''" >登陆</button>
+      <button @click='login' class="login" :disabled="mobile==='' || phoneInValid != '' || password===''" >登陆</button>
     </div>
 
     <div v-transfer-dom>
@@ -37,7 +36,7 @@
 
 <script>
 import { XHeader, AjaxPlugin,Loading, TransferDomDirective as TransferDom } from 'vux';
-import {_userLogin,_getUserMsg} from '../../service/userServices';
+import {_userServices} from '../../service/userServices';
 export default {
   name: 'login',
   directives: {
@@ -47,10 +46,31 @@ export default {
     XHeader,
     Loading
   },
+  created(){
+    try{
+      if(!window.localStorage.getItem('areId')){
+        let reg = new RegExp("(^|&)"+ "areId" +"=([^&]*)(&|$)");
+    　　let r = window.location.search.substr(1).match(reg);
+    　　let areId = unescape(r[2]); 
+        window.localStorage.setItem('areId', areId);
+      }
+    }catch(err){
+      console.log(err)
+    }
+
+    let that = this;
+    document.onkeydown = function(event){
+      var ev = event || window.event || arguments.callee.caller.arguments[0];
+      if (ev && ev.keyCode == 13) {
+          if(that.mobile==='' || that.phoneInValid != '' || that.password==='') return;
+          that.login();
+      }
+    };
+  },
   data () {
     return {
-      mobile: 'ynkjd123456',
-      password: 'ynk123456',
+      mobile: '',
+      password: '',
       remember: false,
       phoneInValid: '',
       showload: false,
@@ -64,40 +84,59 @@ export default {
       // ynk123456
       let that = this;
       that.showload = true;
-      _userLogin({"username": this.mobile,"pwd": this.password}).then(function(data){
+
+      _userServices._userLogin({"username": this.mobile,"pwd": this.password}).then(function(data){
         if(data.ResultType == 0){
           that.loadtext = "登陆成功";
+          //获取用户信息
           window.localStorage.setItem('AccessToken', data.AppendData["AccessToken"]);
           window.localStorage.setItem('RefreshToken', data.AppendData["RefreshToken"]);
-          //获取用户信息
-          _getUserMsg().then(function(data1){
-           
+
+          _userServices._getUserMsg().then(function(data1){
             that.showload = false;
              //已审核通过 转到 人员信息页面
             if(data1.ULAudtiStatus == 3){
-               that.$router.push({name: 'staff-information-list'});
-               
+              that.$router.push({name: 'staff-information-list'});
+            }
+            else if(data1.ULAudtiStatus == 1 || data1.ULAudtiStatus == 2){
+              if(data1.ULAudtiStatus == 1){
+                that.$router.push({name: 'submit-information-view', params: { 'read': false }});
+              }else{
+                that.$router.push({name: 'submit-information-view', params: { 'read': true }});
+              }
 
             }
-           
             else{
-                that.$router.push({name: 'register'});
-                
+              that.$router.push({name: 'submit-information-add'});
             }
-            
-          }).catch(function(err){console.log(err)})
+
+
+          }).catch(function(err){
+            console.log(err, 2)
+            that.showload = false;
+          });
+
+          that.$store.commit('ISLOGIN');
+          that.$store.commit('updateUserInfoAccesstoken', data.AppendData["AccessToken"]);
+          that.$store.commit('updateUserInfoRefreshToken', data.AppendData["RefreshToken"]);
+
+        }else{
+          that.showload = false;
         }
       }).catch(function(err){
+        console.log(err, 1)
         that.showload = false;
       })
-
+    },
+    register() {
+      this.$router.push({name: 'register'});
     },
     // remenberChange () {
     //   console.log(this.remenber);
     //   this.remenber = !this.remenber;
     // },
     findPwd(){
-      this.$router.push({path: '/app/forgetPassword'});
+      this.$router.push({name: 'forgetPassword'});
     },
     judgePhone(){
       // if(/^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/.test(this.username)){
@@ -121,16 +160,20 @@ export default {
 
 <style lang="less">
   @import '../../style/common.less';
-  body{
+  body[data-path=login]{
     background: #fff;
+
+
   }
-  .logo{
+    .logo{
     .px2rem(width, 200);
     .px2rem(height, 200);
     .px2rem(border-radius, 40);
     .px2rem(margin-top, 70);
     .px2rem(margin-bottom, 30);
-    background: green;
+    padding: 0.6em;
+    background: #3c9;
+    box-sizing: border-box;
   }
 
   .title{
@@ -212,7 +255,6 @@ export default {
       }
     }
   }
-
 
 
 </style>

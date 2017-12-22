@@ -2,34 +2,51 @@
   <div>
     <x-header>提交体检预约申请</x-header>
     <group>
-      <selector title="机构名称" v-model="item.Hospital"  :options="HospitalList" placeholder="请选择"></selector>
-      <cell title="成员列表" value-align="left" :value="item.Number+'人'" is-link :link="{name:'staff-information-list'}"></cell>
-      <cell title="体检日期" value-align="left" is-link @click.native="showpop=true" :is-loading="!item.Time" :value="item.Time"></cell>
-      <x-textarea title="预约说明" :max="100" placeholder="预约说明" :show-counter="true"  :rows="2"></x-textarea>
+      <cell title="体检人员" value-align="left" @click.native="showPeople=true" :value="pnumber+'人'" is-link ></cell>
+      <cell title="体检机构" value-align="left" readonly @click.native="showOr=true" is-link :value="PhaOrName"></cell>
+      <cell title="体检日期" placeholder="请选择" value-align="left" is-link @click.native="showpop=true"  :value="ptime"></cell>
+      <x-textarea title="预约说明" v-model="item.PhADescription" :max="100" placeholder="预约说明" :show-counter="true"  :rows="2"></x-textarea>
     </group>
     <div class="submit-box">
-      <button @click='submit' class="round-big-btn" :disabled="item.Hospital===''|| item.Number===0|| item.Time==''" >完成并提交</button>
+      <button @click='submit' class="round-big-btn" :disabled="item.PhAOrCode===''|| pnumber===0|| item.PPNID==''" >完成并提交</button>
     </div>
 
-    
     <div v-transfer-dom>
       <popup v-model="showpop" position="bottom">
-        <popup-header left-text="取消" right-text="完成" title="日期选择" 
+        <popup-header left-text="取消" right-text="完成" title="日期选择"
         @on-click-left="showpop = false"
         @on-click-right="getTime"></popup-header>
         <div class="pop-content">
           <picker :data='timedatas' :columns="2" v-model='mytime'></picker>
         </div>
       </popup>
+
+      <popup v-model="showOr">
+        <popup-header  title="选择机构" right-text='完成' @on-click-right='changeOr'></popup-header>
+        <div class="pop-content">
+          <checklist  :options="orinfoList" :max="1" @on-change='changePhAOrCode' :value="PhAOrCode"></checklist>
+        </div>
+      </popup>
+
+      <popup v-model="showPeople" height='100%'>
+        <popup-header  title="选择人员" right-text=''></popup-header>
+        <div class="pop-content">
+          <checkPeople :phids='item.phid' show='true' :checkedNumber='pnumber'></checkPeople> 
+        </div>
+      </popup>
+
+
     </div>
 
+    
 
   </div>
 </template>
 
 <script>
-import { Group, Cell, XHeader, XTextarea, XInput, Selector, TransferDom, PopupHeader, Popup, Picker } from 'vux';
-
+import { Group, Cell, XHeader,Checklist, XTextarea, XInput, Selector, TransferDom, PopupHeader, Popup, Picker } from 'vux';
+import {_appointmentServce} from '../../service/appointmentServices'
+import checkPeople from '../staff-information/checkPeople'
 export default {
   name: 'appointment-add',
   directives: {
@@ -39,72 +56,161 @@ export default {
     Group,
     Cell,
     XHeader,
+    Checklist,
     XTextarea,
     XInput,
     Selector ,
     PopupHeader,
-    Popup, 
-    Picker
+    Popup,
+    Picker,
+    checkPeople
   },
-  computed :{
-    HospitalList() {
-      return [{key: '1', value: '武侯区第一医院'}, {key: '2', value: '武侯区第二医院'}]
-    }
+  created(){
+    this.fetchData()
+    // 机构列表
+    // this.orinfoList = [{key:1, value:1},{key:2, value:2}]
   },
   data () {
     return {
       showpop: false,
-      timedatas: [
-        {
-          name: '2017-7-7',
-          value: '2017-7-7',
-          parent: 0
-        },
-        {
-          name: '上午',
-          value: '上午',
-          parent: "2017-7-7"
-        },
-        {
-          name: '下午',
-          value: '下午',
-          parent: "2017-7-7"
-        },
-        {
-          name: '2017-7-8',
-          value: '2017-7-8',
-          parent: 0
-        },
-        {
-          name: '上午',
-          value: '上午',
-          parent: "2017-7-8"
-        },
-      ],
+      showOr: false,
+      showPeople: false,
+      PhaOrName: '',
+      ptime:'',
+      maxNumber: 0,
+      timedatas: [],
       mytime: [],
+      orinfoList: [],
+      PhAOrCode: [],
       item: {
-        Status: '1',
-        Hospital: '成都市华西第四医院',
-        Number: '30',
-        Listparma: '123',
-        Time: '2017-04-04 上午',
-        Description: '批准申请',
-      }
+        phid: '',
+        PhAOrCode: '',
+        PPNID: '',
+        PhADescription: '',
+      },
+      pnumber: ''
     };
   },
   methods: {
     submit(){
-      console.log('提交');
+      let that = this;
+      if(this.maxNumber < this.pnumber){
+        return this.$vux.toast.show({
+          text: "所选日期最多可提交"+this.maxNumber+'人次预约',
+          type: 'warn',
+          position: 'middle'
+        });
+      }
+      // console.log(this.item)
+      _appointmentServce.createAppointment(this.item)
+      .then(data => {
+        that.$vux.toast.show({
+          text: "提交预约成功",
+          type: 'success',
+          position: 'middle'
+        });
+        that.$router.push({name: "appointment-list"});
+      }).catch(err => console.log(err));
+
+
     },
     getTime() {
-      this.item.Time = this.mytime.join(" ");
+      this.item.PPNID = this.mytime[1].split(",")[0];
+      this.ptime = this.mytime[0]+' '+ this.mytime[1].split(",")[1];
+      this.maxNumber = this.mytime[1].split(",")[2];
       this.showpop = false
+    },
+    gettbsysorganize(){
+      let that = this;
+      _appointmentServce.gettbsysorganize().then((data) => {
+        if(data.AppendData.length != 0){
+          let list = data.AppendData;
+          let arr = [];
+          list.forEach(function(value, index, array1){
+            arr.push({
+              key: value.OrCode,
+              value: value.OrName
+            });
+          });
+          that.orinfoList = [...arr];
+          that.PhAOrCode[0] = arr[0].key;
+          that.PhAOrCode[1] = arr[0].value;
+          // that.PhAOrCode = [arr[0].key, arr[0].value];
+          //  console.log(that.PhAOrCode)
+          // console.log(list[0])
+          that.changeOr();
+        }
+      })
+      .catch((err) => {console.log(err);})
+    },
+    changePhAOrCode(val,label){
+      this.PhAOrCode[0] = val[0];
+      this.PhAOrCode[1] = label[0]
+    },
+    changeOr(){
+      let that = this;
+      let val = this.PhAOrCode;
+      that.showOr = false;
+
+      if(val.length !== 0){
+        that.PhaOrName = val[1]
+        that.item.PhAOrCode = val[0];
+        that.showOr = false;
+        that.ptime = '';
+        that.item.PPNID = "";
+        //根据体检机构获取预约剩余人数
+        _appointmentServce.gettbphysicalpeoplenumber(val[0])
+        .then((data) => {
+          // console.log(data)
+          if(!!data.AppendData && data.AppendData.length != 0){
+            let list = data.AppendData;
+            let arr = [];
+            list.forEach(function(value, index, array1){
+              let length = arr.length;
+              if(value.Number !== value.UsedNumber) { // 余0不显示
+                if(length != 0 && value.PPNDate == arr[length-1].parent){
+                  arr.push({
+                    name : ["全天","上午","下午"][value.PPNType]+"(余"+(value.Number-value.UsedNumber)+"/总"+value.Number+")",
+                    value : value.PPNID+','+["全天","上午","下午"][value.PPNType]+','+(value.Number-value.UsedNumber),
+                    parent : value.PPNDate
+                  });
+                }else{
+                  arr.push({
+                    name : value.PPNDate,
+                    value : value.PPNDate,
+                    parent : 0
+                  });
+                  arr.push({
+                    name : ["全天","上午","下午"][value.PPNType]+"(余"+(value.Number-value.UsedNumber)+"/总"+value.Number+")",
+                    value :  value.PPNID+","+["全天","上午","下午"][value.PPNType]+','+(value.Number-value.UsedNumber),
+                    parent : value.PPNDate
+                  })
+                }
+              };
+            });
+            that.timedatas = arr;
+          }
+        })
+        .catch((err) => { console.log(err) })
+      }
+
+    },
+    fetchData(){
+      this.gettbsysorganize();
+      this.item.phid = this.$route.params.phid;
+      this.pnumber = this.item.phid.length == 0?0:this.item.phid.split(',').length-1;
+    }
+  },
+  watch:{
+    '$route'(to, from) {
+      this.fetchData()
     }
   }
 };
 </script>
 
 <style lang="less">
+body[data-path=appointment-add]{
   .weui-cell__ft.vux-cell-align-left{
     padding-left: 1em;
   }
@@ -114,4 +220,6 @@ export default {
       background: #ebc650;
     }
   }
+}
+
 </style>

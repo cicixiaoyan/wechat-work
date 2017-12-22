@@ -1,267 +1,362 @@
 <template>
   <div class="myapp">
-    <x-header>编辑机构信息</x-header>
+    <x-header :left-options="{showBack: false}">提交机构信息</x-header>
+    <scroll class="scroll-normal" :on-refresh="onRefresh" refreshLayerColor='#fff' loadingLayerColor='#fff'>
     <div class="add-form">
       <group>
-        <div class="mid-title">必填项</div>
-        <x-input title="机构名称" v-model="uoname"></x-input>
-        <selector title="机构类型" v-model="ubusinesstype"  :options="gettbsysbasicdatabycode" placeholder="请选择"></selector>
-        <x-input title="执照代码" v-model="businessnumber"></x-input>
-
-        <!-- <x-input title="所属区域" v-model="areid"></x-input> -->
-        <!-- <picker :data='areidList'  :columns="3" v-model='areid' @on-change='changeAreid'></picker> -->
-        <!-- <popup-picker title="所属区域" :columns="2"  :data="areidList" v-model="areid"  placeholder="请选择"></popup-picker> -->
-        <x-input title="经营地址" v-model="ubusinessaddress"></x-input>
-        <!-- 文档：https://github.com/waynecz/vue-img-inputer -->
+        <div class="mid-title"><span>必填项</span></div>
+        <x-input title="机构名称" required :min="2"  :max="50" placeholder="机构名称" v-model="item.uoname"></x-input>
+        <selector title="机构类型" required  v-model="item.ubusinesstype"  :options="tbsysbasicdatabycode" placeholder="请选择"></selector>
+        <x-input title="执照代码" required :max="30" placeholder="营业执照统一社会信用代码" v-model="item.businessnumber"></x-input>
+        <!-- <x-input title="所属区域"  required placeholder="所属区域"  @click.native="showArea=true"  v-model="item.arename"></x-input> -->
+        <cell title="所属区域" is-link value-align='left' placeholder="所属区域" :value="item.arename||'请选择'" @click.native="showArea=true"></cell>
+        <x-input title="经营地址" required :max="200" placeholder="经营地址" v-model="item.ubusinessaddress"></x-input>
         <div class="photo-item" style="text-align:right;">
-          <span>身份证照</span>
-          <uploadImg :inputId='cardidimg' name="cardidimg" v-model="cardidimg" theme="light"></uploadImg>
+          <span>身份证正面照<br><span style="font-size:small;color:red;">(必须原件)</span></span>
+          <uploadImg id='cardidimg' name="cardidimg" @onChange="cardidimgChange" v-model="cardidimg" theme="light"></uploadImg>
         </div>
         <div class="photo-item" style="text-align:right;">
-          <span>营业执照</span>
-          <uploadImg :inputId='licenceimg' name="licenceimg" v-model="licenceimg" theme="light"></uploadImg>
+          <span>营业执照<br><span style="font-size:small;color:red;">(必须原件)</span></span>
+          <uploadImg  @onChange='licenceimgChange' id='licenceimg' name="licenceimg" v-model="licenceimg" theme="light"></uploadImg><br/>
+          <uploadImg @onChange='licenceimgChange1' v-if='licenceimg.length!==0' id='licenceimg1' name="licenceimg1" v-model="licenceimg1" theme="light"></uploadImg>
         </div>
-
       </group>
 
       <group>
         <div class="mid-title" @click='Optionalshow'>
-          选填项
-          <span class="iconfont icon-add" v-if="!showOptional"></span>
-          <span class="iconfont icon-tailor" v-if="showOptional"></span>
+          <span>选填项
+          <span class="iconfont icon-iconfontplatformentrance" v-if="!showOptional"></span>
+          <span class="iconfont icon-down1" v-if="showOptional"></span>
+          </span>
         </div>
         <div v-show="showOptional">
-          <x-input title="法人" v-model="ulowman"></x-input>
-          <x-input title="身份证号" v-model="ucardid"></x-input>
-
-          <x-input title="联系电话" v-model="utel"></x-input>
-          <x-input title="附加说明" v-model="uremark"></x-input>
+          <x-input title="法人&emsp;&emsp;" :max="10" placeholder="法人" v-model="item.ulowman"></x-input>
+          <div v-if="item.ulowman>10" class="valid-err">最多输入10位</div>
+          <x-input title="身份证号" @on-change="getIdcValid" :max="18" :min="15" placeholder="身份证号" v-model="item.ucardid"></x-input>
+          <div v-if="!idcValid" class="valid-err">请输入合法的身份证号码</div>
+          <x-input title="联系电话" @on-change="getTelValid" is-type="china-mobile" :max="11" :min="11" placeholder="电话" v-model="item.utel"></x-input>
+          <div v-if="!telValid" class="valid-err">请输入合法的电话号码</div>
+          <x-input title="附加说明" :max="200" placeholder="说明" v-model="item.uremark"></x-input>
           <div class="photo-item" style="text-align:right;">
-            <span>营业执照</span>
-            <uploadImg :inputId='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg>
+            <span>卫生许可<br><span style="font-size:small;;color:red;">(必须原件)</span></span>
+            <uploadImg  @onChange='permitimgChange' id='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg><br>
+            <uploadImg @onChange='permitimgChange1' v-if='permitimg.length != 0' id='permitimg1' name="permitimg1" v-model="permitimg1" theme="light"></uploadImg>
           </div>
         </div>
       </group>
 
 
-      <button @click='submit' class="round-big-btn"  >提交审核</button>
+      <button @click='submit' :disabled="item.uoname == '' || item.ubusinesstype == '' || item.businessnumber == '' ||
+            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0 || !idcValid || !telValid || item.ubusinessaddress==''"
+      class="round-big-btn">提交审核</button>
 
+      <div v-transfer-dom>
+        <popup v-model="showArea">
+          <popup-header @on-click-left='showArea=false' left-text="取消" right-text="" title="区域选择"></popup-header>
+          <div class="pop-content">
+            <checklist  :options="objectList" :max="1" :value="objectListValue" @on-change="changeArea"></checklist>
+          </div>
+        </popup>
+      </div>
+
+      <div v-transfer-dom>
+        <loading :show="showload" text="提交资料中"></loading>
+      </div>
     </div>
+    </scroll>
   </div>
 </template>
 
 <script>
-import { XHeader, Group, XInput, Selector, Picker, PopupPicker } from 'vux';
-import uploadImg from '../../components/uploadImg'
-
+import { XHeader, Group, Cell, XInput, Selector, Picker,Flexbox, Checklist,Loading,
+ FlexboxItem,  PopupHeader, Popup, TransferDom } from 'vux';
+import scroll from "../../components/scroll";
+import { baseurl } from '../../config/axois';
+import uploadImg from '../../components/uploadImg';
+// import {_getlistbyparentid, _gettbsysbasicdatabycode} from '../../service/getdata';
+import {employmentServices} from '../../service/EmploymentRegister';
+import {IdentityCodeValid} from '../../utils/idc-valid';
+import {_userServices} from '../../service/userServices';
 export default {
-  name: 'submit-information-add',
+  name: "submit-information-add",
+  directives: {
+    TransferDom
+  },
   components: {
     XHeader,
     uploadImg,
-    XInput ,
+    XInput,
+    Cell,
     Group,
     Selector,
     Picker,
-    PopupPicker
+    PopupHeader,
+    Popup,
+    Flexbox,
+    FlexboxItem,
+    Checklist,
+    Loading,
+    scroll
   },
-  data () {
+  data() {
     return {
-      uoname: '13155555555',
-      businessnumber: '123456',
-      ubusinesstype: '',
-      ubusinessaddress: '',
-      areid: '',
-      ulowman:'',
-      cardidimg: '',
-      licenceimg: '',
-      permitimg:'',
-      ucardid: '',
-      utel: '',
-      uremark: '',
+      item: {
+        uname:"",
+        usex:'',
+        utel:'',
+        ucardid: '',
+        uoname:'',
+        areid:'',
+        arename:'',
+        ubusinessaddress:'',
+        ubusinesstype:'',
+        ubusinesstypename:'',
+        ulowman:'',
+        businessnumber:'',
+        uremark:'',
+        upicurl:'',
+        cardidimg: '',
+        licenceimg: '',
+        permitimg: '',
+        ulaudtistatus:'',
+        ulstatus:'',
+        description:'',
+        showload: false
+      },
+      cardidimg:[],
+      licenceimg:[],
+      licenceimg1:[],
+      permitimg:[],
+      permitimg1:[],
       showOptional: false,
-      areidList: [
-        {
-          name: '2017-7-7',
-          value: '2017-7-7',
-          parent: 0
-        },
-        {
-          name: '上午',
-          value: '上午',
-          parent: "2017-7-7"
-        },
-        {
-          name: '下午',
-          value: '下午',
-          parent: "2017-7-7"
-        },
-        {
-          name: '2017-7-8',
-          value: '2017-7-8',
-          parent: 0
-        },
-        {
-          name: '上午',
-          value: '上午',
-          parent: "2017-7-8"
-        }
-      ]
+      showArea: false,
+      tbsysbasicdatabycode: [],
+      objectListValue: [],
+      objectList: [],
+      idcValid: true,
+      telValid: true
       // gettbsysbasicdatabycode: []
     };
   },
   computed: {
-    gettbsysbasicdatabycode(){
-      let list = [
-        {
-          "BDID": 2,
-          "ParentID": 1,
-          "Name": "食品生产经营",
-          "Value": "食品生产经营",
-          "Code": "101001"
-        },
-        {
-          "BDID": 3,
-          "ParentID": 1,
-          "Name": "乳制品生产",
-          "Value": "乳制品生产",
-          "Code": "101002"
-        }
-      ]
-
-      list.forEach(function(value, index, array1){
-        list[index].key = value.Name;
-        list[index].value = value.Value;
-      });
-      return  list;
-    },
-    // areidList(){
-    //   let list = [
-    //     {
-    //       "AreID": 26,
-    //       "ParentId": 7,
-    //       "AreName": "红牌楼街道",
-    //       "AreCode": 5501
-    //     },
-    //     {
-    //       "AreID": 27,
-    //       "ParentId": 7,
-    //       "AreName": "双楠街道",
-    //       "AreCode": 5502
-    //     }
-    //   ];
-    //   list.forEach(function(value, index, array1){
-    //     list[index].name = value.AreName;
-    //     list[index].parent = 0;
-    //     list[index].value = value.AreID;
-    //     list.push({
-    //       "AreID": 26,
-    //       "ParentId": 7,
-    //       "AreName": "红牌楼街道",
-    //       "AreCode": 5501,
-    //       "name": '1',
-    //       "value": '1',
-    //       "parent": value.AreID
-    //     })
-    //   });
-    //   console.log(list);
-    //   return list;
-    // }
   },
-
+  created(){
+    this.start();
+  },
   methods: {
-    submit () {
-      this.$router.push({path: '/app/appointment/list'});
+    submit() {
+      this.showload = true;
+      let that = this;
+      employmentServices
+        ._editorganizeinfo(this.item)
+        .then(function(data) {
+          that.showload = false;
+          if (data.ResultType == 0) {
+            that.$vux.toast.show({
+              text: "提交信息成功",
+              type: 'success',
+              position: 'middle'
+            });
+            that.$router.push({ name: "submit-information-view", params: {read: 'true'}});
+          }
+        })
+        .catch(function(err) {
+          that.showload = false;
+          console.log(err, "err");
+        });
+    },
+    onRefresh(done){
+      this.start();
+      setTimeout(() => {
+        done(); //必须有
+      }, 1500);
+    },
+    cardidimgChange(file, name){
+      this.cardidimg = file;
+      this.item.cardidimg =  encodeURIComponent(file);
+    },
+    licenceimgChange(file, name){
+      this.licenceimg = file;
+      if(this.licenceimg1.length > 10) this.item.licenceimg = encodeURIComponent(file+"|"+this.licenceimg1);
+      else this.item.licenceimg = encodeURIComponent(file)
+    },
+    licenceimgChange1(file, name){
+      this.licenceimg1 = file;
+      this.item.licenceimg = encodeURIComponent(this.licenceimg+"|"+file);
+    },
+    permitimgChange(file, name){
+      this.permitimg = file;
+      if(this.permitimg1.length > 10) this.item.permitimg = encodeURIComponent(file+"|"+this.permitimg1);
+      else this.item.permitimg = encodeURIComponent(file)
+    },
+    permitimgChange1(file, name){
+      this.permitimg1 = file;
+      this.item.permitimg = encodeURIComponent(this.permitimg+"|"+file);
     },
     Optionalshow() {
-      console.log(this.showOptional);
       this.showOptional = !this.showOptional;
     },
-    changeAreid(){
-
+    changeArea(value, label){
+      if(value.length != 0){
+        this.item.areid = value[0];
+        this.item.arename = label[0];
+        this.showArea = false;
+      }
     },
-    onShowAre(){},
-    onHideAre(){}
+    
+    gettbsysbasicdatabycode() {
+      var that = this;
+      return employmentServices._gettbsysbasicdatabycode().then(function(data){
+        let list = data.AppendData;
+        list.forEach(function(value, index, array1){
+          list[index].key = value.BDID;
+          list[index].value = value.Value;
+        });
+        that.tbsysbasicdatabycode = list;
+      }).catch(err => console.log(err))
+    },
+    getareas(){
+      var that = this;
+      let params = {"areid": window.localStorage.getItem('areId')};
+      return employmentServices._getlistbyareidone(params).then(function(data){
+        let list = data.AppendData;
+        list.forEach(function(value, index, array1){
+          list[index].key = value.AreCode;
+          list[index].value = value.AreName;
+        });
+        that.objectList = list;
+  
+      }).catch(err => console.log(err))
+    },
+    getIdcValid(value){
+      // var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/
+      if((this.item.ucardid.length == 15 || this.item.ucardid.length==18) && IdentityCodeValid(this.item.ucardid)){
+        this.idcValid = true;
+      }else{
+        if(this.item.ucardid.length !== 0) this.idcValid = false;
+      }
+    },
+    getTelValid(value){
+      var reg = /^((13[0-9])|(14[5|7])|(15([0-9]))|(17[0-9])|(18[0-9]))\d{8}$/;
+      if((this.item.utel.length==11) && reg.test(this.item.utel)){
+        this.telValid = true;
+      }else{
+        if(this.item.utel.length !== 0) this.telValid = false;
+      }
+    },
+    start(){
+      this.showload = false;
+      let that = this;
+      _userServices._getUserMsg().then(function(data1){
+        if(data1.ULAudtiStatus == 1){
+          if(that.read) that.$router.push({name: 'submit-information-view', params: { 'read': false }});
+        }else if(data1.ULAudtiStatus == 2){
+          if(!that.read)  that.$router.push({name: 'submit-information-view', params: { 'read': true }});
+        }else if(data1.ULAudtiStatus == 3){
+          that.$router.push({name: 'staff-information-list'});
+        }
+      }).catch(function(err){
+        console.log(err)
+      });
+
+      this.getareas();
+      this.gettbsysbasicdatabycode();
+
+    }
   }
 };
 </script>
 
 
 <style lang="less">
-  body{
-    background: #3c9;
+body[data-path=submit-information-add]{
+  background: #3c9;
+  /* cell样式更改 */ 
+  .vux-label{
+    color: #878f98;
+    width: 5em;
+  }
+  .weui-cell__ft{
+    color: #333;
   }
 
-  .myapp{
-    .add-form{
+  .myapp {
+    .valid-err{
+      text-align: center;
+      font-size: small;
+      color: red;
+    }
+    .add-form {
       margin: 28/72*1rem;
-      > div{
+      > div {
         background: #fff;
-        border-radius: .2rem;
-        .weui-cells{
-          border-radius: .2rem;
+        border-radius: 0.2rem;
+        .weui-cells {
+          border-radius: 0.2rem;
         }
       }
-      .round-big-btn{
+      .round-big-btn {
         background: #fff;
         color: #3c9;
-        margin-top: .5rem;
+        margin-top: 0.5rem;
+        &[disabled]{
+          background: #ccc;
+          color: cornsilk;
+        }
       }
 
-
-      .weui-cells__title{
+      .weui-cells__title {
         padding-top: 0.333rem;
         padding-bottom: 0.333rem;
       }
 
-      .mid-title{
-        padding: 0.29rem .2rem;
+      .mid-title {
+        padding: 0.29rem 0.2rem;
         background: #f5f2f2;
-        color: #4CAF50;
+        color: #4caf50;
         position: relative;
-        .iconfont{
+        >span{
+          border-left: .2em solid #3c9;
+          padding-left: .3em;
+        }
+        .iconfont {
           position: absolute;
-          right: .1rem;
+          right: 0.1rem;
         }
       }
-
     }
-    .weui-label{
+    .weui-label {
       color: #878f98;
     }
 
-    .photo-item{
+    .photo-item {
       position: relative;
       padding: 1em 1em 1em 0.138rem;
-      > span{
+      > span {
         color: #999;
         position: absolute;
         left: 0.417rem;
         top: 50%;
         transform: translateY(-50%);
+        text-align: left;
       }
 
-      &::before{
+      &::before {
         content: " ";
         position: absolute;
         left: 0;
         top: 0;
         right: 0;
         height: 1px;
-        border-top: 1px solid #E5E5E5;
-        color: #E5E5E5;
+        border-top: 1px solid #e5e5e5;
+        color: #e5e5e5;
         -webkit-transform-origin: 0 0;
         transform-origin: 0 0;
         -webkit-transform: scaleY(0.5);
         transform: scaleY(0.5);
         left: 15px;
-
       }
     }
-
   }
-
-
-
-
+}
 </style>

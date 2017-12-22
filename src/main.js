@@ -7,7 +7,8 @@ import App from './App';
 // import Home from './components/HelloFromVux'
 import store from './store';
 import routers from './router/routers';
-import { ToastPlugin, ConfirmPlugin, AjaxPlugin } from 'vux';
+import { ToastPlugin, ConfirmPlugin, AjaxPlugin, ConfigPlugin } from 'vux';
+// import {baseIp} from './config/axois';
 
 Vue.use(VueRouter);
 Vue.use(ToastPlugin);
@@ -21,8 +22,13 @@ Vue.prototype.$http.defaults.baseURL = 'http://192.168.0.42:10062';
 // }]
 
 const router = new VueRouter({
+  // mode: "history",
   routes: routers
 });
+
+Vue.use(ConfigPlugin, {
+  $layout: 'VIEW_BOX' // global config for VUX
+})
 
 // simple history management
 const history = window.sessionStorage
@@ -44,8 +50,24 @@ methods.forEach(key => {
 })
 
 router.beforeEach(function (to, from, next) {
-  store.commit('updateLoadingStatus', {isLoading: true})
+  var ua = window.navigator.userAgent.toLowerCase(); 
+  
+  if (ua.match(/MicroMessenger/i) == 'micromessenger') { 
+    // 在微信中
+  } else {     
+    // 不在微信中
+    if(to.name != 'redirect')  next({path: '/app/redirect'});
+    else next();
+  }
 
+  if(from.name == 'login' && !!window.localStorage.getItem('areId') && !!window.location.search){
+    window.location.href =  "/#" + to.fullPath;
+  }
+  
+  store.commit('updateLoadingStatus', {isLoading: true})
+  // console.log(to, from)
+  var body=document.getElementsByTagName("body")[0];
+  body.setAttribute("data-path", to.name);
   const toIndex = history.getItem(to.path)
   const fromIndex = history.getItem(from.path)
 
@@ -79,8 +101,8 @@ router.afterEach(function (to) {
   isPush = false
   store.commit('updateLoadingStatus', {isLoading: false})
   if (process.env.NODE_ENV === 'production') {
-    ga && ga('set', 'page', to.fullPath)
-    ga && ga('send', 'pageview')
+    // ga && ga('set', 'page', to.fullPath)
+    // ga && ga('send', 'pageview')
   }
 })
 
@@ -89,7 +111,7 @@ FastClick.attach(document.body);
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
-new Vue({
+export default new Vue({
   router,
   store,
   render: h => h(App)

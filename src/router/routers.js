@@ -7,13 +7,13 @@ export default [
     path: '/',
     // name: 'app',
     component: App,
-    redirect: '/app/submit-information/add',
+    redirect: '/app/redirect',
     children: [
       {
-        path: '/app/tab',
-        name: 'tab',
+        path: '/app/redirect',
+        name: 'redirect',
         component: function (resolve) {
-          require(['../components/tab'], resolve);
+          require(['../page/account-management/redirect'], resolve);
         }
       },
       {
@@ -52,7 +52,7 @@ export default [
         }
       },
       {
-        path: '/app/appointment/add',
+        path: '/app/appointment/add/:phid',
         name: 'appointment-add',
         component: function (resolve) {
           require(['../page/appointment/add'], resolve);
@@ -73,10 +73,10 @@ export default [
         }
       },
       {
-        path: '/app/staff-information/add',
-        name: 'staff-information-add',
+        path: '/app/staff-information/view-list/:phaid',
+        name: 'staff-information-view-list',
         component: function (resolve) {
-          require(['../page/staff-information/add'], resolve);
+          require(['../page/staff-information/view-list'], resolve);
         }
       },
       {
@@ -94,17 +94,24 @@ export default [
         }
       },
       {
+        path: '/app/staff-information/check/:phids',
+        name: 'staff-information-check',
+        component: function (resolve) {
+          require(['../page/staff-information/check'], resolve);
+        }
+      },
+      {
+        path: '/app/submit-information/view/:read',
+        name: 'submit-information-view',
+        component: function (resolve) {
+          require(['../page/submit-information/view'], resolve);
+        }
+      },
+      {
         path: '/app/submit-information/add',
         name: 'submit-information-add',
         component: function (resolve) {
           require(['../page/submit-information/add'], resolve);
-        }
-      },
-      {
-        path: '/app/submit-information/view',
-        name: 'submit-information-view',
-        component: function (resolve) {
-          require(['../page/submit-information/view'], resolve);
         }
       },
       {

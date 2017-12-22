@@ -3,15 +3,15 @@
     <router-view :class="{'has-bottom-tabbar':!showTabbar}" class="router-view"></router-view>
     <tabbar  v-show="showTabbar"  slot="bottom" style="position:fixed;">
       <tabbar-item  :link="{name: 'staff-information-list' }">
-        <span slot="icon" class="iconfont icon-task_fill"></span>
+        <span slot="icon" class="iconfont icon-tijianyuyue1"></span>
         <span slot="label">体检预约</span>
       </tabbar-item>
-      <tabbar-item show-dot :link="{name: 'appointment-list' }">
-        <span slot="icon" class="iconfont icon-task_fill"></span>
+      <tabbar-item :link="{name: 'appointment-list' }">
+        <span slot="icon" class="iconfont icon-shenhejilu"></span>
         <span slot="label" link="../page/appointment/add">审核记录</span>
       </tabbar-item>
       <tabbar-item :link="{name: 'personal-center' }">
-        <span slot="icon" class="iconfont icon-task_fill"></span>
+        <span slot="icon" class="iconfont icon-gerenxinxi"></span>
         <span slot="label" >个人中心</span>
       </tabbar-item>
     </tabbar>
@@ -57,12 +57,12 @@ export default {
   }
 };
 </script>
-
+<style src="./assets/iconfont/iconfont.css"></style>
 
 <style lang="less">
 @import '/style/common.less';
 @import '~vux/src/styles/reset.less';
-@import '//at.alicdn.com/t/font_502622_e609vzsilv0r7ldi.css';
+// @import '//at.alicdn.com/t/font_507624_dj5d8uffyfuvj9k9.css';
 
 html{
   font-size: 20px;
@@ -86,7 +86,7 @@ body {
   }
 
   &[disabled]{
-    background: #ccc;
+    background: #ccc!important;
   }
 }
 
@@ -108,12 +108,31 @@ body {
 }
 
 .app{
+  ._v-container.scroll-normal > {
+    .px2rem(top, 100);
+    .px2rem(bottom, 0);
+    position: fixed;
+    height: auto!important;
+  }
+  
   > .router-view{
-    .px2rem(margin-top, 80);
+    .px2rem(margin-top, 100);
 
     &.has-bottom-tabbar{
       .px2rem(margin-bottom, 100);
     }
+  }
+
+  .weui-tabbar__item{
+    .px2rem(height, 100);
+  }
+
+  .weui-tabbar__icon .iconfont{
+    .px2px(font-size, 40);
+  }
+
+  .weui-tabbar__label > span{
+    .px2px(font-size, 24);
   }
 
 
@@ -127,6 +146,7 @@ body {
     left: 0px;
     top: 0px;
     z-index: 100;
+    .px2rem(height, 100);
   }
   .list{
     position: relative;

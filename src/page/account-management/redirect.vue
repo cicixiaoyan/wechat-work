@@ -1,87 +1,91 @@
 <template>
     <div class="firstContainer">
-      <img class="success_pic" src="../../images/img_qred@3x.png">
-      <article >请确认您有微粒贷额度，<br/>并已使用且正常还款至少一期哦！
-      </article>
-      <footer class="footer">
-      <button class="checkNoBtn" @click="toLogin">我没有</button>
-      <button class="checkYesBtn" @click="Yes">我有且已使用</button>
-      </footer>
-      <p class="tips">温馨提示：如您没有微粒贷额度，我们将为您推荐其他产品。</p>
+      <div v-show='showtip' class="uatip">
+        您当前使用非微信浏览器访问!
+        <br/>
+        <br/>
+        请切换到微信中访问。。。
+        <br>
+        <br>
+        <span>如已切换，<a href='javascript:void(0)' @click='reload'>点击刷新...</a></span>
+      </div>
+
     </div>
 </template>
 
 <script>
-  import { getQuery,customToast } from '../../config/mUtils';
-  import { getOpenId ,searchLimit,getToken} from '../../service/getData';
+  import { mapGetters } from 'vuex'
+  import {_userServices} from '../../service/userServices';
 
   export default {
+    name: 'redirect',
     data(){
       return{
-
+        showtip: false
       }
     },
     created(){
+      // 验证是否在微信环境中   main.js第54行解除注释
+      var ua = window.navigator.userAgent.toLowerCase(); 
+      if (ua.match(/MicroMessenger/i) == 'micromessenger') { 
+          this.redirect();
+      } else { 
+        this.showtip = true;
+      }
 
       // this.redirect();
+      
     },
 
     components:{
+      
+    },
+    computed: {
 
     },
     methods:{
-      toLogin() {
-        this.$router.push('/login')
-      },
-      Yes(){
 
-        const openId = getQuery('open_id');
-        window.localStorage.setItem('openId',openId);
-        //判断是否需要登录
-        getToken({
-           thirdAccount:openId,
-           thirdType:'weixin'
-        }).then((data)=>{
-          if(data.error){
-            customToast(data);
-            return ;
-          }
-          //查询是否有额度，如果有，则跳转borrowMoney页，否则跳转填写额度页
-          searchLimit({
-            openId:openId
-          }).then((data)=>{
-            if(data.error){
-              customToast(data);
-              return ;
+      redirect(){
+        var that = this;
+        if(this.$store.getters['getLoginState']){
+            _userServices._getUserMsg().then(function(data1){
+             //已审核通过 转到 人员信息页面
+            if(data1.ULAudtiStatus == 3){
+              that.$router.push({name: 'staff-information-list'});
             }
-            if(data.data && data.data.wldMoney){
-              
-              this.$router.push('/borrowMoney')
+            if(data1.ULAudtiStatus == 1 || data1.ULAudtiStatus == 2){
+              that.$router.push({name: 'submit-information-view'});
             }
             else{
-              this.$router.push('/fillLimit')
+              that.$router.push({name: 'submit-information-add'});
             }
-          })
-        })
-        
+          }).catch(function(err){console.log(err)})
+        }else{
+          this.$router.push({name: 'login'});
+        }
       },
-      redirect(){
-        const code = getQuery('code');
-        getOpenId({
-          appid:'wxca056aeb5eea7277',
-          secret:'ca02f835e372398ffecaf424b8e42105',
-          code:code,
-          grant_type:'authorization_code'
-        }).then(data =>{
-          console.log(data)
-        })
+      reload(){
+        window.location.reload();
       }
 
     },
   }
 </script>
 <style lang="less">
-
+body{
+  .uatip{
+    text-align: center;
+    font-size: large;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    color: #3c9;
+    span{
+      font-size: small;
+    }
+  }
+}
 </style>
 
 
