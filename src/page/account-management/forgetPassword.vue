@@ -366,7 +366,7 @@ body[data-path=forgetPassword] {
         .px2rem(padding-left, 20);
         .px2rem(padding-right, 20);
         .px2rem(border-radius, 40);
-        .px2rem(bottom, 5);
+        .px2rem(bottom, 10);
         background: #fff;
         border: 1px solid #3c9;
         display: inline-block;
