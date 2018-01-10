@@ -73,7 +73,7 @@ export default [
         }
       },
       {
-        path: '/app/staff-information/view-list/:phaid',
+        path: '/app/staff-information/view-list/:phaid/:showcancel',
         name: 'staff-information-view-list',
         component: function (resolve) {
           require(['../page/staff-information/view-list'], resolve);

@@ -2,9 +2,9 @@ import Vue from 'vue';
 import { AjaxPlugin, ToastPlugin } from 'vux';
 import main from '../main';
 
-var baseIp = process.env.NODE_ENV === 'development' ? 'http://192.168.0.73:10062' : 'http://www.cdstjyypt.com:83';
+var baseIp = process.env.NODE_ENV === 'development' ? 'http://192.168.0.73:10062' : 'http://192.168.0.73:10062';
 var  baseurl = baseIp + '/apiv1';
-var imgIp = process.env.NODE_ENV === 'development' ? 'http://192.168.0.73:10061' : 'http://www.cdstjyypt.com:81';
+var imgIp = process.env.NODE_ENV === 'development' ? 'http://192.168.0.73:10061' : 'http://192.168.0.73:10061';
 
 function json2url (json) { //, isQueryToken
   var arr = [];

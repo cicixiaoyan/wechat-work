@@ -16,14 +16,14 @@
 
         <!-- :is-loading="!item.Description" -->
         <cell :title="stateTitle" readonly  :value="item.PhABackOption" placeholder="无"></cell>
-        <div  class="result-tip " :class='{"success":(item.PhAStatus != 1),"danger":(item.PhAStatus == 1) }'>
+        <div v-if='item.PhAStatus != 2'  class="result-tip " :class='{"success":(item.PhAStatus != 1),"danger":(item.PhAStatus == 1) }'>
           <span class="iconfont icon-fail"></span>
           <div v-if="item.PhAStatus == 3">预约成功，请通知相关人员凭身份证按时到【{{item.PhaOrName}}】进行体检</div>
           <div v-if="item.PhAStatus == 1">预约失败了，可以删除这条申请，重新提交申请</div>
-          <div v-if='item.PhAStatus != 1'>
+          <!-- <div v-if='item.PhAStatus != 1'>
             --体检机构电话：<a :href="'tel:' + phinfo.OrTel ">{{phinfo.OrTel}}</a><br>
             --体检机构地址：{{phinfo.OrAddress}}
-          </div>
+          </div> -->
         </div>
           
       </group>
@@ -56,10 +56,10 @@ export default {
         let time = new Date(that.item.PhADate.replace(/-/g, '/'));
         let timeArr = time.getFullYear()+'-'+(time.getMonth()+1)+'-'+time.getDate();
         that.item.Time = timeArr+' '+["全天", "上午", "下午"][that.item.PPNType];
-        // 获取体检机构信息
-        _appointmentServce.getorganizebycode(this.item.PhAAreaID).then(data => {
-          that.phinfo = data.AppendData;
-        }).catch(err => console.log(err));
+        // // 获取体检机构信息
+        // _appointmentServce.getorganizebycode(this.item.PhAAreaID).then(data => {
+        //   that.phinfo = data.AppendData;
+        // }).catch(err => console.log(err));
       } else {
         alert('获取失败');
       }
@@ -68,7 +68,7 @@ export default {
   methods: {
     viewStaffList(){
       if(this.item.PhCount != 0)
-       this.$router.push({name: "staff-information-view-list", params: {phaid: this.item.PhAID }});
+       this.$router.push({name: "staff-information-view-list", params: {phaid: this.item.PhAID, "showcancel": "0" }});
     }
   },
   beforeRouteUpdate (to, from, next) {

@@ -32,6 +32,12 @@ export var _appointmentServce = {
         return getInfo(baseurl + '/employment/deletetbphysicalappointment', {"phaids": phids}, 'post', true);
     },
 
+    // 取消预约
+    cacelAppointment: (parma) => {
+        // {"phaid": phaid,// "phadid": phadid}
+        return getInfo(baseurl + '/employment/caceltbphysicalappointment', parma, 'post', true);
+    },
+
     // 获取体检预约机构
     gettbsysorganize: () => {
         return getInfo(baseurl + '/employment/gettbsysorganize', {}, 'get', true);
