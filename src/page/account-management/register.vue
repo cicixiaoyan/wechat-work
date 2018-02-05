@@ -5,7 +5,12 @@
       <img src="../../assets/logo.png" class="logo" title="logo"/>
       <div class="title">从业人员健康体检信息大数据平台</div>
     </div>
+
     <div class="login-form">
+      <button-tab v-model="registerType">
+          <button-tab-item @on-item-click="consoleIndex()">个人用户</button-tab-item>
+          <button-tab-item @on-item-click="consoleIndex()">企业用户</button-tab-item>
+      </button-tab>
       <div class="user">
         <span class="iconfont icon-yonghuming"></span>
         <input type="number"  @input="judgePhone" @blur="judgePhone" @focus='dirtyPhone=true' placeholder="请输入手机号" maxlength="11" v-model="username">
@@ -37,15 +42,18 @@
 </template>
 
 <script>
-import { XHeader } from 'vux';
+import { XHeader, ButtonTab, ButtonTabItem } from 'vux';
 import {_userServices} from '../../service/userServices';
 export default {
   name: 'register',
   components: {
-    XHeader
+    XHeader,
+    ButtonTab,
+    ButtonTabItem
   },
   data () {
     return {
+      registerType: 1, // 默认企业， 个人0
       username: '',
       pwd: '',
       pwdRep: '',
@@ -79,6 +87,9 @@ export default {
 
   },
   methods: {
+    consoleIndex () {
+      console.log('click demo01', this.demo01)
+    },
     judgePhone(){
       if(/^((13[0-9])|(14[5|7])|(15([0-9]))|(17([0-9]))|(18[0-9]))\d{8}$/.test(this.username)){
         // 后台验证是否为已注册
@@ -181,12 +192,18 @@ export default {
     .title{
       .px2px(font-size, 32);
       color: #3c9;
-      .px2rem(margin-bottom, 90);
+      .px2rem(margin-bottom,50);
     }
     .login-form{
       .px2px(margin-left, 70);
       .px2px(margin-right, 70);
       // margin: 0 3.5rem;
+
+      .vux-button-group{
+        .px2rem(margin-bottom, 30);
+        .px2rem(padding-left, 40);
+        .px2rem(padding-right, 40);
+      }
 
       .user{
         &.has-btn{

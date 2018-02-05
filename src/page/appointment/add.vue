@@ -93,9 +93,9 @@ export default {
   },
   methods: {
     getPhid(val, length){
-      // console.log(val,this.item.phid);
+      console.log(val,this.item.phid);
       this.item.phid = val;
-      this.pnumber = length
+      this.pnumber = length;
       this.showPeople = false;
     },
     submit(){
@@ -158,9 +158,10 @@ export default {
       let that = this;
       that.timedatas = [];
       let val = this.PhAOrCode;
+      console.log(val);
       that.showOr = false;
 
-      if(val.length !== 0){
+      if(val[0] != ""){
         that.PhaOrName = val[1]
         that.item.PhAOrCode = val[0];
         that.showOr = false;

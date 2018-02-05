@@ -51,18 +51,39 @@ export default [
           require(['../page/account-management/register'], resolve);
         }
       },
-      {
+      { // 提交机构信息
         path: '/app/appointment/add/:phid',
         name: 'appointment-add',
         component: function (resolve) {
           require(['../page/appointment/add'], resolve);
         }
       },
-      {
+      // { // 提交个人资料
+      //   path: '/app/submit-information/add-person/:phid',
+      //   name: 'submit-informationt-add-person',
+      //   component: function (resolve) {
+      //     require(['../page/submit-information/add-person'], resolve);
+      //   }
+      // },
+      { // 预约列表
         path: '/tabbar/appointment/list',
         name: 'appointment-list',
         component: function (resolve) {
           require(['../page/appointment/list'], resolve);
+        }
+      },
+      { // 个人预约提示关联列表
+        path: '/tabbar/appointment/list-person',
+        name: 'appointment-list-person',
+        component: function (resolve) {
+          require(['../page/appointment/list-person'], resolve);
+        }
+      },
+      { // 健康证关联列表
+        path: '/tabbar/health-card/list',
+        name: 'health-list',
+        component: function (resolve) {
+          require(['../page/health-card/list'], resolve);
         }
       },
       {
