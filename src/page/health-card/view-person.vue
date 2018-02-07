@@ -74,7 +74,7 @@ export default {
   },
   filters: {
     formatdate(time){
-      let date = new Date(time);
+      let date = new Date(time.replace(/-/g, '/'));
       return formatDate(date, "yyyy年MM月dd日")
     }
   },
@@ -114,7 +114,7 @@ body[data-path=health-view-person] {
   padding: 5px;
   .box{
     display: flex;
-    align-content: center;
+    align-items: center;
     justify-content: center;
     height: 90vh;
     .card {

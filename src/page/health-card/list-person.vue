@@ -47,7 +47,7 @@ export default {
   },
   filters: {
     formatdate(time){
-      let date = new Date(time);
+      let date = new Date(time.replace(/-/g, '/'));
       return formatDate(date, "yyyy-MM-dd")
     }
   },
@@ -87,7 +87,7 @@ export default {
           if(data.AppendData.length !== 0){
             that.list = data.AppendData;
             this.list.forEach((item, index, arr) => {
-              let number = new Date(item.PCDateEnd).getTime() - new Date();
+              let number = new Date(item.PCDateEnd.replace(/-/g, '/')).getTime() - new Date();
               if (number < 0) this.list[index].color = "gray";
               else this.list[index].color = "#3c9";
 
