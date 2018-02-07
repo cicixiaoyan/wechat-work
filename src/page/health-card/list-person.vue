@@ -1,31 +1,22 @@
 <template >
   <div class="myapp">
-    <x-header :left-options="{showBack: false}">申请记录</x-header>
+    <x-header :left-options="{showBack: false}">健康证查询</x-header>
     <scroll class='scroll-normal'
           :on-refresh="onRefresh"
           :noDataText='noDataText'
-          loadingLayerColor="red"
           ref="my_scroller">
       <div class="list">
-            <div slot="content">
-              <div class="item" v-for="item in list" :key="item.Id" @click="view(item)">
-
-                <div class="left-ctx"
-                  v-bind:class="{ 'warning': item.PhAStatus==2, 'danger': (item.PhAStatus==1 || item.IsDelete == 1), 'success': item.PhAStatus==3 }">
-                  {{item.IsDelete == 1 ? "已取消" : ["", "已拒绝", "待审核", "已预约"][item.PhAStatus]}}
-                </div>
-
-                <div class="right-ctx">
-                  <h4>{{item.PhADate.split(" ")[0]}}&nbsp;{{["全天", "上午", "下午"][item.PPNType]}}</h4>
-                  <p>{{item.PhADOrName}}</p>
-                </div>
-              </div>
+         <div class="item"  v-for="item in list" :key="item.PCCardNumber" @click="view(item)">
+            <div class="right-ctx" v-bind:style="{ 'border-color': item.color }">
+              <h3>{{item.PCName}}</h3>
+              <p>证件编号：{{item.PCCardNumber}}</p>
+              <p>有效期限：{{item.PCDateStart|formatdate}}&nbsp;~&nbsp;{{item.PCDateEnd|formatdate}}</p>
             </div>
-         
+          </div>
       </div>
-      <div v-if='nodata' class="nodata">
+      <div v-if='nodata' class="nodata" @click="goAppoinment">
         <img src="../../assets/nodata.png" alt="无数据">
-        亲，您目前还没有任何预约记录哦!
+        亲，您目前还未领到健康证哦！！！
       </div>
 
     </scroll>
@@ -33,91 +24,85 @@
 </template>
 
 <script>
-import { XHeader, PopupHeader, Popup,Checklist } from "vux";
+import { XHeader, Swipeout, SwipeoutItem, SwipeoutButton, PopupHeader, Popup,Checklist } from "vux";
 // import vscroll from "../../components/vscroll";
 import { _personServices } from "../../service/personServices";
 import scroll from '../../components/scroll';
+import { formatDate } from '../../utils/formatDate';
 export default {
-  name: "personappointment-list-person",
+  name: "health-list-person",
   components: {
     XHeader,
     scroll,
+    Swipeout,
+    SwipeoutItem,
+    SwipeoutButton,
     PopupHeader, Popup,Checklist
   },
   created() {
-    console.log("创建成功");
+    // console.log("创建成功");
     this.loadData();
+  
+    
+  },
+  filters: {
+    formatdate(time){
+      let date = new Date(time);
+      return formatDate(date, "yyyy-MM-dd")
+    }
   },
   data() {
     return {
       list: [],
-      maxPageIndex: 1,
       isLoading: false,
       nodata: false,
       noDataText: '',
-      loadmore: true,
-      page: 0,
-      size: 10,
-      
     };
   },
   methods: {
     view(item) {
-      console.log(item);
-      this.$store.commit("updateAppointment", item);
+      this.$store.commit("updateHealthyCard", item);
       this.$router.push({
-        name: "appointment-view-person"
+        name: "health-view-person",
       });
     },
 
     onRefresh(done) {
       this.page = 1;
       this.list = [];
-      this.loadmore = true;
       this.loadData();
       setTimeout(() => {
         done(); //必须有
       }, 1500)
       // 刷新
     },
+
     loadData() {
       // this.maxPageIndex = pageindex;
       let that = this;
       this.isLoading = true;
-      _personServices._getinfo().then(data => {
+      _personServices._getphysicalcard().then(data => {
         if (data.ResultType == 0) {
-          if(data.AppendData.appointment.length !== 0){
-            // that.appendToList(data.AppendData);
-            console.log(data.AppendData);
-            that.list = data.AppendData.appointment;
+          console.log(data);
+          if(data.AppendData.length !== 0){
+            that.list = data.AppendData;
+            this.list.forEach((item, index, arr) => {
+              let number = new Date(item.PCDateEnd).getTime() - new Date();
+              if (number < 0) this.list[index].color = "gray";
+              else this.list[index].color = "#3c9";
+
+            });
+            
             that.nodata = false;
             that.isLoading = false;
             that.noDataText = '---- 我是底线 ----';
             // console.log(data.AppendData);
           }else{
-            that.loadmore = false;
             that.nodata = true
             that.noDataText = "";
           }
         }
       }).catch(err => console.log(err));
-    },
-
-    appendToList(AppendData) {
-      let that = this;
-      AppendData.forEach(item => {
-        that.list.push({
-          Id: item.PhAID,
-          time: item.PhADate + " " + ["全天", "上午", "下午"][item.PPNType],
-          number: item.PhCount,
-          status: item.CancelNumber==item.PhCount? "已取消" :["", "未通过", "待审核", "已通过"][item.PhAStatus],
-          originalData: item,
-          PhAStatus: item.PhAStatus,
-          ActualPPNID: item.ActualPPNID,
-          PPNID: item.PPNID,
-          CancelNumber: item.CancelNumber
-        });
-      });
     },
     goAppoinment(){
       this.$router.push({name: 'staff-information-list'});
@@ -127,7 +112,7 @@ export default {
 </script>
 
 <style lang="less">
-.myapp {
+body[data-path=health-list-person] {
   .nodata{
     text-align: center;
     color: #3c9;
@@ -168,6 +153,8 @@ export default {
       }
     }
     .right-ctx {
+        border-left: 1px solid #3c9;
+        padding-left: 1em;
     }
   }
 }

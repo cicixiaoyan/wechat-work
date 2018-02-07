@@ -105,20 +105,36 @@ export default {
 
           _userServices._getUserMsg().then(function(data1){
             that.showload = false;
-             //已审核通过 转到 人员信息页面
-            if(data1.ULAudtiStatus == 3){
-              that.$router.replace({name: 'staff-information-list'});
-            }
-            else if(data1.ULAudtiStatus == 1 || data1.ULAudtiStatus == 2){
-              if(data1.ULAudtiStatus == 1){
-                that.$router.replace({name: 'submit-information-view', params: { 'read': false }});
-              }else{
-                that.$router.replace({name: 'submit-information-view', params: { 'read': true }});
-              }
 
-            }
-            else{
-              that.$router.replace({name: 'submit-information-add'});
+            if (data1.ULType == 3){// 个人
+              window.localStorage.setItem('IsPerson', true);
+              if (data1.ULStatus == 1){ // 未提交个人资料
+                that.$router.replace({name: 'appointment-list-person'});
+              }else{
+                that.$router.replace({name: 'submit-information-add-person'});
+              }
+              
+              that.$store.commit("updateIsPerson", true);
+              
+            }else if(data1.ULType == 2){// 企业
+              window.localStorage.setItem('IsPerson', false);
+              //已审核通过 转到 人员信息页面
+              if(data1.ULAudtiStatus == 3){
+                that.$router.replace({name: 'staff-information-list'});
+              }
+              else if(data1.ULAudtiStatus == 1 || data1.ULAudtiStatus == 2){
+                if(data1.ULAudtiStatus == 1){
+                  that.$router.replace({name: 'submit-information-view', params: { 'read': false }});
+                }else{
+                  that.$router.replace({name: 'submit-information-view', params: { 'read': true }});
+                }
+
+              }  
+              else{              
+                that.$router.replace({name: 'submit-information-add'});
+              }
+              
+              that.$store.commit("updateIsPerson", false);
             }
 
 

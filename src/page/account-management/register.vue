@@ -88,7 +88,7 @@ export default {
   },
   methods: {
     consoleIndex () {
-      console.log('click demo01', this.demo01)
+      // console.log('click registerType', this.registerType)
     },
     judgePhone(){
       if(/^((13[0-9])|(14[5|7])|(15([0-9]))|(17([0-9]))|(18[0-9]))\d{8}$/.test(this.username)){
@@ -107,30 +107,58 @@ export default {
     register () {
     //点击注册
       let that = this;
-      _userServices._userRegister(
-        {username:this.username,pwd:this.pwd,tel:this.username,code:this.code,msg_id:this.msg_id}
-        )
-      .then(function(data){
-          //注册返回值  //注册成功到登录 失败提示 Message
-          // {
-          //   "ResultType": 1,
-          //   "Message": "验证码无效",
-          //   "LogMessage": "",
-          //   "AppendData": null
-          // }
-        if(data.ResultType == 0){
-          that.$vux.toast.show({
-            text: "注册成功",
-            type: 'success',
-            position: 'middle',
-            time: 2000
-          });
-          that.$router.push({name: "login"});
-        }
-      }).catch(function(err){
-        console.log(err);
+      if (this.registerType == 1){
 
-      });
+        _userServices._userRegister(
+          {username:this.username,pwd:this.pwd,tel:this.username,code:this.code,msg_id:this.msg_id}
+          )
+        .then(function(data){
+            //注册返回值  //注册成功到登录 失败提示 Message
+            // {
+            //   "ResultType": 1,
+            //   "Message": "验证码无效",
+            //   "LogMessage": "",
+            //   "AppendData": null
+            // }
+          if(data.ResultType == 0){
+            that.$vux.toast.show({
+              text: "注册成功",
+              type: 'success',
+              position: 'middle',
+              time: 2000
+            });
+            that.$router.push({name: "login"});
+          }
+        }).catch(function(err){
+          console.log(err);
+  
+        });
+      }else{
+        _userServices._userRegisterPerson(
+          {username:this.username,pwd:this.pwd,tel:this.username,code:this.code,msg_id:this.msg_id}
+          )
+        .then(function(data){
+            //注册返回值  //注册成功到登录 失败提示 Message
+            // {
+            //   "ResultType": 1,
+            //   "Message": "验证码无效",
+            //   "LogMessage": "",
+            //   "AppendData": null
+            // }
+          if(data.ResultType == 0){
+            that.$vux.toast.show({
+              text: "注册成功",
+              type: 'success',
+              position: 'middle',
+              time: 2000
+            });
+            that.$router.push({name: "login"});
+          }
+        }).catch(function(err){
+          console.log(err);
+  
+        });
+      }
       // this.$router.push({path: '/app/submit-information/add'});
     },
     getCheckCode () {

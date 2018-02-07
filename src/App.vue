@@ -1,7 +1,8 @@
 <template>
   <div id="app" class="app">
     <router-view :class="{'has-bottom-tabbar':!showTabbar}" class="router-view"></router-view>
-    <tabbar  v-show="showTabbar"  slot="bottom" style="position:fixed;">
+
+    <tabbar  v-if="showTabbar && !person"  slot="bottom" style="position:fixed;">
       <tabbar-item :selected='$route.name=="staff-information-list"' :link="{name: 'staff-information-list', replace: true }">
         <span slot="icon" class="iconfont icon-tijianyuyue1"></span>
         <span slot="label">体检预约</span>
@@ -9,6 +10,21 @@
       <tabbar-item :selected='$route.name=="appointment-list"' :link="{name: 'appointment-list', replace: true }">
         <span slot="icon" class="iconfont icon-shenhejilu"></span>
         <span slot="label" link="../page/appointment/add">预约记录</span>
+      </tabbar-item>
+      <tabbar-item :selected='$route.name=="personal-center"' :link="{name: 'personal-center', replace: true }">
+        <span slot="icon" class="iconfont icon-gerenxinxi"></span>
+        <span slot="label" >个人中心</span>
+      </tabbar-item>
+    </tabbar>
+
+    <tabbar  v-if="showTabbar && person"  slot="bottom" style="position:fixed;">
+      <tabbar-item :selected='$route.name=="appointment-list-person"' :link="{name: 'appointment-list-person', replace: true }">
+        <span slot="icon" class="iconfont icon-tijianyuyue1"></span>
+        <span slot="label">预约记录</span>
+      </tabbar-item>
+      <tabbar-item :selected='$route.name=="health-list-person"' :link="{name: 'health-list-person', replace: true }">
+        <span slot="icon" class="iconfont icon-shenhejilu"></span>
+        <span slot="label" link="../page/appointment/add">健康证查询</span>
       </tabbar-item>
       <tabbar-item :selected='$route.name=="personal-center"' :link="{name: 'personal-center', replace: true }">
         <span slot="icon" class="iconfont icon-gerenxinxi"></span>
@@ -35,6 +51,17 @@ export default {
     showTabbar () {
       return /tabbar/.test(this.$route.path);
     },
+    person() {
+      if (/-person/.test(this.$route.path)){
+        return true;
+      }else{
+        console.log(window.localStorage.getItem('IsPerson'), typeof window.localStorage.getItem('IsPerson'));
+        let bol = window.localStorage.getItem('IsPerson') == "true" ? true : false;
+        return bol;
+      }
+      
+      // return /-person/.test(this.$route.path)
+    }
   },
   watch: {
     // path (path) {

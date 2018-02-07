@@ -4,7 +4,7 @@
     <scroll class="scroll-normal" :on-refresh="onRefresh" refreshLayerColor='#fff' loadingLayerColor='#fff'>
     <div class="add-form">
       <group>
-        <div v-show="showOptional">
+        <div>
           <x-input title="姓名&emsp;&emsp;" :max="10" placeholder="姓名" v-model="item.uname"></x-input>
           <div v-if="item.uname>10" class="valid-err">最多输入10位</div>
           <x-input title="身份证号" @on-change="getIdcValid" :max="18" :min="15" placeholder="身份证号" v-model="item.ucardid"></x-input>
@@ -17,7 +17,7 @@
 
 
       <button @click='submit' :disabled="item.uoname == '' || item.ubusinesstype == '' || item.businessnumber == '' ||
-            item.areid == '' || cardidimg.length == 0 || licenceimg.length == 0 || !idcValid || !telValid || item.ubusinessaddress==''"
+            item.areid == ''  ||  !idcValid || !telValid || item.ubusinessaddress==''"
       class="round-big-btn">提交审核</button>
       <div v-transfer-dom>
         <loading :show="showload" text="提交资料中"></loading>
@@ -37,6 +37,8 @@ import uploadImg from '../../components/uploadImg';
 import {employmentServices} from '../../service/EmploymentRegister';
 import {IdentityCodeValid} from '../../utils/idc-valid';
 import {_personServices} from '../../service/personServices';
+import {_userServices} from '../../service/userServices';
+
 export default {
   name: "submit-information-add-person",
   directives: {
@@ -75,11 +77,11 @@ export default {
   },
   methods: {
     submit() {
+      // console.log(this.item);
       this.showload = true;
       let that = this;
-      that.item._personServices = that.$refs['ubusinesstype'].getFullValue()[0].Name;
-      employmentServices
-        ._editorganizeinfo(this.item)
+      _personServices
+        ._updateuserinfo(this.item)
         .then(function(data) {
           that.showload = false;
           if (data.ResultType == 0) {
@@ -88,7 +90,7 @@ export default {
               type: 'success',
               position: 'middle'
             });
-            that.$router.replace({ name: "submit-information-view", params: {read: 'true'}});
+            that.$router.replace({ name: "appointment-list-person"});
           }
         })
         .catch(function(err) {
@@ -123,20 +125,14 @@ export default {
       this.showload = false;
       let that = this;
       _userServices._getUserMsg().then(function(data1){
-        if(data1.ULAudtiStatus == 1){
-          if(that.read) that.$router.replace({name: 'submit-information-view', params: { 'read': false }});
-        }else if(data1.ULAudtiStatus == 2){
-          if(!that.read)  that.$router.replace({name: 'submit-information-view', params: { 'read': true }});
+        if(data1.ULAudtiStatus == 0){
+          if(that.read) that.$router.replace({name: 'submit-information-add-person'});
         }else if(data1.ULAudtiStatus == 3){
-          that.$router.replace({name: 'staff-information-list'});
+          that.$router.replace({name: 'appointment-list-person'});
         }
       }).catch(function(err){
         console.log(err)
       });
-
-      this.getareas();
-      this.gettbsysbasicdatabycode();
-
     }
   }
 };
