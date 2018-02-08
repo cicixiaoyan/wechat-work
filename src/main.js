@@ -52,17 +52,17 @@ methods.forEach(key => {
 })
 
 router.beforeEach(function(to, from, next) {
-    // var ua = window.navigator.userAgent.toLowerCase(); 
-    // /* 
-    // ** 判断是否在微信中
-    // */
-    // if (ua.match(/MicroMessenger/i) == 'micromessenger') { 
-    //   // 在微信中
-    // } else {     
-    //   // 不在微信中
-    //   if(to.name != 'redirect')  next({path: '/app/redirect'});
-    //   else next();
-    // }
+    var ua = window.navigator.userAgent.toLowerCase();
+    /* 
+     ** 判断是否在微信中
+     */
+    if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+        // 在微信中
+    } else {
+        // 不在微信中
+        if (to.name != 'redirect') next({ path: '/app/redirect' });
+        else next();
+    }
 
     /* 
      ** 清除location.search   '?areId=7'

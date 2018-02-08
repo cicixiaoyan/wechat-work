@@ -20,11 +20,14 @@
       </div>
 
     </scroll>
+    <div v-transfer-dom>
+      <loading :show="isLoading" text="加载中"></loading>
+    </div>
   </div>
 </template>
 
 <script>
-import { XHeader, Swipeout, SwipeoutItem, SwipeoutButton, PopupHeader, Popup,Checklist } from "vux";
+import { XHeader, Swipeout, SwipeoutItem, SwipeoutButton, PopupHeader, Popup,Checklist, Loading, TransferDomDirective as TransferDom } from "vux";
 // import vscroll from "../../components/vscroll";
 import { _personServices } from "../../service/personServices";
 import scroll from '../../components/scroll';
@@ -37,7 +40,11 @@ export default {
     Swipeout,
     SwipeoutItem,
     SwipeoutButton,
+    Loading,
     PopupHeader, Popup,Checklist
+  },
+  directives: {
+    TransferDom
   },
   created() {
     // console.log("创建成功");
@@ -98,11 +105,14 @@ export default {
             that.noDataText = '---- 我是底线 ----';
             // console.log(data.AppendData);
           }else{
+            that.isLoading = false;
             that.nodata = true
             that.noDataText = "";
           }
         }
-      }).catch(err => console.log(err));
+      }).catch(err => {
+        console.log(err); that.isLoading = false;
+      });
     },
     goAppoinment(){
       this.$router.push({name: 'staff-information-list'});

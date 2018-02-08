@@ -158,7 +158,12 @@ body {
   .weui-tabbar__item{
     .px2rem(height, 100);
     .px2px(min-height, 88);
+    padding: 2px 0 2px;
     // .px2rem(line-height, 48);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   .weui-tabbar__icon .iconfont{
@@ -167,7 +172,7 @@ body {
   }
 
   .weui-tabbar__label > span{
-    .px2px(font-size, 24);
+    .px2px(font-size, 26);
     // .px2rem(line-height, 37);
   }
 

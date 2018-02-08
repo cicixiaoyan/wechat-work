@@ -29,11 +29,14 @@
       </div>
 
     </scroll>
+    <div v-transfer-dom>
+      <loading :show="isLoading" text="加载中"></loading>
+    </div>
   </div>
 </template>
 
 <script>
-import { XHeader, PopupHeader, Popup,Checklist } from "vux";
+import { XHeader, PopupHeader, Popup, Checklist, Loading, TransferDomDirective as TransferDom } from "vux";
 // import vscroll from "../../components/vscroll";
 import { _personServices } from "../../service/personServices";
 import scroll from '../../components/scroll';
@@ -41,8 +44,11 @@ export default {
   name: "personappointment-list-person",
   components: {
     XHeader,
-    scroll,
+    scroll, Loading,
     PopupHeader, Popup,Checklist
+  },
+  directives: {
+    TransferDom
   },
   created() {
     console.log("创建成功");
@@ -95,12 +101,15 @@ export default {
             that.noDataText = '---- 我是底线 ----';
             // console.log(data.AppendData);
           }else{
+            that.isLoading = false;
             that.loadmore = false;
             that.nodata = true
             that.noDataText = "";
           }
         }
-      }).catch(err => console.log(err));
+      }).catch(err => {
+        console.log(err); that.isLoading = false;
+      });
     },
 
     appendToList(AppendData) {

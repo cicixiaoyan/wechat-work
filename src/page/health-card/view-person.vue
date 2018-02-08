@@ -22,7 +22,10 @@
                 <div class="flex-none">有效期限：</div>
                 <div class="flex-1 canvas-box">
                   {{item.PCDateStart|formatdate}}至<br>{{item.PCDateEnd|formatdate}}
-                  <div class="canvas"><canvas id="seal" width="100" height="100"></canvas></div>
+                  <!-- <div class="canvas"><canvas id="seal" width="100" height="100"></canvas></div> -->
+                  <div class="canvas">
+                    <img v-bind:src="sealImg"  />
+                  </div>
                 </div>
               </div>
               <div class="card-number">编号：{{item.PCCardNumber}}</div>
@@ -33,15 +36,24 @@
           </div>
           <div>发证机构：{{item.orseal}}</div>
           <div style="padding-left:1.5em;">
-            <VueBarcode  tag="svg" :options="{width: 2, height: 32.5, fontSize: 14, margin: 0}" :value="item.IdentityNumber"></VueBarcode>
+            <VueBarcode style="width:5rem;"  tag="img" :options="{height: 33, margin: 0, displayValue: false}" :value="item.IdentityNumber"></VueBarcode>
           </div>
+          <div class="identity-number" >{{item.IdentityNumber}}</div>
+
         </div>
         <div class="bottom row">
           <div class="col-25"></div>
           <div class="flex-1"></div>
         </div>
       </div>
+
+      <div style="display:none">
+        <canvas id="seal" width="250" height="250"></canvas>
+      </div>
+     
     </div>
+
+
 
     <!-- <div></div> -->
     <!-- <div class="photo" v-if="item.PcPicUrl">
@@ -86,11 +98,12 @@ export default {
   mounted:function(){
     console.log("体检专用章1");
     // createSeal("seal", "郫县德源镇卫生院", "体检专用章"); 
-    createSeal("seal", this.item.orseal, "体检专用章"); 
+    this.sealImg = createSeal("seal", this.item.orseal, "体检专用章"); 
 
   },
   data() {
     return {
+      sealImg: '',
       item: {
         "PCName": "",
         "PCSex": "",
@@ -124,7 +137,7 @@ body[data-path=health-view-person] {
       // margin-bottom: -50%;
       width: 100%;
       > .top{
-        background: #2b25a2;
+        background: #1d2088;
         color: #fff;
         font-family: 'SimHei', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         font-size: .5rem;
@@ -140,6 +153,7 @@ body[data-path=health-view-person] {
       > .contents{
         font-family: 'SimSun', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         font-size: .4rem;
+        font-weight: bold;
         line-height: 150%;
         padding-left: 1em;
         padding-right: .5em;
@@ -165,9 +179,13 @@ body[data-path=health-view-person] {
           position: relative;
           .canvas{
             position: absolute;
-            right: 0;
-            bottom: -4.5em;
+            left: 6.5em;
+            bottom: -4.2em;
             z-index: 1;
+            > img{
+              width:2.5rem;
+              height:2.5rem;
+            }
             // background: transparent;
           }
         }
@@ -188,14 +206,30 @@ body[data-path=health-view-person] {
           flex: none;
         }
         .col-25 {
-          flex: 0 0 25%;
+          flex: 0 0 5.5em;
         }
+      }
+
+      .identity-number{
+        padding-left:5em;
+        line-height: 1em;
+        font-size: .4rem;
+        font-weight: bold;
+        margin-top: -.4em;
       }
   
       > .bottom{
-        padding: 5px;
-        background: #2b25a2;
         border-radius: 0 0 12px 12px;
+        .col-25{
+          height: 1em;
+          background: #f08300;
+          border-bottom-left-radius: 12px;
+        }
+        .flex-1{
+          background: #1d2088;
+          border-bottom-right-radius: 12px;
+        }
+
       }
     }
   }
