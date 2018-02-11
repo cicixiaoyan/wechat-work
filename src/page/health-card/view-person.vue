@@ -7,34 +7,34 @@
         <div class="contents">
           <div class="row">
             <div class="left canvas-box">
-              <div>姓名：{{item.PCName}}</div>
+              <div>姓名：{{item.PcName}}</div>
               <div class="row">
                 <div class="flex-1">
-                  <div>性别：{{item.PCSex}}</div>                  
+                  <div>性别：{{item.PcSex}}</div>                  
                 </div>
                 <div class="flex-1">
-                  <div>年龄：{{item.PCAge}}</div>
+                  <div>年龄：{{item.PcAge}}</div>
                 </div>
               </div>
               <div class="row">
                 <div class="flex-none">有效期限：</div>
                 <div class="flex-1 ">
-                  至{{item.PCDateEnd|formatdate}}
+                  至{{item.PcDateEnd|formatdate}}
                 </div>
               </div>
-              <div class="card-number">编号：{{item.PCCardNumber}}</div>
-              <div  class="card-number">发证机构：{{item.orseal}}</div>
+              <div class="card-number">编号：{{item.PcCardNumber}}</div>
+              <div  class="card-number">发证机构：{{item.OrName}}</div>
               <div class="canvas">
                 <img v-bind:src="sealImg"  />
               </div>
             </div>
             <div class="right">
-              <img v-bind:src="item.PCPicUrl">
+              <img v-bind:src="item.PcPicUrl">
             </div>
           </div>
           
           <div  class="card-number">
-            <VueBarcode style="width:5.1rem;"  tag="img" :options="{height: 30, margin: 0, displayValue: false, background:'transparent'}" :value="item.IdentityNumber"></VueBarcode>
+            <VueBarcode style="width:5.1rem;"  tag="img" :options="{height: 30, margin: 0, displayValue: false, background:'transparent'}" :value="PcCardId"></VueBarcode>
           </div>
           <!-- <div class="identity-number" style="margin-bottom:.1em">{{item.IdentityNumber}}</div> -->
 
@@ -58,6 +58,7 @@
 import { XHeader,Group, Cell, } from "vux";
 import { formatDate } from '../../utils/formatDate';
 import { createSeal } from '../../utils/createSeal';
+import { _personServices } from '../../service/personServices';
 import VueBarcode from '@xkeshi/vue-barcode';
 export default {
   name: "health-view-person",
@@ -71,28 +72,41 @@ export default {
     }
   },
   created() {
-    this.item =  this.$store.getters.getHealthyCard;
+    let item =  this.$store.getters.getHealthyCard, 
+        that = this;
+    _personServices._setcardid(item.PCCardId).then(data => {
+      this.PcCardId = data;
+      _personServices._selectcardid({'key': this.$store.getters.getCardKey, cardid: data}).then(resJson => {
+        if (resJson.ResultType == 0) {
+          this.item = resJson.AppendData;
+          this.sealImg = createSeal("seal", this.item.OrSeal, "体检专用章"); 
+        }else{
+          
+        }
+      });
+    });
 
     // this.component('barcode', VueBarcode);
   },
   mounted:function(){
     console.log("体检专用章1");
     // createSeal("seal", "郫县德源镇卫生院", "体检专用章"); 
-    this.sealImg = createSeal("seal", '成都市' + this.item.orseal, "体检专用章"); 
+    // this.sealImg = createSeal("seal", this.item.OrSeal, "体检专用章"); 
 
   },
   data() {
     return {
       sealImg: '',
       item: {
-        "PCName": "",
-        "PCSex": "",
-        "PCAge": "",
-        "PCCardId": "",
-        "PCCardNumber": "",
-        "PCDateStart": "",
-        "PCDateEnd": "",
-      }
+        "PcName": "",
+        "PcSex": "",
+        "PcAge": "",
+        "PcCardId": "",
+        "PcCardNumber": "",
+        "PcDateStart": "",
+        "PcDateEnd": "",
+      },
+      PcCardId: ''
     };
   },
   methods: {

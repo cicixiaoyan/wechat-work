@@ -18,11 +18,13 @@ const store = new Vuex.Store({
         direction: 'forward',
         demoScrollTop: 0,
         parmaCommon: 'h27EdZlBIm9R1ysOrDo1boC2KLlyuCRKNC8E7nO%2bcIo%3d',
+
         // parmaCommon: 'h27EdZlBIm9R1ysOrDo1boC2KLlyuCRKNC8E7nO+cIo='
 
         healthyCard: {},
         appointment: {},
-        isPerson: false
+        isPerson: false,
+        cardKey: encodeURIComponent('h27EdZlBIm9R1ysOrDo1boC2KLlyuCRKNC8E7nO+cIo=')
     },
     actions: {
         isLogin({ commit }) {
@@ -121,7 +123,10 @@ const store = new Vuex.Store({
         },
         getAppointment(state) {
             return state.appointment;
-        }
+        },
+        getCardKey(state) {
+            return state.cardKey;
+        },
     }
 })
 

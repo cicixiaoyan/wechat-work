@@ -10,7 +10,9 @@
             <div class="right-ctx" v-bind:style="{ 'border-color': item.color }">
               <h3>{{item.PCName}}</h3>
               <p>证件编号：{{item.PCCardNumber}}</p>
-              <p>有效期限：{{item.PCDateStart|formatdate}}&nbsp;~&nbsp;{{item.PCDateEnd|formatdate}}</p>
+              <p>有效期限：{{item.PCDateStart|formatdate}}&nbsp;~&nbsp;{{item.PCDateEnd|formatdate}}
+                <span v-if="item.color == 'gray'">[已过期]</span>
+              </p>
             </div>
           </div>
       </div>
@@ -94,7 +96,7 @@ export default {
           if(data.AppendData.length !== 0){
             that.list = data.AppendData;
             this.list.forEach((item, index, arr) => {
-              let number = new Date(item.PCDateEnd.replace(/-/g, '/')).getTime() - new Date();
+              let number = new Date(item.PCDateEnd.replace(/-/g, '/')).getTime() - new Date().getTime() - 60 * 60 * 24;
               if (number < 0) this.list[index].color = "gray";
               else this.list[index].color = "#3c9";
 
