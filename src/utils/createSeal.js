@@ -6,7 +6,7 @@ export function createSeal(id, company, name) {
     // 绘制印章边框   
     var width = canvas.width / 2;
     var height = canvas.height / 2;
-    context.lineWidth = 7;
+    context.lineWidth = 4;
     context.strokeStyle = "#f00";
     context.beginPath();
     context.arc(width, height, 110, 0, Math.PI * 2);
@@ -16,7 +16,7 @@ export function createSeal(id, company, name) {
     create5star(context, width, height, 30, "#f00", 0);
 
     // 绘制印章名称   
-    context.font = '2.2em Helvetica';
+    context.font = '2em Helvetica';
     context.textBaseline = 'middle'; //设置文本的垂直对齐方式
     context.textAlign = 'center'; //设置文本的水平对对齐方式
     context.lineWidth = 1;
