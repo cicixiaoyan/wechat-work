@@ -22,7 +22,9 @@ module.exports = {
         // 'generator-star-spacing': 0,
         // allow debugger during development
         // 'no-debugger': process.env.NODE_ENV === 'production' ? 4 : 0,
-        "semi": ["error", "always", { "omitLastInOneLineBlock": true }],
-        // "spaced-comment": 0
+        "semi": ["off", "never", { "beforeStatementContinuationChars": "any" }],
+        'indent': ['off', 4, { 'SwitchCase': 1 }],
+        'space-before-function-paren': ["off"]
+            // "spaced-comment": 0
     }
 }

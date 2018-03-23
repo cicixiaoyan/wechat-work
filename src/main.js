@@ -33,55 +33,55 @@ Vue.use(ConfigPlugin, {
 })
 
 // simple history management
-const history = window.sessionStorage
-history.clear()
-let historyCount = history.getItem('count') * 1 || 0
-history.setItem('/', 0)
-let isPush = false
-let endTime = Date.now()
-let methods = ['push', 'go', 'replace', 'forward', 'back']
+const history = window.sessionStorage;
+history.clear();
+let historyCount = history.getItem('count') * 1 || 0;
+history.setItem('/', 0);
+let isPush = false;
+let endTime = Date.now();
+let methods = ['push', 'go', 'replace', 'forward', 'back'];
 document.addEventListener('touchend', () => {
-    endTime = Date.now()
-})
+    endTime = Date.now();
+});
 methods.forEach(key => {
-    let method = router[key].bind(router)
+    let method = router[key].bind(router);
     router[key] = function(...args) {
-        isPush = true
-        method.apply(null, args)
+        isPush = true;
+        method.apply(null, args);
     }
-})
+});
 
 router.beforeEach(function(to, from, next) {
     let ua = window.navigator.userAgent.toLowerCase();
-    /* 
+    /*
      ** 判断是否在微信中
      */
-    if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-        // 在微信中
-    } else {
-        // 不在微信中
-        if (to.name != 'redirect') next({ path: '/app/redirect' });
-        else next();
-    }
+    // if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+    //     // 在微信中
+    // } else {
+    //     // 不在微信中
+    //     if (to.name != 'redirect') next({ path: '/app/redirect' });
+    //     else next();
+    // }
 
-    /* 
+    /*
      ** 清除location.search   '?areId=7'
      */
 
-    if (from.name == 'login' && !!window.localStorage.getItem('areId') && !!window.location.search) {
-        window.location.href = "/#" + to.fullPath;
+    if (from.name === 'login' && !!window.localStorage.getItem('areId') && !!window.location.search) {
+        window.location.href = '/#' + to.fullPath;
     }
 
-    store.commit('updateLoadingStatus', { isLoading: true })
+    store.commit('updateLoadingStatus', { isLoading: true });
 
-    /* 
+    /*
      ** 给每个页面添加pro,以便设置样式
      */
 
-    let body = document.getElementsByTagName("body")[0];
-    body.setAttribute("data-path", to.name);
+    let body = document.getElementsByTagName('body')[0];
+    body.setAttribute('data-path', to.name);
 
-    /* 
+    /*
      ** 清除浏览器判断
      */
 

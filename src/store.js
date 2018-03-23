@@ -24,7 +24,8 @@ const store = new Vuex.Store({
         healthyCard: {},
         appointment: {},
         isPerson: false,
-        cardKey: encodeURIComponent('h27EdZlBIm9R1ysOrDo1boC2KLlyuCRKNC8E7nO+cIo=')
+        cardKey: encodeURIComponent('h27EdZlBIm9R1ysOrDo1boC2KLlyuCRKNC8E7nO+cIo='),
+        submitItem: {}
     },
     actions: {
         isLogin({ commit }) {
@@ -94,6 +95,9 @@ const store = new Vuex.Store({
         },
         updateAppointment(state, obj) {
             state.appointment = obj;
+        },
+        updateSubmitItem(state, obj) {
+            state.submitItem = obj;
         }
     },
     getters: {
@@ -127,6 +131,9 @@ const store = new Vuex.Store({
         getCardKey(state) {
             return state.cardKey;
         },
+        getSubmitItem(state) {
+            return state.submitItem;
+        }
     }
 })
 

@@ -42,18 +42,25 @@ export default [{
                 require(['../page/account-management/forgetPassword'], resolve);
             }
         },
-        {
+        { // 注册
             path: '/app/register',
             name: 'register',
             component: function(resolve) {
                 require(['../page/account-management/register'], resolve);
             }
         },
-        { // 提交机构信息
+        { // 提交预约
             path: '/app/appointment/add/:phid',
             name: 'appointment-add',
             component: function(resolve) {
                 require(['../page/appointment/add'], resolve);
+            }
+        },
+        { // 提交预约--个人
+            path: '/app/appointment/add-person',
+            name: 'appointment-add-person',
+            component: function(resolve) {
+                require(['../page/appointment/add-person'], resolve);
             }
         },
         { // 提交个人资料
@@ -98,14 +105,14 @@ export default [{
                 require(['../page/health-card/view-person'], resolve);
             }
         },
-        {
+        { // 预约详情
             path: '/app/appointment/view/:id',
             name: 'appointment-view',
             component: function(resolve) {
                 require(['../page/appointment/view'], resolve);
             }
         },
-        {
+        { // 人员列表
             path: '/app/staff-information/view-list/:phaid/:showcancel',
             name: 'staff-information-view-list',
             component: function(resolve) {

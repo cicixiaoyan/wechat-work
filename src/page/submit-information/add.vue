@@ -13,12 +13,12 @@
         <x-input title="经营地址" required :max="200" placeholder="经营地址" v-model="item.ubusinessaddress"></x-input>
         <div class="photo-item" style="text-align:right;">
           <span>身份证正面照<br><span style="font-size:small;color:red;">(必须原件)</span></span>
-          <uploadImg id='cardidimg' name="cardidimg" @onChange="cardidimgChange" v-model="cardidimg" theme="light"></uploadImg>
+          <uploadImg id='cardidimg' name="cardidimg" :imgSrc="cardidimg" @onChange="cardidimgChange" v-model="cardidimg" theme="light"></uploadImg>
         </div>
         <div class="photo-item" style="text-align:right;">
           <span>营业执照<br><span style="font-size:small;color:red;">(必须原件)</span></span>
-          <uploadImg  @onChange='licenceimgChange' id='licenceimg' name="licenceimg" v-model="licenceimg" theme="light"></uploadImg><br/>
-          <uploadImg @onChange='licenceimgChange1' v-if='licenceimg.length!==0' id='licenceimg1' name="licenceimg1" v-model="licenceimg1" theme="light"></uploadImg>
+          <uploadImg  @onChange='licenceimgChange' id='licenceimg' :imgSrc="licenceimg" name="licenceimg" v-model="licenceimg" theme="light"></uploadImg><br/>
+          <uploadImg @onChange='licenceimgChange1' v-if='licenceimg.length!==0' :imgSrc="licenceimg1" id='licenceimg1' name="licenceimg1" v-model="licenceimg1" theme="light"></uploadImg>
         </div>
       </group>
 
@@ -39,8 +39,8 @@
           <x-input title="附加说明" :max="200" placeholder="说明" v-model="item.uremark"></x-input>
           <div class="photo-item" style="text-align:right;">
             <span>卫生许可<br><span style="font-size:small;;color:red;">(必须原件)</span></span>
-            <uploadImg  @onChange='permitimgChange' id='permitimg' name="permitimg" v-model="permitimg" theme="light"></uploadImg><br>
-            <uploadImg @onChange='permitimgChange1' v-if='permitimg.length != 0' id='permitimg1' name="permitimg1" v-model="permitimg1" theme="light"></uploadImg>
+            <uploadImg  @onChange='permitimgChange' id='permitimg' :imgSrc="permitimg" name="permitimg" v-model="permitimg" theme="light"></uploadImg><br>
+            <uploadImg @onChange='permitimgChange1' v-if='permitimg.length != 0' :imgSrc="permitimg1" id='permitimg1' name="permitimg1" v-model="permitimg1" theme="light"></uploadImg>
           </div>
         </div>
       </group>
@@ -124,22 +124,23 @@ export default {
         description:'',
         showload: false
       },
-      cardidimg:[],
-      licenceimg:[],
-      licenceimg1:[],
-      permitimg:[],
-      permitimg1:[],
+      cardidimg:'',
+      licenceimg:'',
+      licenceimg1:'',
+      permitimg:'',
+      permitimg1:'',
       showOptional: false,
       showArea: false,
       tbsysbasicdatabycode: [],
       objectListValue: [],
+      objectListValue1: [],
       objectList: [],
       idcValid: true,
       telValid: true,
       haschidren: false,
-      objectListValue1: [],
       objectList1: [],
-      areid:''
+      areid:'',
+      isSubmit: false
       // gettbsysbasicdatabycode: []
     };
   },
@@ -153,6 +154,7 @@ export default {
       this.showload = true;
       let that = this;
       that.item.ubusinesstypename = that.$refs['ubusinesstype'].getFullValue()[0].Name;
+      console.log(this.item);
       employmentServices
         ._editorganizeinfo(this.item)
         .then(function(data) {
@@ -163,11 +165,13 @@ export default {
               type: 'success',
               position: 'middle'
             });
+            that.isSubmit = true;
             that.$router.replace({ name: "submit-information-view", params: {read: 'true'}});
           }
         })
         .catch(function(err) {
           that.showload = false;
+          this.isSubmit = false;
           console.log(err, "err");
         });
     },
@@ -319,9 +323,31 @@ export default {
         console.log(err)
       });
 
+      if (this.$store.getters.getSubmitItem){
+        
+        this.item = this.$store.getters.getSubmitItem;
+        this.cardidimg = !!this.item.cardidimg?decodeURIComponent(this.item.cardidimg):'';
+        this.licenceimg = !!this.item.licenceimg?decodeURIComponent(this.item.licenceimg):'';
+        console.log(this.cardidimg, this.licenceimg);
+        this.licenceimg1 = !!this.item.licenceimg1?decodeURIComponent(this.item.licenceimg1):'';
+        this.permitimg = !!this.item.permitimg?decodeURIComponent(this.item.permitimg):'';
+        this.permitimg1 = !!this.item.permitimg1?decodeURIComponent(this.item.permitimg1):'';
+        if(this.areid != ''){
+          this.objectListValue[0] = this.item.areid;
+          this.objectListValue[1] = this.item.arename;
+        }
+        console.log(this.item);
+      }
+
       this.getareas();
       this.gettbsysbasicdatabycode();
 
+    }
+  },
+  beforeDestroy(){
+    if (!this.isSubmit){
+
+      this.$store.commit('updateSubmitItem', this.item);
     }
   }
 };

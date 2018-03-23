@@ -35,7 +35,7 @@
           </span>
         </div>
         <div v-show="showOptional">
-          <x-input title="法人&emsp;&emsp;" :readonly='read':max="10" placeholder="法人" v-model="item.ulowman"></x-input>
+          <x-input title="法人&emsp;&emsp;" :readonly='read' :max="10" placeholder="法人" v-model="item.ulowman"></x-input>
           <x-input title="身份证号" @on-change="getIdcValid" :readonly='read' :max="18" :min="15" placeholder="身份证号" v-model="item.ucardid"></x-input>
           <div v-if="!idcValid" class="valid-err">请输入合法的身份证号码</div>
           <x-input title="联系电话" @on-change="getTelValid" :readonly='read' is-type="china-mobile" :max="11" :min="11" placeholder="手机号" v-model="item.utel"></x-input>

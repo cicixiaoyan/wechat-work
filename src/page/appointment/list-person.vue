@@ -1,6 +1,6 @@
 <template >
   <div class="myapp">
-    <x-header :left-options="{showBack: false}">申请记录</x-header>
+    <x-header :left-options="{showBack: false}" >申请记录<a slot="right" v-if='!appointmenting' @click='appointment'>预约</a></x-header>
     <scroll class='scroll-normal'
           :on-refresh="onRefresh"
           :noDataText='noDataText'
@@ -64,6 +64,7 @@ export default {
       loadmore: true,
       page: 0,
       size: 10,
+      appointmenting: false
       
     };
   },
@@ -130,6 +131,9 @@ export default {
     },
     goAppoinment(){
       this.$router.push({name: 'staff-information-list'});
+    },
+    appointment(){
+      this.$router.push({name: 'appointment-add-person'});
     }
   }
 };
